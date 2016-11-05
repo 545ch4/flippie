@@ -13,10 +13,8 @@ flippie_t flippie_dev;
 Flippie flippie;
 
 const char* host = "flippie";
-//const char* ssid = "network";
-//const char* password = "forensicgenetics";
-const char* ssid = "wlan";
-const char* password = "oskarheleneheim";
+const char* ssid = "WIFI";
+const char* password = "***********";
 
 ESP8266WebServer server(80);
 MDNSResponder mdns;
