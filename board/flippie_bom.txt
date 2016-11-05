@@ -1,0 +1,31 @@
+Stückliste exportiert aus /Users/sascha/Dropbox/flippie/rev7/flippie.sch am 05.11.16 12:07
+
+Part Value        Device          Package              Description                                                      
+C1   100u         CPOL-EUC        PANASONIC_C          POLARIZED CAPACITOR, European symbol                             
+C2   22u          CPOL-EUB        PANASONIC_B          POLARIZED CAPACITOR, European symbol                             
+J1   INT_3V3      M021X02_NO_SILK 1X02_NO_SILK         Standard 2-pin 0.1" header. Use with                             
+LED1 A            LEDSMT1206      1206                 LED                                                              
+LED2 B            LEDSMT1206      1206                 LED                                                              
+MCU1 WEMOS        WEMOS           WEMOS                                                                                 
+R1   680K         R-EU_R1206      R1206                RESISTOR, European symbol                                        
+R2   100K         R-EU_R1206      R1206                RESISTOR, European symbol                                        
+R3   10K          R-EU_R1206      R1206                RESISTOR, European symbol                                        
+R4   150          R-EU_R1206      R1206                RESISTOR, European symbol                                        
+R5   10K          R-EU_R1206      R1206                RESISTOR, European symbol                                        
+R6   150          R-EU_R1206      R1206                RESISTOR, European symbol                                        
+U1   FPF2702MX    FPF2700         SOIC127P600X175-8N   AccuPower 0.4~2 A Adjustable Over-Current Protection Load Switch 
+U2   SN74AHC595D  SN74AHC595D     SOIC127P600X175-16N  8 bit Shift registers                                            
+U3   SN74AHC595D  SN74AHC595D     SOIC127P600X175-16N  8 bit Shift registers                                            
+U4   SN74AHC595D  SN74AHC595D     SOIC127P600X175-16N  8 bit Shift registers                                            
+U5   SN74AHC595D  SN74AHC595D     SOIC127P600X175-16N  8 bit Shift registers                                            
+U6   SN74AHC595D  SN74AHC595D     SOIC127P600X175-16N  8 bit Shift registers                                            
+U7   SN74AHC595D  SN74AHC595D     SOIC127P600X175-16N  8 bit Shift registers                                            
+U8   SN74AHC595D  SN74AHC595D     SOIC127P600X175-16N  8 bit Shift registers                                            
+U9   ULN2803ADW   ULN2803ADW      SOIC127P1030X265-18N Darlington transistor array                                      
+U10  ULN2803ADW   ULN2803ADW      SOIC127P1030X265-18N Darlington transistor array                                      
+U11  TD62783AP    UDN2981LW       SO18W                DRIVER ARRAY                                                     
+U12  TD62783AP    UDN2981LW       SO18W                DRIVER ARRAY                                                     
+U13  TD62783AP    UDN2981LW       SO18W                DRIVER ARRAY                                                     
+U14  ULN2803ADW   ULN2803ADW      SOIC127P1030X265-18N Darlington transistor array                                      
+X1   PWR          1X4-CLEANBIG    1X04-CLEANBIG        4-pin connector                                                  
+X2   BROSE-60-POL 057-060-1       057-060-1            CONNECTOR                                                        
