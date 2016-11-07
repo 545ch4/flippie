@@ -1,7 +1,7 @@
 #include "flippie.h"
 #include "flippie_device.h"
 #include "flippie_server.h"
-#include <ESP8266Web_server.h>
+#include <ESP8266WebServer.h>
 
 #define DEBUG true
 
@@ -73,7 +73,7 @@ void FlippieServer::handleFlipdot() {
   } else if(_server.arg("task").equals("inverse")) {
     _flippie_device.f.inverse();
   } else if(_server.arg("task").equals("magnitize")) {
-    _flippie_device.f.magnitize(_server.arg("state").toInt(), _server.arg("duration").toInt());
+    _flippie_device.f.magnetize(_server.arg("state").toInt(), _server.arg("duration").toInt());
   } else {
     if(!sent) {
       Serial.printf("FLIPDOT Unknown command '%s'\n", _server.arg("task").c_str());
