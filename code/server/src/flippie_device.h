@@ -2,13 +2,9 @@
 #ifndef FLIPPIE_DEVICE_H
 #define FLIPPIE_DEVICE_H
 
-class FlippieDevice {
-private:
-   flippie_t ft;
+class FlippieDevice : public Flippie {
 public:
    FlippieDevice();
-   void init();
-   Flippie f;
 };
 
 #endif

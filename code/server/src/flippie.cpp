@@ -1,17 +1,11 @@
 #include "flippie.h"
 
+Flippie::Flippie() {}
+
 Flippie::Flippie(flippie_t f) {
   unsigned int i;
 
-  _f = f;
-
-  // set rows and columns for convinient access
-  rows = _f.num_rows;
-  modules = _f.num_modules;
-  columns = 0;
-  for(i = 0; i < _f.num_modules; ++i) {
-    columns += _f.num_columns[i];
-  }
+  config = f;
 
   // initialze shift-register as NUMBER_OF_SHIFT_REGISTERS * 8 (unsigned char)
   _shift_register = (byte *)calloc(NUMBER_OF_SHIFT_REGISTERS, sizeof(byte));
@@ -22,28 +16,28 @@ Flippie::Flippie(flippie_t f) {
   _led_c_on = true;
 
   // define pins (not srPins) as outputs
-  pinMode(_f.output_enable_pin, OUTPUT);
-  pinMode(_f.clock_pin, OUTPUT);
-  pinMode(_f.serial_data_pin, OUTPUT);
-  pinMode(_f.latch_pin, OUTPUT);
-  pinMode(_f.clear_pin, OUTPUT);
-  pinMode(_f.enable_pin, OUTPUT);
+  pinMode(config.output_enable_pin, OUTPUT);
+  pinMode(config.clock_pin, OUTPUT);
+  pinMode(config.serial_data_pin, OUTPUT);
+  pinMode(config.latch_pin, OUTPUT);
+  pinMode(config.clear_pin, OUTPUT);
+  pinMode(config.enable_pin, OUTPUT);
   // don't enable
-  digitalWrite(_f.enable_pin, HIGH);
+  digitalWrite(config.enable_pin, HIGH);
   // enable +VS
-  digitalWrite(_f.vs_enable_pin, LOW);
+  digitalWrite(config.vs_enable_pin, LOW);
 
   // reset shift-register
-  digitalWrite(_f.clear_pin, LOW);
+  digitalWrite(config.clear_pin, LOW);
   delayMicroseconds(SHIFT_REGISTER_CLEAR_TIME_IN_USEC);
-  digitalWrite(_f.clear_pin, HIGH);
+  digitalWrite(config.clear_pin, HIGH);
 
   // init shift-register to tristate all outputs
-  digitalWrite(_f.output_enable_pin, HIGH);
-  digitalWrite(_f.clock_pin, LOW);
-  digitalWrite(_f.serial_data_pin, LOW);
-  digitalWrite(_f.latch_pin, LOW);
-  digitalWrite(_f.clear_pin, LOW);
+  digitalWrite(config.output_enable_pin, HIGH);
+  digitalWrite(config.clock_pin, LOW);
+  digitalWrite(config.serial_data_pin, LOW);
+  digitalWrite(config.latch_pin, LOW);
+  digitalWrite(config.clear_pin, LOW);
 
   // init shift-register to ALL-LOW and just flash LED_A and LED_B shortly
   fire_shift_register(false);
@@ -53,11 +47,11 @@ Flippie::Flippie(flippie_t f) {
   fire_shift_register(false);
 
   // initialze _dots and _next_dots
-  _dots = (unsigned int **)malloc(_f.num_rows * sizeof(unsigned int *));
-  _next_dots = (unsigned int **)malloc(_f.num_rows * sizeof(unsigned int *));
-  for(unsigned int i = 0; i < _f.num_rows; ++i) {
-    _dots[i] = (unsigned int *)calloc(_f.num_modules, sizeof(unsigned int));
-    _next_dots[i] = (unsigned int *)calloc(_f.num_modules, sizeof(unsigned int));
+  _dots = (unsigned int **)malloc(config.num_rows * sizeof(unsigned int *));
+  _next_dots = (unsigned int **)malloc(config.num_rows * sizeof(unsigned int *));
+  for(unsigned int i = 0; i < config.num_rows; ++i) {
+    _dots[i] = (unsigned int *)calloc(config.num_modules, sizeof(unsigned int));
+    _next_dots[i] = (unsigned int *)calloc(config.num_modules, sizeof(unsigned int));
   }
 
   // init fast bit-wise comparator array (int-sized)
@@ -75,9 +69,9 @@ Flippie::Flippie(flippie_t f) {
 
 // copy current state _next_dots to _dots
 void Flippie::cycle_dots() {
-   memcpy(_dots, _next_dots, _f.num_rows * sizeof(unsigned int *));
-   for(unsigned int i = 0; i < _f.num_rows; ++i) {
-     memcpy(_dots[i], _next_dots[i], _f.num_modules * sizeof(unsigned int));
+   memcpy(_dots, _next_dots, config.num_rows * sizeof(unsigned int *));
+   for(unsigned int i = 0; i < config.num_rows; ++i) {
+     memcpy(_dots[i], _next_dots[i], config.num_modules * sizeof(unsigned int));
    }
 }
 
@@ -87,9 +81,9 @@ void Flippie::paint() {
    paint(false);
 }
 void Flippie::paint(bool override_former_dot_state) {
-  for(unsigned int i = 0; i < _f.num_rows; ++i) {
-    for(unsigned int j = 0; j < _f.num_modules; ++j) {
-      for(unsigned int k = 0; k < _f.num_columns[j]; ++k) {
+  for(unsigned int i = 0; i < config.num_rows; ++i) {
+    for(unsigned int j = 0; j < config.num_modules; ++j) {
+      for(unsigned int k = 0; k < config.num_columns[j]; ++k) {
         if(override_former_dot_state || (_dots[i][j] & _int_bit_array[k]) != (_next_dots[i][j] & _int_bit_array[k])) {
           fill_shift_register_and_fire(i, j, k, (_next_dots[i][j] & _int_bit_array[k]) == _int_bit_array[k] ? 1 : 0, FP2800A_ACTIVE_TIME_IN_USEC);
         }
@@ -102,9 +96,9 @@ void Flippie::paint(bool override_former_dot_state) {
 
 // repaint (magnetize) the whole display
 void Flippie::magnetize(unsigned int duration) {
-  for(unsigned int i = 0; i < _f.num_rows; ++i) {
-    for(unsigned int j = 0; j < _f.num_modules; ++j) {
-      for(unsigned int k = 0; k < _f.num_columns[j]; ++k) {
+  for(unsigned int i = 0; i < config.num_rows; ++i) {
+    for(unsigned int j = 0; j < config.num_modules; ++j) {
+      for(unsigned int k = 0; k < config.num_columns[j]; ++k) {
           fill_shift_register_and_fire(i, j, k, _dots[i][j], duration);
       }
     }
@@ -116,17 +110,17 @@ void Flippie::magnetize(unsigned int duration) {
 
 // set content of _next_dots and paint
 void Flippie::paint(unsigned int ** dots) {
-  memcpy(_next_dots, dots, _f.num_rows * sizeof(unsigned int *));
-  for(unsigned int i = 0; i < _f.num_rows; ++i) {
-    memcpy(_next_dots[i], dots[i], _f.num_modules * sizeof(unsigned int));
+  memcpy(_next_dots, dots, config.num_rows * sizeof(unsigned int *));
+  for(unsigned int i = 0; i < config.num_rows; ++i) {
+    memcpy(_next_dots[i], dots[i], config.num_modules * sizeof(unsigned int));
   }
   paint();
 }
 
 // clear all dots and paint
 void Flippie::clear() {
-  for(unsigned int i = 0; i < _f.num_rows; ++i) {
-    for(unsigned int j = 0; j < _f.num_modules; ++j) {
+  for(unsigned int i = 0; i < config.num_rows; ++i) {
+    for(unsigned int j = 0; j < config.num_modules; ++j) {
       _next_dots[i][j] = 0;
       _dots[i][j] = 0;
     }
@@ -137,8 +131,8 @@ void Flippie::clear() {
 // calc inverse of _dots, save to _next_dots and paint
 void Flippie::inverse() {
   unsigned int x = 0;
-  for(unsigned int i = 0; i < _f.num_rows; ++i) {
-    for(unsigned int j = 0; j < _f.num_modules; ++j) {
+  for(unsigned int i = 0; i < config.num_rows; ++i) {
+    for(unsigned int j = 0; j < config.num_modules; ++j) {
       _next_dots[i][j] = UINT_MAX - _dots[i][j];
     }
   }
@@ -148,8 +142,8 @@ void Flippie::inverse() {
 // fill all dots, save to _next_dots and paint
 void Flippie::fill() {
   unsigned int x = 0;
-  for(unsigned int i = 0; i < _f.num_rows; ++i) {
-    for(unsigned int j = 0; j < _f.num_modules; ++j) {
+  for(unsigned int i = 0; i < config.num_rows; ++i) {
+    for(unsigned int j = 0; j < config.num_modules; ++j) {
       _next_dots[i][j] = UINT_MAX;
       _dots[i][j] = UINT_MAX;
     }
@@ -177,19 +171,19 @@ void Flippie::paint_leds(unsigned int led_a_state, unsigned int led_b_state, uns
 
   if(led_a_state == 1) {
      _led_a_on = true;
-    _shift_register[_f.sr_led_a_pin/8] |= _byte_bit_array[_f.sr_led_a_pin%8];
+    _shift_register[config.sr_led_a_pin/8] |= _byte_bit_array[config.sr_led_a_pin%8];
   } else _led_a_on = false;
 
 
   if(led_b_state == 1) {
      _led_b_on = true;
-     _shift_register[_f.sr_led_b_pin/8] |= _byte_bit_array[_f.sr_led_b_pin%8];
+     _shift_register[config.sr_led_b_pin/8] |= _byte_bit_array[config.sr_led_b_pin%8];
   } else _led_b_on = false;
 
 
   if(led_c_state == 1) {
      _led_c_on = true;
-    _shift_register[_f.sr_led_c_pin/8] |= _byte_bit_array[_f.sr_led_c_pin%8];
+    _shift_register[config.sr_led_c_pin/8] |= _byte_bit_array[config.sr_led_c_pin%8];
   } else _led_c_on = false;
 
   // fireing
@@ -213,10 +207,10 @@ void Flippie::test(unsigned int test_bit, unsigned int state) {
 
 void Flippie::set_row(unsigned int row) {
   // reset all GND rows
-  for(unsigned int i = 0; i < _f.num_rows; ++i) {
-    _shift_register[_f.sr_set_row_pins[i]/8] &= (255 - _byte_bit_array[_f.sr_set_row_pins[i]%8]);
+  for(unsigned int i = 0; i < config.num_rows; ++i) {
+    _shift_register[config.sr_set_row_pins[i]/8] &= (255 - _byte_bit_array[config.sr_set_row_pins[i]%8]);
   }
-  _shift_register[_f.sr_set_row_pins[row]/8] |= _byte_bit_array[_f.sr_set_row_pins[row]%8];
+  _shift_register[config.sr_set_row_pins[row]/8] |= _byte_bit_array[config.sr_set_row_pins[row]%8];
 
   // fireing shift-register
   fire_shift_register_with_print(false);
@@ -224,10 +218,10 @@ void Flippie::set_row(unsigned int row) {
 
 void Flippie::rst_row(unsigned int row) {
   // reset all +VS rows
-  for(unsigned int i = 0; i < _f.num_rows; ++i) {
-    _shift_register[_f.sr_rst_row_pins[i]/8] &= (255 - _byte_bit_array[_f.sr_rst_row_pins[i]%8]);
+  for(unsigned int i = 0; i < config.num_rows; ++i) {
+    _shift_register[config.sr_rst_row_pins[i]/8] &= (255 - _byte_bit_array[config.sr_rst_row_pins[i]%8]);
   }
-  _shift_register[_f.sr_rst_row_pins[row]/8] |= _byte_bit_array[_f.sr_rst_row_pins[row]%8];
+  _shift_register[config.sr_rst_row_pins[row]/8] |= _byte_bit_array[config.sr_rst_row_pins[row]%8];
 
   // fireing shift-register
   fire_shift_register_with_print(false);
@@ -236,9 +230,9 @@ void Flippie::rst_row(unsigned int row) {
 void Flippie::set_column(unsigned int column){
   for(unsigned int i = 0; i < 5; ++i) {
     if(fp2800a_column_codes[column][i] == 1) {
-        _shift_register[_f.sr_column_code_pins[i]/8] |= _byte_bit_array[_f.sr_column_code_pins[i]%8];
+        _shift_register[config.sr_column_code_pins[i]/8] |= _byte_bit_array[config.sr_column_code_pins[i]%8];
     } else {
-      _shift_register[_f.sr_column_code_pins[i]/8] &= (255 - _byte_bit_array[_f.sr_column_code_pins[i]%8]);
+      _shift_register[config.sr_column_code_pins[i]/8] &= (255 - _byte_bit_array[config.sr_column_code_pins[i]%8]);
     }
   }
 
@@ -249,9 +243,9 @@ void Flippie::set_column(unsigned int column){
 void Flippie::set_column_code(unsigned int fp2800a_column_code, unsigned int state){
   for(unsigned int i = 0; i < 5; ++i) {
     if(state == 1) {
-      _shift_register[_f.sr_column_code_pins[fp2800a_column_code]/8] |= _byte_bit_array[_f.sr_column_code_pins[fp2800a_column_code]%8];
+      _shift_register[config.sr_column_code_pins[fp2800a_column_code]/8] |= _byte_bit_array[config.sr_column_code_pins[fp2800a_column_code]%8];
     } else {
-      _shift_register[_f.sr_column_code_pins[fp2800a_column_code]/8] &= (255 - _byte_bit_array[_f.sr_column_code_pins[fp2800a_column_code]%8]);
+      _shift_register[config.sr_column_code_pins[fp2800a_column_code]/8] &= (255 - _byte_bit_array[config.sr_column_code_pins[fp2800a_column_code]%8]);
     }
   }
   // fireing shift-register
@@ -262,7 +256,7 @@ void Flippie::set_column_code(unsigned int fp2800a_column_code, unsigned int sta
 void Flippie::set_address(byte address) {
   for(unsigned int i = 0; i < 7; ++i) {
     if((address>>i) & 1 == 1) {
-      _shift_register[_f.sr_address_pins[i]/8] |= _byte_bit_array[_f.sr_address_pins[i]%8];
+      _shift_register[config.sr_address_pins[i]/8] |= _byte_bit_array[config.sr_address_pins[i]%8];
     }
   }
   // fireing shift-register
@@ -272,9 +266,9 @@ void Flippie::set_address(byte address) {
 // set FP2800A direction HIGH => switches +VS, LOW switches GND
 void Flippie::set_data(unsigned int state) {
   if(state == 1) {
-    _shift_register[_f.sr_data_pin/8] |= _byte_bit_array[_f.sr_data_pin%8];
+    _shift_register[config.sr_data_pin/8] |= _byte_bit_array[config.sr_data_pin%8];
   } else {
-    _shift_register[_f.sr_data_pin/8] &= (255 - _byte_bit_array[_f.sr_data_pin%8]);
+    _shift_register[config.sr_data_pin/8] &= (255 - _byte_bit_array[config.sr_data_pin%8]);
   }
   // fireing shift-register
   fire_shift_register_with_print(false);
@@ -297,49 +291,49 @@ void Flippie::fill_shift_register_and_fire(unsigned int row, unsigned int module
 
   // set state of the selected row
   if(state == 1) {
-    _shift_register[_f.sr_set_row_pins[row]/8] |= _byte_bit_array[_f.sr_set_row_pins[row]%8];
+    _shift_register[config.sr_set_row_pins[row]/8] |= _byte_bit_array[config.sr_set_row_pins[row]%8];
   } else {
-    _shift_register[_f.sr_rst_row_pins[row]/8] |= _byte_bit_array[_f.sr_rst_row_pins[row]%8];
+    _shift_register[config.sr_rst_row_pins[row]/8] |= _byte_bit_array[config.sr_rst_row_pins[row]%8];
   }
 
   // set column code (B1-A0)
   for(i = 0; i < 5; ++i) {
-    if(fp2800a_column_codes[(28 - _f.num_columns[module]) + column][i] == 1) {
-      _shift_register[_f.sr_column_code_pins[i]/8] |= _byte_bit_array[_f.sr_column_code_pins[i]%8];
+    if(fp2800a_column_codes[(28 - config.num_columns[module]) + column][i] == 1) {
+      _shift_register[config.sr_column_code_pins[i]/8] |= _byte_bit_array[config.sr_column_code_pins[i]%8];
     }
   }
 
   // set address (ADDR1-ADDR7)
   for(i = 0; i < 7; ++i) {
-    if(_f.addresses[module]>>i & 1 == 1) {
-      _shift_register[_f.sr_address_pins[i]/8] |= _byte_bit_array[_f.sr_address_pins[i]%8];
+    if(config.addresses[module]>>i & 1 == 1) {
+      _shift_register[config.sr_address_pins[i]/8] |= _byte_bit_array[config.sr_address_pins[i]%8];
     }
   }
 
   // set state (DATA)
   if(state == 0) {
-    _shift_register[_f.sr_data_pin/8] |= _byte_bit_array[_f.sr_data_pin%8];
+    _shift_register[config.sr_data_pin/8] |= _byte_bit_array[config.sr_data_pin%8];
   }
 
   // set toggle between LED_A/LED_B
   if(_led_a_on) {
-    _shift_register[_f.sr_led_a_pin/8] |= _byte_bit_array[_f.sr_led_a_pin%8];
+    _shift_register[config.sr_led_a_pin/8] |= _byte_bit_array[config.sr_led_a_pin%8];
     _led_a_on = false;
-    _shift_register[_f.sr_led_b_pin/8] -= _byte_bit_array[_f.sr_led_b_pin%8];
+    _shift_register[config.sr_led_b_pin/8] -= _byte_bit_array[config.sr_led_b_pin%8];
     _led_b_on = true;
   } else {
-    _shift_register[_f.sr_led_a_pin/8] -= _byte_bit_array[_f.sr_led_a_pin%8];
+    _shift_register[config.sr_led_a_pin/8] -= _byte_bit_array[config.sr_led_a_pin%8];
     _led_a_on = true;
-    _shift_register[_f.sr_led_b_pin/8] |= _byte_bit_array[_f.sr_led_b_pin%8];
+    _shift_register[config.sr_led_b_pin/8] |= _byte_bit_array[config.sr_led_b_pin%8];
     _led_a_on = false;
   }
 
   // set LED C to state
   _led_c_on = state == 1;
   if(_led_c_on) {
-    _shift_register[_f.sr_led_c_pin/8] |= _byte_bit_array[_f.sr_led_c_pin%8];
+    _shift_register[config.sr_led_c_pin/8] |= _byte_bit_array[config.sr_led_c_pin%8];
    } else {
-      _shift_register[_f.sr_led_c_pin/8] -= _byte_bit_array[_f.sr_led_c_pin%8];
+      _shift_register[config.sr_led_c_pin/8] -= _byte_bit_array[config.sr_led_c_pin%8];
    }
 
   // fireing shift-register
@@ -349,26 +343,27 @@ void Flippie::fill_shift_register_and_fire(unsigned int row, unsigned int module
 // fire a given shift-register according to pins given
 void Flippie::fire_shift_register(bool enable) {
   // just in case => defined start point
-  digitalWrite(_f.clock_pin, LOW);
+  digitalWrite(config.clock_pin, LOW);
   // just in case => clear shift-register
-  digitalWrite(_f.clear_pin, LOW);
-  digitalWrite(_f.clear_pin, HIGH);
+  digitalWrite(config.clear_pin, LOW);
+  digitalWrite(config.clear_pin, HIGH);
 
   // shift out (reverse order) shift-register byte array
   for(unsigned int i = NUMBER_OF_SHIFT_REGISTERS * 8; 0 < i--;) {
-    digitalWrite(_f.serial_data_pin, (_shift_register[i/8] & _byte_bit_array[i%8]) == _byte_bit_array[i%8] ? HIGH : LOW);
-    digitalWrite(_f.clock_pin, HIGH);
-    digitalWrite(_f.clock_pin, LOW);
+    digitalWrite(config.serial_data_pin, (_shift_register[i/8] & _byte_bit_array[i%8]) == _byte_bit_array[i%8] ? HIGH : LOW);
+    digitalWrite(config.clock_pin, HIGH);
+    digitalWrite(config.clock_pin, LOW);
   }
-  digitalWrite(_f.latch_pin, HIGH);
-  digitalWrite(_f.latch_pin, LOW);
+  digitalWrite(config.latch_pin, HIGH);
+  digitalWrite(config.latch_pin, LOW);
 
   if(enable) {
      // fire using ADDR8 aka NOT_EN => FP2800A enable (E)
-     digitalWrite(_f.enable_pin, HIGH);
+     digitalWrite(config.enable_pin, HIGH);
      delayMicroseconds(FP2800A_ACTIVE_TIME_IN_USEC);
-     digitalWrite(_f.enable_pin, LOW);
+     digitalWrite(config.enable_pin, LOW);
   }
+  yield();
 }
 
 // fire a given shift-register according to pins given

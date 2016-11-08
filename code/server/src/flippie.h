@@ -73,46 +73,45 @@ typedef struct {
 class Flippie {
 
 private:
-    flippie_t _f;
-    unsigned int ** _dots;
-    unsigned int ** _next_dots;
-    byte * _shift_register;
-    bool _led_a_on;
-    bool _led_b_on;
-    bool _led_c_on;
-    unsigned int * _int_bit_array;
-    byte * _byte_bit_array;
-    void cycle_dots();
-    void fire_shift_register();
-    void fire_shift_register(bool enable);
-    void fire_shift_register_with_print();
-    void fire_shift_register_with_print(bool enable);
+   unsigned int ** _dots;
+   unsigned int ** _next_dots;
+   byte * _shift_register;
+   bool _led_a_on;
+   bool _led_b_on;
+   bool _led_c_on;
+   unsigned int * _int_bit_array;
+   byte * _byte_bit_array;
+   void cycle_dots();
+   void fire_shift_register();
+   void fire_shift_register(bool enable);
+   void fire_shift_register_with_print();
+   void fire_shift_register_with_print(bool enable);
 
 public:
-    Flippie(flippie_t _f);
-    void clear();
-    void fill();
-    void inverse();
-    void magnetize(unsigned int duration);
-    void paint();
-    void paint(bool override_former_dot_state);
-    void paint(unsigned int ** dots);
-    void paint(unsigned int ** dots, unsigned int led1_state, unsigned int led2_state, unsigned int led3_state);
-    void paint_leds(unsigned int led1_state, unsigned int led2_state, unsigned int led3_state);
-    void fill_shift_register_and_fire(unsigned int row, unsigned int module, unsigned int column, unsigned int state, unsigned int duration);
-    unsigned int rows;
-    unsigned int modules;
-    unsigned int columns;
+   Flippie();
+   Flippie(flippie_t _f);
+   flippie_t config;
 
-    void test(unsigned int test_bit, unsigned int state);
-    void clear_shift_register(bool fire_after_clear);
-    void set_row(unsigned int row);
-    void rst_row(unsigned int row);
-    void set_column(unsigned int column);
-    void set_column_code(unsigned int fp2800a_column_code, unsigned int state);
-    void set_address(byte address);
-    void set_data(unsigned int state);
-    void set_enable(unsigned int state);
+   void clear();
+   void fill();
+   void inverse();
+   void magnetize(unsigned int duration);
+   void paint();
+   void paint(bool override_former_dot_state);
+   void paint(unsigned int ** dots);
+   void paint(unsigned int ** dots, unsigned int led1_state, unsigned int led2_state, unsigned int led3_state);
+   void paint_leds(unsigned int led1_state, unsigned int led2_state, unsigned int led3_state);
+   void fill_shift_register_and_fire(unsigned int row, unsigned int module, unsigned int column, unsigned int state, unsigned int duration);
+
+   void test(unsigned int test_bit, unsigned int state);
+   void clear_shift_register(bool fire_after_clear);
+   void set_row(unsigned int row);
+   void rst_row(unsigned int row);
+   void set_column(unsigned int column);
+   void set_column_code(unsigned int fp2800a_column_code, unsigned int state);
+   void set_address(byte address);
+   void set_data(unsigned int state);
+   void set_enable(unsigned int state);
 };
 
 #endif
