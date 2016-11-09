@@ -4,16 +4,14 @@
 
 ### Schematics
 
-Since it's my first electronic project with an own design, the schematic may be slightly unusual. But it works... Suggestions are very welcome. Get the [Eagle SCH file](https://github.com/545ch4/flippie/board/flippie.sch) or see the [PDF file](https://github.com/545ch4/flippie/board/flippie_schematics.pdf).
-
-![flippie schematics](https://github.com/545ch4/flippie/board/schematics.png "flippie schematics")
+Since it's my first electronic project with an own design, the schematic may be slightly unusual. But it works... Suggestions are very welcome. Get the [Eagle SCH file](https://github.com/545ch4/flippie/raw/master/board/flippie.sch) or see the [PDF file](https://github.com/545ch4/flippie/raw/master/board/flippie_schematics.pdf).
 
 ### Layout
 
-![flippie board top view](https://github.com/545ch4/flippie/board/board_top.png "flippie board top view")
-![flippie board bottom view](https://github.com/545ch4/flippie/board/board_bottom.png "flippie board bottom view")
+![flippie board top view](https://github.com/545ch4/flippie/raw/master/board/board_top.png "flippie board top view")
+![flippie board bottom view](https://github.com/545ch4/flippie/raw/master/board/board_bottom.png "flippie board bottom view")
 
-You are welcome to use the [Eagle BRD](https://github.com/545ch4/flippie/board/flippie.brd) file and/or generated [GERBER files as ZIP archive](https://github.com/545ch4/flippie/board/flippie_gerber.zip) using [SparkFuns Extended Gerber Format](https://github.com/sparkfun/SparkFun_Eagle_Settings/blob/master/cam/sfe-gerb274x-withGBP.cam)
+You are welcome to use the [Eagle BRD](https://github.com/545ch4/flippie/board/flippie.brd) file and/or generated [GERBER files as ZIP archive](https://github.com/545ch4/flippie/raw/master/board/flippie_gerber.zip) using [SparkFuns Extended Gerber Format](https://github.com/sparkfun/SparkFun_Eagle_Settings/blob/master/cam/sfe-gerb274x-withGBP.cam)
 
 ### BOM
 
