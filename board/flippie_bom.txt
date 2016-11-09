@@ -1,62 +1,62 @@
 Part Value        Device            Package              Description
-C1   100u         CPOL-EUC          PANASONIC_C          POLARIZED CAPACITOR
-C2   22u          CPOL-EUB          PANASONIC_B          POLARIZED CAPACITOR
-D1   BZV55-C3V6   ZENER-DIODESOD80C SOD80C               Z-Diode
-D2   BZV55-C3V6   ZENER-DIODESOD80C SOD80C               Z-Diode
-D3   BZV55-C3V6   ZENER-DIODESOD80C SOD80C               Z-Diode
-D4   BZV55-C3V6   ZENER-DIODESOD80C SOD80C               Z-Diode
-D5   BZV55-C3V6   ZENER-DIODESOD80C SOD80C               Z-Diode
-D6   BZV55-C3V6   ZENER-DIODESOD80C SOD80C               Z-Diode
-D7   BZV55-C3V6   ZENER-DIODESOD80C SOD80C               Z-Diode
-D8   BZV55-C3V6   ZENER-DIODESOD80C SOD80C               Z-Diode
-D9   BZV55-C3V6   ZENER-DIODESOD80C SOD80C               Z-Diode
-D10  BZV55-C3V6   ZENER-DIODESOD80C SOD80C               Z-Diode
-D11  BZV55-C3V6   ZENER-DIODESOD80C SOD80C               Z-Diode
-D12  BZV55-C3V6   ZENER-DIODESOD80C SOD80C               Z-Diode
-D13  BZV55-C3V6   ZENER-DIODESOD80C SOD80C               Z-Diode
-D14  BZV55-C3V6   ZENER-DIODESOD80C SOD80C               Z-Diode
-J1   INT_3V3      M021X02_NO_SILK   1X02_NO_SILK         JUMPER
-JP1  PWR          1X5X2MM           1X05X2MM             CONNECTOR
-LED1 C            LEDSMT1206        1206                 LED
-LED2 B            LEDSMT1206        1206                 LED
-LED3 A            LEDSMT1206        1206                 LED
+C1   100u/25V     CPOL              PANASONIC_C          POLARIZED CAPACITOR
+C2   22u/25V      CPOL              PANASONIC_B          POLARIZED CAPACITOR
+D1   BZV55-C3V6   ZENER-DIODE       SOD80C               Z-Diode 3.6V
+D2   BZV55-C3V6   ZENER-DIODE       SOD80C               Z-Diode 3.6V
+D3   BZV55-C3V6   ZENER-DIODE       SOD80C               Z-Diode 3.6V
+D4   BZV55-C3V6   ZENER-DIODE       SOD80C               Z-Diode 3.6V
+D5   BZV55-C3V6   ZENER-DIODE       SOD80C               Z-Diode 3.6V
+D6   BZV55-C3V6   ZENER-DIODE       SOD80C               Z-Diode 3.6V
+D7   BZV55-C3V6   ZENER-DIODE       SOD80C               Z-Diode 3.6V
+D8   BZV55-C3V6   ZENER-DIODE       SOD80C               Z-Diode 3.6V
+D9   BZV55-C3V6   ZENER-DIODE       SOD80C               Z-Diode 3.6V
+D10  BZV55-C3V6   ZENER-DIODE       SOD80C               Z-Diode 3.6V
+D11  BZV55-C3V6   ZENER-DIODE       SOD80C               Z-Diode 3.6V
+D12  BZV55-C3V6   ZENER-DIODE       SOD80C               Z-Diode 3.6V
+D13  BZV55-C3V6   ZENER-DIODE       SOD80C               Z-Diode 3.6V
+D14  BZV55-C3V6   ZENER-DIODE       SOD80C               Z-Diode 3.6V
+J1   INT_3V3      1X02              1X02X2MM             JUMPER
+JP1  PWR          1X05X2MM          1X05X2MM             CONNECTOR
+LED1 C            LED-SMD-1206      1206                 LED
+LED2 B            LED-SMD-1206      1206                 LED
+LED3 A            LED-SMD-1206      1206                 LED
 MCU1 WEMOS        WEMOS_D1_MINI     WEMOS_D1_MINI        WEMOS D1 mini board
-R1   680K         R-EU_R1206        R1206                RESISTOR
-R2   100K         R-EU_R1206        R1206                RESISTOR
-R3   10K          R-EU_R1206        R1206                RESISTOR
-R4   10K          R-EU_R1206        R1206                RESISTOR
-R5   10K          R-EU_R1206        R1206                RESISTOR
-R6   150          R-EU_R1206        R1206                RESISTOR
-R7   150          R-EU_R1206        R1206                RESISTOR
-R8   150          R-EU_R1206        R1206                RESISTOR
-R9   100K         R-EU_R1206        R1206                RESISTOR
-R10  100K         R-EU_R1206        R1206                RESISTOR
-R11  100K         R-EU_R1206        R1206                RESISTOR
-R12  100K         R-EU_R1206        R1206                RESISTOR
-R13  100K         R-EU_R1206        R1206                RESISTOR
-R14  100K         R-EU_R1206        R1206                RESISTOR
-R15  100K         R-EU_R1206        R1206                RESISTOR
-R16  100K         R-EU_R1206        R1206                RESISTOR
-R17  100K         R-EU_R1206        R1206                RESISTOR
-R18  100K         R-EU_R1206        R1206                RESISTOR
-R19  100K         R-EU_R1206        R1206                RESISTOR
-R20  100K         R-EU_R1206        R1206                RESISTOR
-R21  100K         R-EU_R1206        R1206                RESISTOR
-R22  100K         R-EU_R1206        R1206                RESISTOR
-U1   FPF2702MX    FPF270x           SOIC127P600X175-8N   AccuPower 0.4~2 A Ad
-U2   SN74AHC595D  SN74AHC595D       SOIC127P600X175-16N  8 bit Shift register
-U3   SN74AHC595D  SN74AHC595D       SOIC127P600X175-16N  8 bit Shift register
-U4   SN74AHC595D  SN74AHC595D       SOIC127P600X175-16N  8 bit Shift register
-U5   SN74AHC595D  SN74AHC595D       SOIC127P600X175-16N  8 bit Shift register
-U6   SN74AHC595D  SN74AHC595D       SOIC127P600X175-16N  8 bit Shift register
-U7   SN74AHC595D  SN74AHC595D       SOIC127P600X175-16N  8 bit Shift register
-U8   SN74AHC595D  SN74AHC595D       SOIC127P600X175-16N  8 bit Shift register
-U9   ULN2803ADW   ULN2803ADW        SOIC127P1030X265-18N Darlington transisto
-U10  ULN2803ADW   ULN2803ADW        SOIC127P1030X265-18N Darlington transisto
-U11  TD62783AP    UDN2981LW         SO18W                DRIVER ARRAY
-U12  TD62783AP    UDN2981LW         SO18W                DRIVER ARRAY
-U13  TD62783AP    UDN2981LW         SO18W                DRIVER ARRAY
-U14  ULN2803ADW   ULN2803ADW        SOIC127P1030X265-18N Darlington transisto
-U15  TD62783AP    UDN2981LW         SO18W                DRIVER ARRAY
-U16  TD62783AP    UDN2981LW         SO18W                DRIVER ARRAY
-X1   BROSE-60-POL 057-060-1         057-060-1            CONNECTOR
+R1   680K         R-SMD-1206        1206                 RESISTOR
+R2   100K         R-SMD-1206        1206                 RESISTOR
+R3   10K          R-SMD-1206        1206                 RESISTOR
+R4   10K          R-SMD-1206        1206                 RESISTOR
+R5   10K          R-SMD-1206        1206                 RESISTOR
+R6   150          R-SMD-1206        1206                 RESISTOR
+R7   150          R-SMD-1206        1206                 RESISTOR
+R8   150          R-SMD-1206        1206                 RESISTOR
+R9   100K         R-SMD-1206        1206                 RESISTOR
+R10  100K         R-SMD-1206        1206                 RESISTOR
+R11  100K         R-SMD-1206        1206                 RESISTOR
+R12  100K         R-SMD-1206        1206                 RESISTOR
+R13  100K         R-SMD-1206        1206                 RESISTOR
+R14  100K         R-SMD-1206        1206                 RESISTOR
+R15  100K         R-SMD-1206        1206                 RESISTOR
+R16  100K         R-SMD-1206        1206                 RESISTOR
+R17  100K         R-SMD-1206        1206                 RESISTOR
+R18  100K         R-SMD-1206        1206                 RESISTOR
+R19  100K         R-SMD-1206        1206                 RESISTOR
+R20  100K         R-SMD-1206        1206                 RESISTOR
+R21  100K         R-SMD-1206        1206                 RESISTOR
+R22  100K         R-SMD-1206        1206                 RESISTOR
+U1   FPF2702MX    FPF270x           SO8N                 AccuPower 0.4~2 A current limiter
+U2   SN74AHC595D  SN74AHC595D       SO16N                8 bit Shift register
+U3   SN74AHC595D  SN74AHC595D       SO16N                8 bit Shift register
+U4   SN74AHC595D  SN74AHC595D       SO16N                8 bit Shift register
+U5   SN74AHC595D  SN74AHC595D       SO16N                8 bit Shift register
+U6   SN74AHC595D  SN74AHC595D       SO16N                8 bit Shift register
+U7   SN74AHC595D  SN74AHC595D       SO16N                8 bit Shift register
+U8   SN74AHC595D  SN74AHC595D       SO16N                8 bit Shift register
+U9   ULN2803ADW   ULN2803ADW        SO18N                NMOS Darlington transistor array
+U10  ULN2803ADW   ULN2803ADW        SO18N                NMOS Darlington transistor array
+U11  TD62783AP    UDN2981LW         SO18W                PMOS Darlington transistor array
+U12  TD62783AP    UDN2981LW         SO18W                PMOS Darlington transistor array
+U13  TD62783AP    UDN2981LW         SO18W                PMOS Darlington transistor array
+U14  ULN2803ADW   ULN2803ADW        SO18N                NMOS Darlington transistor array
+U15  TD62783AP    UDN2981LW         SO18W                PMOS Darlington transistor array
+U16  TD62783AP    UDN2981LW         SO18W                PMOS Darlington transistor array
+X1   BROSE-60-POL 30X02X2MM         057-060-1            CONNECTOR
