@@ -1,6 +1,15 @@
 # flippie
 
+## Basic idea and some background
+
+I had the opportunity to buy some old flip-dot displays sorted out from public transport vehicles. Quickly it became obvious that reverse engineering the RS484 based IBIS bus would not make me very happy. So I decided to throw away the controller board and drive the flip-dot modules myself. My first PCB was born.
+
 ## Board
+
+### BROSE modules connector
+
+![Specification of the common 60-pin BROSE connector](https://github.com/545ch4/flippie/raw/master/board/brose_diagram.png "Specification of the common 60-pin BROSE connector")
+
 
 ### Schematics
 
@@ -40,8 +49,9 @@ You are welcome to use the [Eagle BRD](https://github.com/545ch4/flippie/board/f
 | ..   |            |               |               |          |
 | R22  | 100K       | R-SMD-1206    | 1206          | RESISTOR |
 | U1   | FPF2702MX  | FPF270x       | SO8N          | AccuPower 0.4~2 A current limiter |
-| U2   | SN74AHC595D| SN74AHC595D   | SO16N         | 8 bit Shift register |
-| U8   | SN74AHC595D| SN74AHC595D   | SO16N         | 8 bit Shift register |
+| U2   | SN74AHC595D| 74HC595       | SO16N         | 8 bit Shift register |
+| ..   |            |               |               |                      |
+| U8   | SN74AHC595D| 74HC595       | SO16N         | 8 bit Shift register |
 | U9   | ULN2803ADW | ULN2803ADW    | SO18N         | NMOS Darlington transistor array |
 | U10  | ULN2803ADW | ULN2803ADW    | SO18N         | NMOS Darlington transistor array |
 | U11  | TD62783AP  | UDN2981LW     | SO18W         | PMOS Darlington transistor array |
