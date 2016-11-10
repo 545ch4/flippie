@@ -2,11 +2,18 @@
 #include "flippie_device.h"
 
 FlippieDevice::FlippieDevice() : Flippie() {
-   config.num_modules = 4;
-   config.addresses = new unsigned int[4]{1, 2, 4, 8};
+   // TODO: How many modules does your display consists of?
+   const unsigned int num_modules = 4;
+   config.num_modules = num_modules;
+   // TODO: What are the addresses (as byte) of the modules? (see DIP-switches at each module)
+   config.addresses = new unsigned int[num_modules]{1, 2, 4, 8};
+   // TODO: How many rows does your display have? (equal over all modules)
    config.num_rows = 18;
-   config.num_columns = new unsigned int[4]{28, 28, 28, 21};
+   // TODO: How many columns does each module of your display have? (same order as the addresses)
+   config.num_columns = new unsigned int[num_modules]{28, 28, 28, 21};
 
+
+   // values below are specific to the flippie board - do not modify
    // shift-register config
    // SR1 - SR20 SET
    config.sr_set_row_pins = new unsigned int[20]{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19};

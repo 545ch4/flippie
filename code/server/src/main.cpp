@@ -11,8 +11,11 @@
 ESP8266WebServer server;
 
 void setup(void){
+   // TODO: What's the hostname of your flippie board?
    const char* host = "flippie";
+   // TODO: What's the SSID of your WiFi?
    const char* ssid = "WIFI";
+   // TODO: What's the PASSWORD of your WiFi?
    const char* password = "***********";
 
    Serial.begin(115200);

@@ -1,10 +1,10 @@
 #ifndef FLIPPIE_SERVER_H
 #define FLIPPIE_SERVER_H
 
+#include "handler/ui.h"
 #include "handler/dots.h"
 #include "handler/flip_dot.h"
 #include "handler/pixel.h"
-#include "handler/root.h"
 #include "handler/sr.h"
 #include <ESP8266WebServer.h>
 
