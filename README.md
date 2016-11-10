@@ -123,7 +123,10 @@ A simple index page with browser UI controlling the flip-dot. All javascripts an
 
 #### '/dots' receiver of base64 encoded dots matrix
 
-Reads the content of HTTP (POST/GET) variable "dots".
+This method reads the content of HTTP (POST/GET) variable `dots` which is base64 encoded. 
+
+[row 1 column 1 module 1], [row 1 column 2 module 1], ..., [row 1 column N module 1], [row 1 column 1 module 1], [row 1 column 2 module 1], ..., [row 1 column N module 1],
+
 
 
 ### Example ruby client
