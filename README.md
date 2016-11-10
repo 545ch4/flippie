@@ -6,9 +6,13 @@ I had the opportunity to buy some old flip-dot displays sorted out from public t
 
 ## Board
 
-### BROSE modules connector
+### BROSE 60-pin connector
 
 ![Specification of the common 60-pin BROSE connector](https://github.com/545ch4/flippie/raw/master/board/brose_diagram.png "Specification of the common 60-pin BROSE connector")
+
+### Block diagram
+
+![flippie block diagram](https://github.com/545ch4/flippie/raw/master/board/block_diagram.png "flippie block diagram")
 
 
 ### Schematics
