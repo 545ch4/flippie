@@ -1,5 +1,8 @@
 # flippie
 
+![first flippie test](https://github.com/545ch4/flippie/raw/master/board/docs/first_flippie_test.gif "first flippie test")
+
+
 ## Basic idea and some background
 
 Usual story: no money, lots of deadlines, unsustainable promises, social responsibility, no time at all, but the unique opportunity to get an additional time-sink. Yeah. Seconds later, I got two huge flip-dot displays I couldn't even carry myself and a lot of single modules. Soon (measured in seasons) it became obvious, that reverse engineering the RS484 based IBIS bus would not make me very happy in the long run. So I decided to throw away the original controller board and drive the flip-dot modules myself. This is the story of that effort...
