@@ -1,6 +1,6 @@
 # flippie
 
-![first flippie test](https://github.com/545ch4/flippie/raw/master/board/docs/first_flippie_test.gif "first flippie test")
+![first flippie test](https://github.com/545ch4/flippie/raw/master/board/docs/flippie_first_test.gif "first flippie test")
 
 
 ## Basic idea and some background
