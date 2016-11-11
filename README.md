@@ -31,7 +31,8 @@ All data and address lines are at 24V logic level. The +VS line should be curren
 
 ## flippie board
 
-The board was designed to drive every serial assembly of modules or single ones without soldering or modifying the module(s).
+The board was designed to drive every serial assembly of modules or single ones without soldering or modifying the module(s) - simply by connection the proprietary 60-pin BROSE connector. The main MCU [ESP3266](https://espressif.com/en/products/hardware/esp8266ex/overview) is mounted on a USB-interfaced USB-to-Serial converter for convenient programming and WiFi on board. Please see [wemos D1 mini](https://www.wemos.cc/product/d1-mini.html) documentation.
+
 
 ### Block diagram
 
@@ -53,7 +54,7 @@ Download the [Eagle BRD](https://github.com/545ch4/flippie/board/flippie.brd) fi
 ### BOM
 
 | Part | Value      | Device        | Package       | Description |
-|-----:|-----------:|--------------:|--------------:|------------:|
+|------|------------|---------------|---------------|-------------|
 | C1   | 100u/25V   | CPOL          | PANASONIC_C   | POLARIZED CAPACITOR |
 | C2   | 22u/25V    | CPOL          | PANASONIC_B   | POLARIZED CAPACITOR |
 | D1   | BZV55-C3V6 | ZENER-DIODE   | SOD80C        | Z-Diode 3.6V |
@@ -90,6 +91,7 @@ Download the [Eagle BRD](https://github.com/545ch4/flippie/board/flippie.brd) fi
 | U16  | TD62783AP  | UDN2981LW     | SO18W         | PMOS Darlington transistor array |
 | X1   | BROSE-60-PO| 30X02X2MM     | 057-060-1     | CONNECTOR |
 
+---
 
 ## Code
 
@@ -100,33 +102,105 @@ Since building and maintaining an ESP8266 toolchain using the [Arduino ESP8266 F
 1. [Download PlatformIO](http://platformio.org/platformio-ide) and install
 2. Launch and follow on-screen instructions (install Python-2.7 if necessary)
 3. [Install Clang/LLVM](http://docs.platformio.org/en/stable/ide/atom.html#ide-atom-installation-clang)
-3. Ensure `platformio-ide` and `platformio-ide-terminal` are enabled (*Settings > Packages*)
+4. Ensure `platformio-ide` and `platformio-ide-terminal` are enabled (*"Settings > Packages"*)
 
 ### Open the project
 
 Download or clone this repository. Open the directory `./code/server` using *"Open project"* at PlatformIO IDE.
 
 
+### Necessary adoptions
+
+Before you compile and upload your custom firmware to the ESP8266, there are some values specific to your setup/environment to be defined.
+**Flip-dot configuration at `code/server/flippie_device.cpp`:**
+```c++
+// TODO: How many modules does your display consists of?
+const unsigned int num_modules = 4;
+config.num_modules = num_modules;
+// TODO: What are the addresses (as decimal) of the modules? (see DIP-switches at each module)
+config.addresses = new unsigned int[num_modules]{1, 2, 4, 8};
+// TODO: How many rows does your display have? (equal over all modules)
+config.num_rows = 18;
+// TODO: How many columns does each module of your display have? (same order as the addresses)
+config.num_columns = new unsigned int[num_modules]{28, 28, 28, 21};
+```
+
+**WiFi configuration at `code/server/main.cpp`:**
+```c++
+// TODO: What's the SSID of your WiFi?
+const char* ssid = "SSID";
+// TODO: What's the PASSWORD of your WiFi?
+const char* password = "PASSWORD";
+// TODO: If you don't want to use DHCP, provide a static IP (uncomment the following lines). Otherwise leave this commented.
+// IPAddress ip(192, 168, 1, 23);
+// IPAddress gateway(192, 168, 1, 1);
+// IPAddress subnet(255, 255, 255, 0);
+// WiFi.config(ip, gateway, subnet);
+```
+
 ### Compile and upload firmware
 
-Navigate to *"PlatformIO > Build"* to compile this project and create the firmware for uploading to the ESP8266. Use *"PlatformIO > Upload"* to upload your firmware using the USB connection. **Please disconnect the power supply of your flippie board or remove the jumper J1 before connecting your computer to the USB port of the ESP8266 (if mounted at the flippie board already).**
+> **Please disconnect the power supply of your flippie board or remove the jumper J1 before connecting your computer to the USB port of the ESP8266 (if mounted at the flippie board already).**
+
+Navigate to *"PlatformIO > Build"* to compile this project and create the firmware for uploading to the ESP8266. Use *"PlatformIO > Upload"* to upload your firmware using the USB connection.
 
 
 ### Test
+
+Disconnect flippie and press the reset button of the wemos D1 mini board. All three LEDs should flash three times. Now, point your browser to `http://<flippie IP>/`. You should be able to do some tests (clearing, filling etc).
+
+If you want to test using the bundled client, please head yourself to the directory `./client/` and initialize the ruby environment with:
+```shell
+gem install bundler
+bundle install
+```
+
+You are now ready to send messages to your flippie board using the ruby tool. Example:
+```shell
+./cli.rb "my precious"
+```
+You should see an visual response on your command line.
+
 
 ### Firmware API documentation
 
 Flippie is basically a simple web server at port 80 serving the following access points:
 
-#### '/' and '/ui' UI pages
-A simple index page with browser UI controlling the flip-dot. All javascripts and stylesheets are loaded from an external CDN, not the ESP8266 itself. Except the flip-dot configuration is rendered as json.
+**`/ui` – UI pages**  
+A simple index page with browser UI controlling the flip-dot. All javascript and stylesheets are loaded from an external CDN, not from the ESP8266 itself. Except the flip-dot configuration, this will be rendered as JSON.
 
-#### '/dots' receiver of base64 encoded dots matrix
+**`/dots` – A receiver of base64 encoded dots vector**  
+This method reads the content of HTTP (POST/GET) variable `dots` which is a base64 encoded string. This string is build of four  from four 8-bit characters of a 32-bit wide integer where each bit (0-31) represents the state of one column. Those integers are ordered by rows and then modules:
+```
+[row 1 column 1-32* module 1], [row 1 column 1-32* module 2], ..., [row 1 column 1-32* module M], [row 2 column 1-32* module 1], [row 2 column 1-32* module 2], ..., ..., [row R column 1-32* module M]
+```
+\* max, could be less, ignoring excess bits. Each integer is split into 4 8-bit characters in LSB order.
 
-This method reads the content of HTTP (POST/GET) variable `dots` which is base64 encoded. 
+**`/flippie` – Directly alter the shift register at flippie (possibly dangerous)**
 
-[row 1 column 1 module 1], [row 1 column 2 module 1], ..., [row 1 column N module 1], [row 1 column 1 module 1], [row 1 column 2 module 1], ..., [row 1 column N module 1],
+| HTTP Variable/Value                | Description |
+|------------------------------------|-------------|
+| led_a(0/1), led_b(0/1), led_c(0/1) | Set appropriate led to state |
+| addr(0 - 255)                      | Set the module address |
+| column(1=2^0 - 32=2^31)                 | Set the column |
+| enable(0/1)                        | Set enable (dangerous, may burn coils/FP2800A when too long) |
+| d(0/1)                             | Set FP2800A D pin (1 = selected column set to GND, 0 = selected column set to +VS) |
+| row_set(1-20)                      | Set the selected row to +VS |
+| row_rst(1-20)                      | Set the selected row to GND |
+| clear(0/1)                         | Clear shift-register |
+| get                                | Get contents of the shift-register as JSON |
+| task=clear                         | Clear the whole display |
+| task=fill                          | Fill the whole display (set all dots) |
+| task=inverse                       | Inverse the whole display |
+| task=magnetize                     | Magnetize the whole display |
 
+**`/pixel` – Set individual pixels**
 
+| HTTP Variable          | Description |
+|------------------------|-------------|
+| r(0-31)                | Row |
+| m(0-128)               | Module |
+| c(0-31)                | Column |
+| state(0/1)             | Set of reset the pixel |
 
-### Example ruby client
+For further information you may have a look at the example ruby code.

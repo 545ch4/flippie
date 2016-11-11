@@ -1,13 +1,13 @@
-#include "pixel.h"
+#include "pixel_handler.h"
 #include "../flippie.h"
 #include "../flippie_device.h"
 #include <ESP8266WebServer.h>
 
-PixelPage::PixelPage(const char* uri, FlippieDevice f) : _uri(uri) {
+PixelHandler::PixelHandler(const char* uri, FlippieDevice f) : _uri(uri) {
    flippie = f;
 }
 
-bool PixelPage::handle(ESP8266WebServer& server, HTTPMethod requestMethod, String requestUri) {
+bool PixelHandler::handle(ESP8266WebServer& server, HTTPMethod requestMethod, String requestUri) {
    if (requestMethod != HTTP_GET || requestUri != _uri) {
       return false;
    }

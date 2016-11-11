@@ -1,7 +1,7 @@
-#include "ui.h"
+#include "ui_handler.h"
 
-UIPage::UIPage(const char* uri, FlippieDevice flippie) : _uri(uri) {
-   root_page = 
+UIHandler::UIHandler(const char* uri, FlippieDevice flippie) : _uri(uri) {
+   root_page =
 #include "data/index.html"
 ;
    char *config_page_temp;
@@ -11,13 +11,13 @@ UIPage::UIPage(const char* uri, FlippieDevice flippie) : _uri(uri) {
    for(int j = 0; j < flippie.config.num_modules - 1; j++) {
       i += sprintf(config_page_temp + i, "\t\t%u,\n", flippie.config.num_columns[j]);
    }
-   
+
    i += sprintf(config_page_temp + i, "\t\t%u\n\t]\n}\n\0", flippie.config.num_columns[flippie.config.num_modules - 1]);
    config_page = String(config_page_temp);
    free(config_page_temp);
 }
 
-bool UIPage::handle(ESP8266WebServer& server, HTTPMethod requestMethod, String requestUri) {
+bool UIHandler::handle(ESP8266WebServer& server, HTTPMethod requestMethod, String requestUri) {
    if (requestMethod != HTTP_GET) {
       return false;
    }

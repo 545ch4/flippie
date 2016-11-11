@@ -1,13 +1,13 @@
-#include "dots.h"
+#include "dots_handler.h"
 #include "../flippie.h"
 #include "../flippie_device.h"
 #include <ESP8266WebServer.h>
 
-DotsPage::DotsPage(const char* uri, FlippieDevice f) : _uri(uri) {
+DotsHandler::DotsHandler(const char* uri, FlippieDevice f) : _uri(uri) {
    flippie = f;
 }
 
-bool DotsPage::handle(ESP8266WebServer& server, HTTPMethod requestMethod, String requestUri) {
+bool DotsHandler::handle(ESP8266WebServer& server, HTTPMethod requestMethod, String requestUri) {
    if (requestMethod != HTTP_GET || requestUri != _uri) {
       return false;
    }

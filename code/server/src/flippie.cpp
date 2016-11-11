@@ -47,6 +47,7 @@ Flippie::Flippie(flippie_t f) {
   fire_shift_register(false);
 
   // initialze _dots and _next_dots
+  // array of rows => array of modules => columns are encoded bit-wise in an integer (32-bit wide => 32 column max)
   _dots = (unsigned int **)malloc(config.num_rows * sizeof(unsigned int *));
   _next_dots = (unsigned int **)malloc(config.num_rows * sizeof(unsigned int *));
   for(unsigned int i = 0; i < config.num_rows; ++i) {
@@ -162,6 +163,20 @@ void Flippie::clear_shift_register(bool fire_after_clear) {
   }
 }
 
+// return shift-register
+String Flippie::shift_register_as_string() {
+   char *bit_string = (char *)malloc(((NUMBER_OF_SHIFT_REGISTERS * sizeof(byte)) + 1) * sizeof(char));
+   unsigned int l = 0;
+   for(unsigned int i = 0; i < NUMBER_OF_SHIFT_REGISTERS; i++) {
+      for(unsigned int j = 0; j < sizeof(byte); j++) {
+         bit_string[l] = ((((_shift_register[i]<<j) & 1) == 1) ? '1' : '0');
+         l++;
+      }
+   }
+   bit_string[l] = '\0';
+   return String(bit_string);
+}
+
 // set LEDs (filling the shift-register and fire it)
 void Flippie::paint_leds(unsigned int led_a_state, unsigned int led_b_state, unsigned int led_c_state) {
   unsigned int i;
@@ -236,18 +251,6 @@ void Flippie::set_column(unsigned int column){
     }
   }
 
-  // fireing shift-register
-  fire_shift_register_with_print(false);
-}
-
-void Flippie::set_column_code(unsigned int fp2800a_column_code, unsigned int state){
-  for(unsigned int i = 0; i < 5; ++i) {
-    if(state == 1) {
-      _shift_register[config.sr_column_code_pins[fp2800a_column_code]/8] |= _byte_bit_array[config.sr_column_code_pins[fp2800a_column_code]%8];
-    } else {
-      _shift_register[config.sr_column_code_pins[fp2800a_column_code]/8] &= (255 - _byte_bit_array[config.sr_column_code_pins[fp2800a_column_code]%8]);
-    }
-  }
   // fireing shift-register
   fire_shift_register_with_print(false);
 }

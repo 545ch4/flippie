@@ -1,12 +1,12 @@
-#ifndef HANDLER_DOTS_H
-#define HANDLER_DOTS_H
+#ifndef PIXEL_HANDLER_H
+#define PIXEL_HANDLER_H
 #include "../flippie.h"
 #include "../flippie_device.h"
 #include <ESP8266WebServer.h>
 
-class DotsPage : public RequestHandler {
+class PixelHandler : public RequestHandler {
 public:
-  DotsPage(const char* uri, FlippieDevice flippie);
+  PixelHandler(const char* uri, FlippieDevice flippie);
   bool handle(ESP8266WebServer& server, HTTPMethod requestMethod, String requestUri) override;
 protected:
   String _uri;

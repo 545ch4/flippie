@@ -108,10 +108,10 @@ public:
    void set_row(unsigned int row);
    void rst_row(unsigned int row);
    void set_column(unsigned int column);
-   void set_column_code(unsigned int fp2800a_column_code, unsigned int state);
    void set_address(byte address);
    void set_data(unsigned int state);
    void set_enable(unsigned int state);
+   String shift_register_as_string();
 };
 
 #endif

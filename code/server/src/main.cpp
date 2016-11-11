@@ -11,16 +11,19 @@
 ESP8266WebServer server;
 
 void setup(void){
-   // TODO: What's the hostname of your flippie board?
-   const char* host = "flippie";
+   Serial.begin(115200);
+   Serial.println();
+   Serial.println("Booting...");
+
    // TODO: What's the SSID of your WiFi?
    const char* ssid = "WIFI";
    // TODO: What's the PASSWORD of your WiFi?
    const char* password = "***********";
-
-   Serial.begin(115200);
-   Serial.println();
-   Serial.println("Booting...");
+   // TODO: If you don't want to use DHCP, provide a static IP (and uncomment). Othewise leave this commented.
+   // IPAddress ip(192, 168, 1, 23);
+   // IPAddress gateway(192, 168, 1, 1);
+   // IPAddress subnet(255, 255, 255, 0);
+   // WiFi.config(ip, gateway, subnet);
 
    WiFi.mode(WIFI_AP_STA);
    WiFi.begin(ssid, password);
