@@ -26,7 +26,7 @@ FlippieDevice::FlippieDevice() : Flippie() {
    // SR41 D
    config.sr_d_pin = 40;
    // SR42 - SR46 A0-B1
-   config.sr_column_code_pins = new unsigned int[FP2800A_DATA_LINES]{45, 44, 43, 42, 41};
+   config.sr_column_code_pins = new unsigned int[FP2800A_COLUMN_CODE_LINES]{45, 44, 43, 42, 41};
    // SR47 - SR53 ADDR1-ADDR7
    config.sr_address_pins = new unsigned int[BROSE_ADDR_LINES - 1]{52, 51, 50, 49, 48, 47, 46};
    // SR54 LED A
