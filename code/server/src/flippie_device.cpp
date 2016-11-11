@@ -11,20 +11,24 @@ FlippieDevice::FlippieDevice() : Flippie() {
    config.num_rows = 18;
    // TODO: How many columns does each module of your display have? (same order as the addresses)
    config.num_columns = new unsigned int[num_modules]{28, 28, 28, 21};
+   // TODO: Should LED C toggle on each shift-register firing?
+   config.led_mode = LED_MODE_FLASHING;
+   // TODO: Verbose outputs on serial line?
+   config.verbose = true;
 
 
    // values below are specific to the flippie board - do not modify
    // shift-register config
    // SR1 - SR20 SET
-   config.sr_set_row_pins = new unsigned int[20]{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19};
+   config.sr_row_set_pins = new unsigned int[BROSE_MAX_ROWS]{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19};
    // SR21 - SR40 RST
-   config.sr_rst_row_pins = new unsigned int[20]{20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39};
+   config.sr_row_rst_pins = new unsigned int[BROSE_MAX_ROWS]{20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39};
    // SR41 D
-   config.sr_data_pin = 40;
+   config.sr_d_pin = 40;
    // SR42 - SR46 A0-B1
-   config.sr_column_code_pins = new unsigned int[5]{45, 44, 43, 42, 41};
+   config.sr_column_code_pins = new unsigned int[FP2800A_DATA_LINES]{45, 44, 43, 42, 41};
    // SR47 - SR53 ADDR1-ADDR7
-   config.sr_address_pins = new unsigned int[7]{52, 51, 50, 49, 48, 47, 46};
+   config.sr_address_pins = new unsigned int[BROSE_ADDR_LINES - 1]{52, 51, 50, 49, 48, 47, 46};
    // SR54 LED A
    config.sr_led_a_pin = 53;
    // SR55 LED B

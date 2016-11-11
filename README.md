@@ -123,6 +123,8 @@ config.addresses = new unsigned int[num_modules]{1, 2, 4, 8};
 config.num_rows = 18;
 // TODO: How many columns does each module of your display have? (same order as the addresses)
 config.num_columns = new unsigned int[num_modules]{28, 28, 28, 21};
+// TODO: Should LED C toggle on each shift-register firing?
+config.led_mode = LED_MODE_FLASHING;
 ```
 
 **WiFi configuration at `code/server/main.cpp`:**
@@ -178,21 +180,33 @@ This method reads the content of HTTP (POST/GET) variable `dots` which is a base
 
 **`/flippie` – Directly alter the shift register at flippie (possibly dangerous)**
 
-| HTTP Variable/Value                | Description |
-|------------------------------------|-------------|
-| led_a(0/1), led_b(0/1), led_c(0/1) | Set appropriate led to state |
-| addr(0 - 255)                      | Set the module address |
-| column(1=2^0 - 32=2^31)                 | Set the column |
-| enable(0/1)                        | Set enable (dangerous, may burn coils/FP2800A when too long) |
-| d(0/1)                             | Set FP2800A D pin (1 = selected column set to GND, 0 = selected column set to +VS) |
-| row_set(1-20)                      | Set the selected row to +VS |
-| row_rst(1-20)                      | Set the selected row to GND |
-| clear(0/1)                         | Clear shift-register |
-| get                                | Get contents of the shift-register as JSON |
-| task=clear                         | Clear the whole display |
-| task=fill                          | Fill the whole display (set all dots) |
-| task=inverse                       | Inverse the whole display |
-| task=magnetize                     | Magnetize the whole display |
+Low level access to flippie. Set using HTTP variables (POST) and retrieve values as JSON using GET. POST request will retung JSON `true`.
+
+| HTTP verb | Variable       | Value           | Description                   |
+|-----------|----------------|---------------- |-------------------------------|
+| GET/POST  | led_X          | 0, 1            | Get/Set the state of LED X (A, B, C) |
+| GET/POST  | address        | 0 - 127         | Get/Set the module address |
+| GET/POST  | column         | 0 - 27          | Get/Set the active column |
+| GET/POST  | d              | 0, 1            | Set FP2800A D pin (1 = selected column set to GND, 0 = selected column set to +VS) |
+| GET/POST  | row_set        | 0 - 19          | Set the selected row to +VS |
+| GET/POST  | row_rst        | 0 - 19          | Set the selected row to GND |
+| GET/POST  | enable         | 0, 1            | Set enable if 1 (dangerous) |
+| POST      | clear          | 0, 1            | Clear shift-register if 1 |
+| GET       | shiftregister  | String          | Get contents of the shift-register as sequence of zeros and ones. |
+| POST      | task           | clear           | Clear the whole display |
+| POST      | task           | fill            | Fill the whole display (set all dots) |
+| POST      | task           | inverse         | Inverse the whole display |
+| POST      | task           | magnetize       | Magnetize the whole display |
+
+Basic mechanism to set a dot (column 2, row 3) at module 0 with address 0x01 (DIP switch 1-0-0-0-0-0-0-1):
+```shell
+$ telnet <flippie IP> 80
+> POST /flippie HTTP/1.0
+> Content-Length: 41
+> 
+> address=1&column=1&row_set=2&d=1&enable=1
+```
+
 
 **`/pixel` – Set individual pixels**
 
