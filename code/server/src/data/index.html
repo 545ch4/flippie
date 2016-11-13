@@ -42,8 +42,10 @@ R"A3A8ESXTTP0DLL(
          </div>
          <div id="navbar" class="navbar-collapse collapse">
             <ul class="nav navbar-nav">
-               <li class="active"><a href="#">SR</a></li>
-               <li><a href="#about">About</a></li>
+               <li class="active"><a href="/ui/index.html">Start</a></li>
+               <li><a href="/ui/control.html">Control</a></li>
+               <li><a href="/ui/low_level.html">Low-Level</a></li>
+               <li><a href="/ui/paint.html">Paint</a></li>
             </ul>
          </div><!--/.nav-collapse -->
       </div>
@@ -51,179 +53,22 @@ R"A3A8ESXTTP0DLL(
    <div class="container">
       <div class="row">
          <div class="col-xs-12">
-            <p>
-               <div class="alert alert-info" id="status" role="alert">Nothing to do yet...</div>
+            <h1>Well done.</h1>
+            <p id="text">
+               You configured a flippie board!
             </p>
-            <p>
-               <div class="btn-group btn-group-justified">
-                  <a href="#" class="btn btn-info" data-flippie-uri="/sr?clear=1" id="clear">Clear shift register</a>
-               </div>
-            </p>
-            <p>
-               LED: 1 <input id="led1" data-flippie-uri="/sr?led=1" type="checkbox" data-toggle="toggle" data-on="ON" data-off="OFF" data-onstyle="warning" />&nbsp;&nbsp;
-               2 <input id="led2" data-flippie-uri="/sr?led=2" type="checkbox" data-toggle="toggle" data-on="ON" data-off="OFF" data-onstyle="warning" />&nbsp;&nbsp;
-               3 <input id="led3" data-flippie-uri="/sr?led=3" type="checkbox" data-toggle="toggle" data-on="ON" data-off="OFF" data-onstyle="warning" />
-            </p>
-            <p>
-               <div class="input-group">
-                  ADDR:
-                  <div class="btn-group">
-                     <a href="#" class="btn btn-default" data-flippie-uri="/sr?fp2800a_addr=0">0000000</a>
-                     <a href="#" class="btn btn-default" data-flippie-uri="/sr?fp2800a_addr=1">0000001</a>
-                     <a href="#" class="btn btn-default" data-flippie-uri="/sr?fp2800a_addr=2">0000010</a>
-                     <a href="#" class="btn btn-default" data-flippie-uri="/sr?fp2800a_addr=3">0000011</a>
-                     <a href="#" class="btn btn-default" data-flippie-uri="/sr?fp2800a_addr=4">0000100</a>
-                     <a href="#" class="btn btn-default" data-flippie-uri="/sr?fp2800a_addr=8">0001000</a>
-                     <a href="#" class="btn btn-default" data-flippie-uri="/sr?fp2800a_addr=16">0010000</a>
-                     <a href="#" class="btn btn-default" data-flippie-uri="/sr?fp2800a_addr=32">0100000</a>
-                     <a href="#" class="btn btn-default" data-flippie-uri="/sr?fp2800a_addr=64">1000000</a>
-                  </div>
-               </div>
-            </p>
-            <p>
-               <div class="input-group">
-                  COLUMN:
-                  <div class="btn-group">
-                     <a href="#" class="btn btn-default" data-flippie-uri="/sr?fp2800a_column=0">0 (A0)</a>
-                     <a href="#" class="btn btn-default" data-flippie-uri="/sr?fp2800a_column=1">1</a>
-                     <a href="#" class="btn btn-default" data-flippie-uri="/sr?fp2800a_column=2">2</a>
-                     <a href="#" class="btn btn-default" data-flippie-uri="/sr?fp2800a_column=10">10 (A2+B0)</a>
-                     <a href="#" class="btn btn-default" data-flippie-uri="/sr?fp2800a_column=20">20</a>
-                     <a href="#" class="btn btn-default" data-flippie-uri="/sr?fp2800a_column=25">25</a>
-                     <a href="#" class="btn btn-default" data-flippie-uri="/sr?fp2800a_column=26">26</a>
-                     <a href="#" class="btn btn-default" data-flippie-uri="/sr?fp2800a_column=27">27 (ALL)</a>
-                  </div>
-               </div>
-            </p>
-            
-            <p>
-               COLUMN CODE: B1 <input id="column_code_B1" data-flippie-uri="/sr?fp2800a_column_raw=1" type="checkbox" data-toggle="toggle" data-on="HIGH" data-off="LOW" data-onstyle="info" />&nbsp;&nbsp;
-               B0 <input id="column_code_B0" data-flippie-uri="/sr?fp2800a_column_raw=2" type="checkbox" data-toggle="toggle" data-on="HIGH" data-off="LOW" data-onstyle="info" />&nbsp;&nbsp;
-               A2 <input id="column_code_A2" data-flippie-uri="/sr?fp2800a_column_raw=4" type="checkbox" data-toggle="toggle" data-on="HIGH" data-off="LOW" data-onstyle="info" />&nbsp;&nbsp;
-               A1 <input id="column_code_A1" data-flippie-uri="/sr?fp2800a_column_raw=8" type="checkbox" data-toggle="toggle" data-on="HIGH" data-off="LOW" data-onstyle="info" />&nbsp;&nbsp;
-               A0 <input id="column_code_A0" data-flippie-uri="/sr?fp2800a_column_raw=16" type="checkbox" data-toggle="toggle" data-on="HIGH" data-off="LOW" data-onstyle="info" />
-            </p>
-            
-            <p>
-               <div class="input-group">
-                  ROW +VS:
-                  <div class="btn-group">
-                     <a href="#" class="btn btn-default" data-flippie-uri="/sr?fp2800a_row_set_plusvs=0">0</a>
-                     <a href="#" class="btn btn-default" data-flippie-uri="/sr?fp2800a_row_set_plusvs=1">1</a>
-                     <a href="#" class="btn btn-default" data-flippie-uri="/sr?fp2800a_row_set_plusvs=2">2</a>
-                     <a href="#" class="btn btn-default" data-flippie-uri="/sr?fp2800a_row_set_plusvs=10">10</a>
-                     <a href="#" class="btn btn-default" data-flippie-uri="/sr?fp2800a_row_set_plusvs=17">17</a>
-                     <a href="#" class="btn btn-default" data-flippie-uri="/sr?fp2800a_row_set_plusvs=18">18</a>
-                     <a href="#" class="btn btn-default" data-flippie-uri="/sr?fp2800a_row_set_plusvs=19">19</a>
-                  </div>
-               </div>
-            </p>
-            
-            <p>
-               <div class="input-group">
-                  ROW GND:
-                  <div class="btn-group">
-                     <a href="#" class="btn btn-default" data-flippie-uri="/sr?fp2800a_row_set_gnd=0">0</a>
-                     <a href="#" class="btn btn-default" data-flippie-uri="/sr?fp2800a_row_set_gnd=1">1</a>
-                     <a href="#" class="btn btn-default" data-flippie-uri="/sr?fp2800a_row_set_gnd=2">2</a>
-                     <a href="#" class="btn btn-default" data-flippie-uri="/sr?fp2800a_row_set_gnd=10">10</a>
-                     <a href="#" class="btn btn-default" data-flippie-uri="/sr?fp2800a_row_set_gnd=17">17</a>
-                     <a href="#" class="btn btn-default" data-flippie-uri="/sr?fp2800a_row_set_gnd=18">18</a>
-                     <a href="#" class="btn btn-default" data-flippie-uri="/sr?fp2800a_row_set_gnd=19">19</a>
-                  </div>
-               </div>
-            </p>
-            
-            <p>
-               ENABLE (+ADDR8): <input id="enable" data-flippie-uri="/sr?fp2800a_enable=1" type="checkbox" data-toggle="toggle" data-on="HIGH" data-off="LOW" data-onstyle="danger" />
-            </p>
-            
-            <p>
-               DATA: <input id="enable" data-flippie-uri="/sr?fp2800a_data=1" type="checkbox" data-toggle="toggle" data-on="+VS" data-off="GND" data-onstyle="danger" />
-            </p>
-            <hr />
-            <p>
-               PIXEL0/0/0 <input id="enable" data-flippie-uri="/pixel?m=0&c=0&r=0" type="checkbox" data-toggle="toggle" data-on="ON" data-off="OFF" data-onstyle="success" data-offstyle="danger" />&nbsp;&nbsp;
-               PIXEL0/2/3 <input id="enable" data-flippie-uri="/pixel?m=0&c=2&r=3" type="checkbox" data-toggle="toggle" data-on="ON" data-off="OFF" data-onstyle="success" data-offstyle="danger" />&nbsp;&nbsp;
-               PIXEL0/10/11 <input id="enable" data-flippie-uri="/pixel?m=0&c=10&r=11" type="checkbox" data-toggle="toggle" data-on="ON" data-off="OFF" data-onstyle="success" data-offstyle="danger" />
-            </p>
-            <p>
-               PIXEL1/2/3 <input id="enable" data-flippie-uri="/pixel?m=1&c=2&r=3" type="checkbox" data-toggle="toggle" data-on="ON" data-off="OFF" data-onstyle="success" data-offstyle="danger" />&nbsp;&nbsp;
-               PIXEL2/2/3 <input id="enable" data-flippie-uri="/pixel?m=2&c=2&r=3" type="checkbox" data-toggle="toggle" data-on="ON" data-off="OFF" data-onstyle="success" data-offstyle="danger" />&nbsp;&nbsp;
-               PIXEL3/2/3 <input id="enable" data-flippie-uri="/pixel?m=3&c=2&r=3" type="checkbox" data-toggle="toggle" data-on="ON" data-off="OFF" data-onstyle="success" data-offstyle="danger" />
-            </p>
-            <p>
-               <div class="btn-group btn-group-justified">
-                  <a href="#" class="btn btn-danger" data-flippie-uri="/flipdot?task=clear">Empty whole flipdot display</a>
-               </div>
-            </p>
-            <p>
-               <div class="btn-group btn-group-justified">
-                  <a href="#" class="btn btn-danger" data-flippie-uri="/flipdot?task=inverse">Inverse whole flipdot display</a>
-               </div>
-            </p>
-            <p>
-               <div class="btn-group btn-group-justified">
-                  <a href="#" class="btn btn-danger" data-flippie-uri="/flipdot?task=fill">Fill whole flipdot display</a>
-               </div>
-            </p>
-            
-            <p>
-               <div class="btn-group btn-group-justified">
-                  <a href="#" class="btn btn-danger" data-flippie-uri="/flipdot?task=magnitize&duration=1000&state=0">Magnitize balck 1ms</a>
-               </div>
-            </p>
-            
-            <p>
-               <div class="btn-group btn-group-justified">
-                  <a href="#" class="btn btn-danger" data-flippie-uri="/flipdot?task=magnitize&duration=1000&state=1">Magnitize yellow 1ms</a>
-               </div>
-            </p>
-            
          </div>
       </div>
    </div>
-   
+
    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
    <script src="https://gitcdn.github.io/bootstrap-toggle/2.2.2/js/bootstrap-toggle.min.js"></script>
-   
+
    <script>
    var flippie_config;
    $.getJSON('/ui/config.json', function(json) {
       flippie_config = json;
-   });
-   function fire(uri) {
-      console.log(uri);
-      $.get(uri).done(function(data) {
-         $('#status').removeClass('alert-info alert-warning alert-danger').addClass('alert-success').html(data);
-      }).fail(function() {
-         $('#status').removeClass('alert-info alert-warning alert-success').addClass('alert-danger').html('Fail');
-      }).always(function() {
-         $('[data-flippie-uri]').attr('disabled', null);
-      });
-   }
-   
-   $('.btn[data-flippie-uri]').on('click', function(e){
-      var elem = $(e.target);
-      if(elem.parent().hasClass('btn-group')) {
-         elem.parent().children().removeClass('active');
-         elem.addClass('active');
-      }
-      if(elem.prop('id') == 'clear') {
-         $('.btn').removeClass('active');
-         $.each($('[data-flippie-uri][type="checkbox"]'), function(a,b) {
-            if($(this).prop('checked')){
-               $(this).bootstrapToggle('off');
-            }
-         });
-      }
-      $('[data-flippie-uri]').attr('disabled', 'disabled');
-      fire(elem.data('flippieUri'));
-      return false;
-   });
-   
-   $('[data-flippie-uri][type=checkbox]').change(function() {
-      fire($(this).data('flippieUri') + '&state=' + ($(this).prop('checked') ? '1' : '0'));
+      $('#text').html('You configured a flippie board with ' + flippie_config['rows'] + ' rows and ' + flippie_config['column'].length + ' module' + (flippie_config['column'].length > 1 ? 's' : '') + '.');
    });
    </script>
 </body>

@@ -1,9 +1,6 @@
 #include "dots_handler.h"
-#include "../flippie.h"
-#include "../flippie_device.h"
-#include <ESP8266WebServer.h>
 
-DotsHandler::DotsHandler(const char* uri, FlippieDevice f) : _uri(uri) {
+DotsHandler::DotsHandler(const char* uri, Flippie* f) : _uri(uri) {
    flippie = f;
 }
 
@@ -16,8 +13,8 @@ bool DotsHandler::handle(ESP8266WebServer& server, HTTPMethod requestMethod, Str
      String dots = server.arg("dots");
      const char * dots_c_str = dots.c_str();
      // hex encoded post data
-     if(dots.length() != flippie.config.num_rows * flippie.config.num_modules * sizeof(unsigned int) * 2) {
-       Serial.printf("Size mismatch: 'dots' is %u instead of %u bytes (%u rows X %u modules X %u bytes X 2) long!\n", dots.length(), flippie.config.num_rows * flippie.config.num_modules * sizeof(unsigned int) * 2, flippie.config.num_rows, flippie.config.num_modules, sizeof(unsigned int));
+     if(dots.length() != flippie->config->num_rows * flippie->config->num_modules * sizeof(unsigned int) * 2) {
+       Serial.printf("Size mismatch: 'dots' is %u instead of %u bytes (%u rows X %u modules X %u bytes X 2) long!\n", dots.length(), flippie->config->num_rows * flippie->config->num_modules * sizeof(unsigned int) * 2, flippie->config->num_rows, flippie->config->num_modules, sizeof(unsigned int));
      }
  #ifdef DEBUG
      Serial.printf("dots(%i)=%s\n", dots.length(), dots_c_str);
@@ -35,11 +32,11 @@ bool DotsHandler::handle(ESP8266WebServer& server, HTTPMethod requestMethod, Str
  #ifdef DEBUG
      Serial.print("\ndots(int)=[ ");
  #endif
-     unsigned int ** int_dots = (unsigned int **)malloc(flippie.config.num_rows * sizeof(unsigned int *));
+     unsigned int ** int_dots = (unsigned int **)malloc(flippie->config->num_rows * sizeof(unsigned int *));
      ptr = 0;
-     for(unsigned int i = 0; i < flippie.config.num_rows; ++i) {
-       int_dots[i] = (unsigned int *)malloc(flippie.config.num_modules * sizeof(unsigned int));
-       for(unsigned int j = 0; j < flippie.config.num_modules; ++j) {
+     for(unsigned int i = 0; i < flippie->config->num_rows; ++i) {
+       int_dots[i] = (unsigned int *)malloc(flippie->config->num_modules * sizeof(unsigned int));
+       for(unsigned int j = 0; j < flippie->config->num_modules; ++j) {
  //        for(unsigned int k = 4; --k > 0;) {
  //        for(unsigned int k = 0; k < 4; ++k) {
  #ifdef DEBUG
@@ -53,16 +50,16 @@ bool DotsHandler::handle(ESP8266WebServer& server, HTTPMethod requestMethod, Str
  #ifdef DEBUG
      Serial.println("]");
 
-     for(unsigned int i = 0; i < flippie.config.num_rows; ++i) {
-       for(unsigned int j = 0; j < flippie.config.num_modules; ++j) {
+     for(unsigned int i = 0; i < flippie->config->num_rows; ++i) {
+       for(unsigned int j = 0; j < flippie->config->num_modules; ++j) {
          Serial.printf("%010u | ", int_dots[i][j]);
        }
        Serial.print("\n");
      }
 
-     for(unsigned int i = 0; i < flippie.config.num_rows; ++i) {
-       for(unsigned int j = 0; j < flippie.config.num_modules; ++j) {
-         for(unsigned int k = 0; k < flippie.config.num_columns[j]; ++k) {
+     for(unsigned int i = 0; i < flippie->config->num_rows; ++i) {
+       for(unsigned int j = 0; j < flippie->config->num_modules; ++j) {
+         for(unsigned int k = 0; k < flippie->config->num_columns[j]; ++k) {
             Serial.print(((int_dots[i][j] & 1<<k) == 1<<k) ? '*' : ' ');
          }
        }
@@ -70,7 +67,7 @@ bool DotsHandler::handle(ESP8266WebServer& server, HTTPMethod requestMethod, Str
      }
  #endif
 
-     flippie.paint(int_dots);
+     flippie->paint(int_dots);
      server.send(200, "text/html", "OK");
    } else {
      return false;

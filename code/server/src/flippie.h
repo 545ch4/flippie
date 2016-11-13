@@ -8,6 +8,7 @@
 
 
 #define NUMBER_OF_SHIFT_REGISTERS 7
+#define SHIFT_REGISTER_WIDTH 8
 #define SHIFT_REGISTER_CLEAR_TIME_IN_USEC 2
 #define SHIFT_REGISTER_LATCH_TIME_IN_USEC 2
 
@@ -73,10 +74,10 @@ typedef struct {
    // pin of the last (8th) BROSE module comparator adress pin and FP2800A enable (E)
    // set it on the DIP switches to "ON" to archive a enable-like functionality
    unsigned int enable_pin;
-   
+
    // set the led mode
    unsigned int led_mode;
-   
+
    // enable/disable verbose messages on serial console
    bool verbose;
 } flippie_t;
@@ -93,10 +94,10 @@ private:
 
 public:
    Flippie();
-   Flippie(flippie_t _f);
-   
+   Flippie(flippie_t* f);
+
    // flippie configuation
-   flippie_t config;
+   flippie_t* config;
 
    // LEDs status
    bool led_A_on;
@@ -108,12 +109,12 @@ public:
    void fill();
    void inverse();
    void magnetize(unsigned int repeats);
-   
+
    // paint _dots in different flavours
    void paint();
    void paint(bool override_former_dot_state);
    void paint(unsigned int ** dots);
-   
+
    // setter and getter of shift-register parts
    void clear_shift_register(bool fire_after_clear);
    void set_row_set(unsigned int row);
