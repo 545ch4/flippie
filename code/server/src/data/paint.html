@@ -1,0 +1,232 @@
+R"C897ND7ZDT24Z7(
+<!DOCTYPE html>
+<html lang="en">
+<head>
+   <title>flippie - paint</title>
+   <meta charset="utf-8" />
+   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+   <meta name="viewport" content="width=device-width, initial-scale=1" />
+   <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css" rel="stylesheet" />
+   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" />
+   <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet" />
+   <link href="https://gitcdn.github.io/bootstrap-toggle/2.2.2/css/bootstrap-toggle.min.css" rel="stylesheet" />
+   <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
+   <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+   <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+   <!--[if lt IE 9]>
+   <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+   <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+   <![endif]-->
+   <style>
+   body {
+      padding-top: 70px;
+      padding-bottom: 30px;
+   }
+   .btn not-active {
+      color: #3276b1;
+      background-color: #fff;
+   }
+   .glyphicon-refresh-animate {
+      -animation: spin .7s infinite linear;
+      -webkit-animation: spin2 .7s infinite linear;
+   }
+   
+   @-webkit-keyframes spin2 {
+      from { -webkit-transform: rotate(0deg);}
+      to { -webkit-transform: rotate(360deg);}
+   }
+   
+   @keyframes spin {
+      from { transform: scale(1) rotate(0deg);}
+      to { transform: scale(1) rotate(360deg);}
+   }
+   </style>
+</head>
+<body>
+   <!-- Fixed navbar -->
+   <nav class="navbar navbar-inverse navbar-fixed-top">
+      <div class="container">
+         <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+               <span class="sr-only">Toggle navigation</span>
+               <span class="icon-bar"></span>
+               <span class="icon-bar"></span>
+               <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="#">Flippie</a>
+         </div>
+         <div id="navbar" class="navbar-collapse collapse">
+            <ul class="nav navbar-nav">
+               <li class="active"><a href="/ui/index.html">Start</a></li>
+               <li><a href="/ui/control.html">Control</a></li>
+               <li><a href="/ui/low_level.html">Low-Level</a></li>
+               <li><a href="/ui/paint.html">Paint</a></li>
+            </ul>
+         </div><!--/.nav-collapse -->
+      </div>
+   </nav>
+   <div class="container">
+      <div class="row">
+         <div class="col-xs-12">
+            <div id="flippie">
+               <canvas id="paintBox" style="background-color: #333">
+                  Your browser doesnot support canvas
+               </canvas>
+               <div class="errors"></div>
+               <p>
+                  <div class="btn-group btn-group-justified">
+                     <a href="#" data-task="clear" class="btn btn-default"><span class="glyphicon glyphicon-exclamation-sign"></span> Clear display</a>
+                  </div>
+               </p>
+               
+               <p>
+                  <div class="btn-group btn-group-justified">
+                     <a href="#" data-task="fill" class="btn btn-default"><span class="glyphicon glyphicon-exclamation-sign"></span> Fill display</a>
+                  </div>
+               </p>
+               
+               <p>
+                  <div class="btn-group btn-group-justified">
+                     <a href="#" data-task="inverse" class="btn btn-default"><span class="glyphicon glyphicon-exclamation-sign"></span> Inverse display</a>
+                  </div>
+               </p>
+            </div>
+         </div>
+      </div>
+   </div>
+   
+   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+   <script src="https://gitcdn.github.io/bootstrap-toggle/2.2.2/js/bootstrap-toggle.min.js"></script>
+   
+   <script type="text/javascript">
+   var flippie_config = {};
+   
+   var canvas = null; //canvas object
+   var context = null; //canvas's context object
+   var hold_down = false;
+   var last_x = -1;
+   var last_y = -1;
+   var delta = 3;
+   var delta_half = 0.5 * delta;
+   
+   function clear_canvas() {
+      context.clearRect(0, 0, canvas.width, canvas.height);
+      for(var x = 0; x < width; x++) {
+         for(var y = 0; y < flippie_config['rows']; y++) {
+            context.beginPath();
+            context.arc(x * delta + delta_half, y  * delta + delta_half, delta_half, 0, 2.0 * Math.PI, false);
+            context.fillStyle = 'black';
+            context.fill();
+         }
+      }
+   }
+   
+   function initilaize_canvas(evt) {
+      var width = 0;
+      $.each(flippie_config['columns'], function(){
+         width += parseInt(this) || 0;
+      });
+      canvas.width = width * delta;
+      canvas.height = flippie_config['rows'] * delta;
+      
+      $.getJSON('/dots').done(function(dots_as_string) {
+         var r, m, x = 0, c, pos = 0;
+         for(r = 0; r < flippie_config['rows']; r++;) {
+            for(m = 0; m < flippie_config['columns'].length; m++;) {
+               for(c = 0; c < flippie_config['columns'][m]; c++;) {
+                  context.beginPath();
+                  context.arc(x, r * delta + delta_half, delta_half, 0, 2 * Math.PI, false);
+                  if((dots_as_string.charCodeAt(pos + Math.floor(c/8))>>(c%8)) & 1 == 1) {
+                     context.fillStyle = 'yellow';
+                  } else {
+                     context.fillStyle = 'black';
+                  }
+                  context.fill();
+                  x++;
+                  pos+=4;
+               }
+            }
+         }
+      }).fail(function() {
+         $('#flippie .errors').append($('<p />').html('Failed getting dots.');
+      }).always(function() {
+         $('#flippie input,select,button,textarea,a').prop('disabled', false);
+      });
+   }
+   
+   $(document).ready(function() {
+      canvas = $('#paintBox');
+      context = canvas.getContext('2d');
+      $('#flippie input,select,button,textarea,a').prop('disabled', true);
+      
+      $.getJSON('/ui/config.json').done(function(json) {
+         flippie_config = json;
+         initialize_canvas();
+      }).fail(function() {
+         $('#flippie .errors').append($('<p />').html('Failed getting flippie configuration.');
+      }).always(function() {
+         $('#flippie input,select,button,textarea,a').prop('disabled', false);
+      });
+      
+      $('#flippie a[data-task]').on('click', function(e) {
+         $('#flippie input,select,button,textarea,a').prop('disabled', true);
+         var elem = $(e.target);
+         elem.removeClass('glyphicon-exclamation-sign').addClass('glyphicon-refresh glyphicon-refresh-animate');
+         $.post('/ui/flippie', {task: elem.data('task')}).done(function(json) {
+            flippie_config = json;
+         }).fail(function() {
+            $('#flippie .errors').append($('<p />').html('Failed getting flippie configuration.');
+         }).always(function() {
+            elem.removeClass('glyphicon-refresh glyphicon-refresh-animate').addClass('glyphicon-exclamation-sign');
+            $('#flippie input,select,button,textarea,a').prop('disabled', false);
+         });
+      });
+
+      canvas.on('touchstart', function(e){
+         e.preventDefault();
+         var last_x = Math.floor(e.touches[0].pageX / delta) * delta + delta_half;
+         var last_y = Math.floor(e.touches[0].pageY / delta) * delta + delta_half;
+         if(!hold_down) {
+            var data = context.getImageData(last_x, last_y, 1, 1).data;
+            context.beginPath();
+            context.arc(last_x, last_y, delta_half, 0, 2 * Math.PI, false);
+            if(data[0] == 0 && data[1] == 0 && data[2] == 0 && data[3] == 255) {
+               context.fillStyle = 'yellow';
+            } else {
+               context.fillStyle = 'black';
+            }
+            context.fill();
+            hold_down = true;
+         }
+         
+      });
+      canvas.on('touchmove', function(e){
+         e.preventDefault();
+         var x = Math.floor(e.touches[0].pageX / delta) * delta + delta_half;
+         var y = Math.floor(e.touches[0].pageY / delta) * delta + delta_half;
+         if(hold_down && (x != last_x || y != last_y)) {
+               last_x = x;
+               last_y = y;
+               var data = context.getImageData(x, y, 1, 1).data;
+               context.beginPath();
+               context.arc(x, y, delta_half, 0, 2 * Math.PI, false);
+               if(data[0] == 0 && data[1] == 0 && data[2] == 0 && data[3] == 255) {
+                  context.fillStyle = 'yellow';
+               } else {
+                  context.fillStyle = 'black';
+               }
+               context.fill();
+            }
+         }
+      });
+      canvas.on('touchend', function(e){
+         e.preventDefault();
+         last_y = -1;
+         last_x = -1;
+         hold_down = false;
+      });
+   });
+   </script>
+   </body>
+   </html>
+)C897ND7ZDT24Z7"

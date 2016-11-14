@@ -1,18 +1,18 @@
 #include "dots_handler.h"
 
-DotsHandler::DotsHandler(const char* uri, Flippie* f) : _uri(uri) {
+DotsHandler::DotsHandler(Flippie* f) {
    flippie = f;
 }
 
-bool DotsHandler::handle(ESP8266WebServer& server, HTTPMethod requestMethod, String requestUri) {
-   if (requestMethod != HTTP_GET || requestUri != _uri) {
+bool DotsHandler::handle(ESP8266WebServer& server, HTTPMethod method, String uri) {
+   if(!canHandle(method, uri)) {
       return false;
    }
-   if(server.hasArg("dots")) {
+   if(method == HTTP_POST && server.hasArg("dots")) {
      unsigned int ptr, u;
      String dots = server.arg("dots");
-     const char * dots_c_str = dots.c_str();
-     // hex encoded post data
+     const char* dots_c_str = dots.c_str();
+     // hex encoded 4*byte => uint32 post data
      if(dots.length() != flippie->config->num_rows * flippie->config->num_modules * sizeof(unsigned int) * 2) {
        Serial.printf("Size mismatch: 'dots' is %u instead of %u bytes (%u rows X %u modules X %u bytes X 2) long!\n", dots.length(), flippie->config->num_rows * flippie->config->num_modules * sizeof(unsigned int) * 2, flippie->config->num_rows, flippie->config->num_modules, sizeof(unsigned int));
      }
@@ -74,3 +74,12 @@ bool DotsHandler::handle(ESP8266WebServer& server, HTTPMethod requestMethod, Str
    }
    return true;
 }
+
+bool DotsHandler::canHandle(HTTPMethod method, String uri) {
+   if (uri == "/dots" && (method == HTTP_GET || method == HTTP_POST)) {
+      return true;
+   }
+   return false;
+}
+
+

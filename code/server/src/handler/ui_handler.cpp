@@ -2,8 +2,17 @@
 
 UIHandler::UIHandler(Flippie* f) {
    flippie = f;
-   root_page =
+   index_page =
 #include "data/index.html"
+;
+low_level_page =
+#include "data/low_level.html"
+;
+paint_page =
+#include "data/paint.html"
+;
+tasks_page =
+#include "data/tasks.html"
 ;
    char *config_page_temp;
    config_page_temp = (char *)malloc(1024 * sizeof(char));
@@ -19,7 +28,7 @@ UIHandler::UIHandler(Flippie* f) {
 }
 
 bool UIHandler::handle(ESP8266WebServer& server, HTTPMethod method, String uri) {
-   if (method != HTTP_GET) {
+   if(!canHandle(method, uri)) {
       return false;
    }
    if(uri == "/" || strncmp("/ui", uri.c_str(), 3) == 0) {
@@ -27,7 +36,13 @@ bool UIHandler::handle(ESP8266WebServer& server, HTTPMethod method, String uri) 
          server.sendHeader("Location", "/ui/", true);
          server.send(302, "text/html", "");
       } else if(uri == "/ui" || uri == "/ui/" || uri == "/ui/index.html") {
-         server.send(200, "text/html", root_page);
+         server.send(200, "text/html", index_page);
+      } else if(uri == "/ui/low_level.html") {
+         server.send(200, "text/html", low_level_page);
+      } else if(uri == "/ui/paint_page.html") {
+         server.send(200, "text/html", paint_page);
+      } else if(uri == "/ui/tasks.html") {
+         server.send(200, "text/html", tasks_page);
       } else if(uri == "/ui/config.json") {
          server.send(200, "application/json", config_page);
       }

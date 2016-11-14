@@ -2,6 +2,7 @@ R"D8ESKJ6H4DSKHU(
 <!DOCTYPE html>
 <html lang="en">
 <head>
+   <title>flippie - low-level</title>
    <meta charset="utf-8" />
    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
    <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -25,6 +26,20 @@ R"D8ESKJ6H4DSKHU(
       color: #3276b1;
       background-color: #fff;
    }
+   .glyphicon-refresh-animate {
+       -animation: spin .7s infinite linear;
+       -webkit-animation: spin2 .7s infinite linear;
+   }
+
+   @-webkit-keyframes spin2 {
+       from { -webkit-transform: rotate(0deg);}
+       to { -webkit-transform: rotate(360deg);}
+   }
+
+   @keyframes spin {
+       from { transform: scale(1) rotate(0deg);}
+       to { transform: scale(1) rotate(360deg);}
+   }
    </style>
 </head>
 <body>
@@ -42,9 +57,9 @@ R"D8ESKJ6H4DSKHU(
          </div>
          <div id="navbar" class="navbar-collapse collapse">
             <ul class="nav navbar-nav">
-               <li class="active"><a href="/ui/index.html">Start</a></li>
+               <li><a href="/ui/index.html">Start</a></li>
                <li><a href="/ui/control.html">Control</a></li>
-               <li><a href="/ui/low_level.html">Low-Level</a></li>
+               <li class="active"><a href="/ui/low_level.html">Low-Level</a></li>
                <li><a href="/ui/paint.html">Paint</a></li>
             </ul>
          </div><!--/.nav-collapse -->
@@ -53,112 +68,290 @@ R"D8ESKJ6H4DSKHU(
    <div class="container">
       <div class="row">
          <div class="col-xs-12">
-            <p>
-               <div class="alert alert-info" id="status" role="alert">Nothing to do yet...</div>
-            </p>
-            <p>
-               <div class="btn-group btn-group-justified">
-                  <a href="#" class="btn btn-info" data-flippie-uri="/sr?clear=1" id="clear">Clear shift register</a>
-               </div>
-            </p>
-            <p>
-               LED: 1 <input id="led1" data-flippie-uri="/flippie?led=1" type="checkbox" data-toggle="toggle" data-on="ON" data-off="OFF" data-onstyle="warning" />&nbsp;&nbsp;
-               2 <input id="led2" data-flippie-uri="/sr?led=2" type="checkbox" data-toggle="toggle" data-on="ON" data-off="OFF" data-onstyle="warning" />&nbsp;&nbsp;
-               3 <input id="led3" data-flippie-uri="/sr?led=3" type="checkbox" data-toggle="toggle" data-on="ON" data-off="OFF" data-onstyle="warning" />
-            </p>
-            <p>
-               <div class="input-group">
-                  ADDR:
-                  <div class="btn-group">
-                     <a href="#" class="btn btn-default" data-flippie-uri="/sr?fp2800a_addr=0">0000000</a>
-                     <a href="#" class="btn btn-default" data-flippie-uri="/sr?fp2800a_addr=1">0000001</a>
-                     <a href="#" class="btn btn-default" data-flippie-uri="/sr?fp2800a_addr=2">0000010</a>
-                     <a href="#" class="btn btn-default" data-flippie-uri="/sr?fp2800a_addr=3">0000011</a>
-                     <a href="#" class="btn btn-default" data-flippie-uri="/sr?fp2800a_addr=4">0000100</a>
-                     <a href="#" class="btn btn-default" data-flippie-uri="/sr?fp2800a_addr=8">0001000</a>
-                     <a href="#" class="btn btn-default" data-flippie-uri="/sr?fp2800a_addr=16">0010000</a>
-                     <a href="#" class="btn btn-default" data-flippie-uri="/sr?fp2800a_addr=32">0100000</a>
-                     <a href="#" class="btn btn-default" data-flippie-uri="/sr?fp2800a_addr=64">1000000</a>
+            <form action="/flippie" method="POST" id="flippie" onsubmit="return false;">
+               <p>
+                  <input name="led_A" value="1" type="checkbox" data-toggle="toggle" data-on="A" data-off="A" data-onstyle="success" />&nbsp;&nbsp;
+                  <input name="led_B" value="1" type="checkbox" data-toggle="toggle" data-on="B" data-off="B" data-onstyle="success" />&nbsp;&nbsp;
+                  <input name="led_C" value="1" type="checkbox" data-toggle="toggle" data-on="C" data-off="C" data-onstyle="success" />
+               </p>
+               
+               <p>
+                  <div class="input-group">
+                     Address
+                     <select name="address" size="1">
+                        <option value="-1">undefined</option>
+                        <option value="0">0: 0-0-0-0-0-0-0</option>
+                        <option value="1">1: 1-0-0-0-0-0-0</option>
+                        <option value="2">2: 0-1-0-0-0-0-0</option>
+                        <option value="3">3: 1-1-0-0-0-0-0</option>
+                        <option value="4">4: 0-0-1-0-0-0-0</option>
+                        <option value="5">5: 1-0-1-0-0-0-0</option>
+                        <option value="6">6: 0-1-1-0-0-0-0</option>
+                        <option value="7">7: 1-1-1-0-0-0-0</option>
+                        <option value="8">8: 0-0-0-1-0-0-0</option>
+                        <option value="9">9: 1-0-0-1-0-0-0</option>
+                        <option value="10">10: 0-1-0-1-0-0-0</option>
+                        <option value="11">11: 1-1-0-1-0-0-0</option>
+                        <option value="12">12: 0-0-1-1-0-0-0</option>
+                        <option value="13">13: 1-0-1-1-0-0-0</option>
+                        <option value="14">14: 0-1-1-1-0-0-0</option>
+                        <option value="15">15: 1-1-1-1-0-0-0</option>
+                        <option value="16">16: 0-0-0-0-1-0-0</option>
+                        <option value="17">17: 1-0-0-0-1-0-0</option>
+                        <option value="18">18: 0-1-0-0-1-0-0</option>
+                        <option value="19">19: 1-1-0-0-1-0-0</option>
+                        <option value="20">20: 0-0-1-0-1-0-0</option>
+                        <option value="21">21: 1-0-1-0-1-0-0</option>
+                        <option value="22">22: 0-1-1-0-1-0-0</option>
+                        <option value="23">23: 1-1-1-0-1-0-0</option>
+                        <option value="24">24: 0-0-0-1-1-0-0</option>
+                        <option value="25">25: 1-0-0-1-1-0-0</option>
+                        <option value="26">26: 0-1-0-1-1-0-0</option>
+                        <option value="27">27: 1-1-0-1-1-0-0</option>
+                        <option value="28">28: 0-0-1-1-1-0-0</option>
+                        <option value="29">29: 1-0-1-1-1-0-0</option>
+                        <option value="30">30: 0-1-1-1-1-0-0</option>
+                        <option value="31">31: 1-1-1-1-1-0-0</option>
+                        <option value="32">32: 0-0-0-0-0-1-0</option>
+                        <option value="33">33: 1-0-0-0-0-1-0</option>
+                        <option value="34">34: 0-1-0-0-0-1-0</option>
+                        <option value="35">35: 1-1-0-0-0-1-0</option>
+                        <option value="36">36: 0-0-1-0-0-1-0</option>
+                        <option value="37">37: 1-0-1-0-0-1-0</option>
+                        <option value="38">38: 0-1-1-0-0-1-0</option>
+                        <option value="39">39: 1-1-1-0-0-1-0</option>
+                        <option value="40">40: 0-0-0-1-0-1-0</option>
+                        <option value="41">41: 1-0-0-1-0-1-0</option>
+                        <option value="42">42: 0-1-0-1-0-1-0</option>
+                        <option value="43">43: 1-1-0-1-0-1-0</option>
+                        <option value="44">44: 0-0-1-1-0-1-0</option>
+                        <option value="45">45: 1-0-1-1-0-1-0</option>
+                        <option value="46">46: 0-1-1-1-0-1-0</option>
+                        <option value="47">47: 1-1-1-1-0-1-0</option>
+                        <option value="48">48: 0-0-0-0-1-1-0</option>
+                        <option value="49">49: 1-0-0-0-1-1-0</option>
+                        <option value="50">50: 0-1-0-0-1-1-0</option>
+                        <option value="51">51: 1-1-0-0-1-1-0</option>
+                        <option value="52">52: 0-0-1-0-1-1-0</option>
+                        <option value="53">53: 1-0-1-0-1-1-0</option>
+                        <option value="54">54: 0-1-1-0-1-1-0</option>
+                        <option value="55">55: 1-1-1-0-1-1-0</option>
+                        <option value="56">56: 0-0-0-1-1-1-0</option>
+                        <option value="57">57: 1-0-0-1-1-1-0</option>
+                        <option value="58">58: 0-1-0-1-1-1-0</option>
+                        <option value="59">59: 1-1-0-1-1-1-0</option>
+                        <option value="60">60: 0-0-1-1-1-1-0</option>
+                        <option value="61">61: 1-0-1-1-1-1-0</option>
+                        <option value="62">62: 0-1-1-1-1-1-0</option>
+                        <option value="63">63: 1-1-1-1-1-1-0</option>
+                        <option value="64">64: 0-0-0-0-0-0-1</option>
+                        <option value="65">65: 1-0-0-0-0-0-1</option>
+                        <option value="66">66: 0-1-0-0-0-0-1</option>
+                        <option value="67">67: 1-1-0-0-0-0-1</option>
+                        <option value="68">68: 0-0-1-0-0-0-1</option>
+                        <option value="69">69: 1-0-1-0-0-0-1</option>
+                        <option value="70">70: 0-1-1-0-0-0-1</option>
+                        <option value="71">71: 1-1-1-0-0-0-1</option>
+                        <option value="72">72: 0-0-0-1-0-0-1</option>
+                        <option value="73">73: 1-0-0-1-0-0-1</option>
+                        <option value="74">74: 0-1-0-1-0-0-1</option>
+                        <option value="75">75: 1-1-0-1-0-0-1</option>
+                        <option value="76">76: 0-0-1-1-0-0-1</option>
+                        <option value="77">77: 1-0-1-1-0-0-1</option>
+                        <option value="78">78: 0-1-1-1-0-0-1</option>
+                        <option value="79">79: 1-1-1-1-0-0-1</option>
+                        <option value="80">80: 0-0-0-0-1-0-1</option>
+                        <option value="81">81: 1-0-0-0-1-0-1</option>
+                        <option value="82">82: 0-1-0-0-1-0-1</option>
+                        <option value="83">83: 1-1-0-0-1-0-1</option>
+                        <option value="84">84: 0-0-1-0-1-0-1</option>
+                        <option value="85">85: 1-0-1-0-1-0-1</option>
+                        <option value="86">86: 0-1-1-0-1-0-1</option>
+                        <option value="87">87: 1-1-1-0-1-0-1</option>
+                        <option value="88">88: 0-0-0-1-1-0-1</option>
+                        <option value="89">89: 1-0-0-1-1-0-1</option>
+                        <option value="90">90: 0-1-0-1-1-0-1</option>
+                        <option value="91">91: 1-1-0-1-1-0-1</option>
+                        <option value="92">92: 0-0-1-1-1-0-1</option>
+                        <option value="93">93: 1-0-1-1-1-0-1</option>
+                        <option value="94">94: 0-1-1-1-1-0-1</option>
+                        <option value="95">95: 1-1-1-1-1-0-1</option>
+                        <option value="96">96: 0-0-0-0-0-1-1</option>
+                        <option value="97">97: 1-0-0-0-0-1-1</option>
+                        <option value="98">98: 0-1-0-0-0-1-1</option>
+                        <option value="99">99: 1-1-0-0-0-1-1</option>
+                        <option value="100">100: 0-0-1-0-0-1-1</option>
+                        <option value="101">101: 1-0-1-0-0-1-1</option>
+                        <option value="102">102: 0-1-1-0-0-1-1</option>
+                        <option value="103">103: 1-1-1-0-0-1-1</option>
+                        <option value="104">104: 0-0-0-1-0-1-1</option>
+                        <option value="105">105: 1-0-0-1-0-1-1</option>
+                        <option value="106">106: 0-1-0-1-0-1-1</option>
+                        <option value="107">107: 1-1-0-1-0-1-1</option>
+                        <option value="108">108: 0-0-1-1-0-1-1</option>
+                        <option value="109">109: 1-0-1-1-0-1-1</option>
+                        <option value="110">110: 0-1-1-1-0-1-1</option>
+                        <option value="111">111: 1-1-1-1-0-1-1</option>
+                        <option value="112">112: 0-0-0-0-1-1-1</option>
+                        <option value="113">113: 1-0-0-0-1-1-1</option>
+                        <option value="114">114: 0-1-0-0-1-1-1</option>
+                        <option value="115">115: 1-1-0-0-1-1-1</option>
+                        <option value="116">116: 0-0-1-0-1-1-1</option>
+                        <option value="117">117: 1-0-1-0-1-1-1</option>
+                        <option value="118">118: 0-1-1-0-1-1-1</option>
+                        <option value="119">119: 1-1-1-0-1-1-1</option>
+                        <option value="120">120: 0-0-0-1-1-1-1</option>
+                        <option value="121">121: 1-0-0-1-1-1-1</option>
+                        <option value="122">122: 0-1-0-1-1-1-1</option>
+                        <option value="123">123: 1-1-0-1-1-1-1</option>
+                        <option value="124">124: 0-0-1-1-1-1-1</option>
+                        <option value="125">125: 1-0-1-1-1-1-1</option>
+                        <option value="126">126: 0-1-1-1-1-1-1</option>
+                        <option value="127">127: 1-1-1-1-1-1-1</option>
+                     </select>
                   </div>
-               </div>
-            </p>
-            <p>
-               <div class="input-group">
-                  COLUMN:
-                  <div class="btn-group">
-                     <a href="#" class="btn btn-default" data-flippie-uri="/sr?fp2800a_column=0">0 (A0)</a>
-                     <a href="#" class="btn btn-default" data-flippie-uri="/sr?fp2800a_column=1">1</a>
-                     <a href="#" class="btn btn-default" data-flippie-uri="/sr?fp2800a_column=2">2</a>
-                     <a href="#" class="btn btn-default" data-flippie-uri="/sr?fp2800a_column=10">10 (A2+B0)</a>
-                     <a href="#" class="btn btn-default" data-flippie-uri="/sr?fp2800a_column=20">20</a>
-                     <a href="#" class="btn btn-default" data-flippie-uri="/sr?fp2800a_column=25">25</a>
-                     <a href="#" class="btn btn-default" data-flippie-uri="/sr?fp2800a_column=26">26</a>
-                     <a href="#" class="btn btn-default" data-flippie-uri="/sr?fp2800a_column=27">27 (ALL)</a>
+               </p>
+               
+               <p>
+                  <div class="input-group">
+                     Column
+                     <select name="column" size="1">
+                        <option value="-1">undefined</option>
+                        <option value="0">0</option>
+                        <option value="1">1</option>
+                        <option value="2">2</option>
+                        <option value="3">3</option>
+                        <option value="4">4</option>
+                        <option value="5">5</option>
+                        <option value="6">6</option>
+                        <option value="7">7</option>
+                        <option value="8">8</option>
+                        <option value="9">9</option>
+                        <option value="10">10</option>
+                        <option value="11">11</option>
+                        <option value="12">12</option>
+                        <option value="13">13</option>
+                        <option value="14">14</option>
+                        <option value="15">15</option>
+                        <option value="16">16</option>
+                        <option value="17">17</option>
+                        <option value="18">18</option>
+                        <option value="19">19</option>
+                        <option value="20">20</option>
+                        <option value="21">21</option>
+                        <option value="22">22</option>
+                        <option value="23">23</option>
+                        <option value="24">24</option>
+                        <option value="25">25</option>
+                        <option value="26">26</option>
+                        <option value="27">27</option>
+                     </select>
                   </div>
-               </div>
-            </p>
+               </p>
 
-            <p>
-               COLUMN CODE: B1 <input id="column_code_B1" data-flippie-uri="/sr?fp2800a_column_raw=1" type="checkbox" data-toggle="toggle" data-on="HIGH" data-off="LOW" data-onstyle="info" />&nbsp;&nbsp;
-               B0 <input id="column_code_B0" data-flippie-uri="/sr?fp2800a_column_raw=2" type="checkbox" data-toggle="toggle" data-on="HIGH" data-off="LOW" data-onstyle="info" />&nbsp;&nbsp;
-               A2 <input id="column_code_A2" data-flippie-uri="/sr?fp2800a_column_raw=4" type="checkbox" data-toggle="toggle" data-on="HIGH" data-off="LOW" data-onstyle="info" />&nbsp;&nbsp;
-               A1 <input id="column_code_A1" data-flippie-uri="/sr?fp2800a_column_raw=8" type="checkbox" data-toggle="toggle" data-on="HIGH" data-off="LOW" data-onstyle="info" />&nbsp;&nbsp;
-               A0 <input id="column_code_A0" data-flippie-uri="/sr?fp2800a_column_raw=16" type="checkbox" data-toggle="toggle" data-on="HIGH" data-off="LOW" data-onstyle="info" />
-            </p>
-
-            <p>
-               <div class="input-group">
-                  ROW +VS:
-                  <div class="btn-group">
-                     <a href="#" class="btn btn-default" data-flippie-uri="/sr?fp2800a_row_set_plusvs=0">0</a>
-                     <a href="#" class="btn btn-default" data-flippie-uri="/sr?fp2800a_row_set_plusvs=1">1</a>
-                     <a href="#" class="btn btn-default" data-flippie-uri="/sr?fp2800a_row_set_plusvs=2">2</a>
-                     <a href="#" class="btn btn-default" data-flippie-uri="/sr?fp2800a_row_set_plusvs=10">10</a>
-                     <a href="#" class="btn btn-default" data-flippie-uri="/sr?fp2800a_row_set_plusvs=17">17</a>
-                     <a href="#" class="btn btn-default" data-flippie-uri="/sr?fp2800a_row_set_plusvs=18">18</a>
-                     <a href="#" class="btn btn-default" data-flippie-uri="/sr?fp2800a_row_set_plusvs=19">19</a>
+               <p>
+                  <div class="input-group">
+                     Row SET
+                     <select name="row_set" size="1">
+                        <option value="-1">undefined</option>
+                        <option value="0">0</option>
+                        <option value="1">1</option>
+                        <option value="2">2</option>
+                        <option value="3">3</option>
+                        <option value="4">4</option>
+                        <option value="5">5</option>
+                        <option value="6">6</option>
+                        <option value="7">7</option>
+                        <option value="8">8</option>
+                        <option value="9">9</option>
+                        <option value="10">10</option>
+                        <option value="11">11</option>
+                        <option value="12">12</option>
+                        <option value="13">13</option>
+                        <option value="14">14</option>
+                        <option value="15">15</option>
+                        <option value="16">16</option>
+                        <option value="17">17</option>
+                        <option value="18">18</option>
+                        <option value="19">19</option>
+                        <option value="20">20</option>
+                        <option value="21">21</option>
+                        <option value="22">22</option>
+                        <option value="23">23</option>
+                        <option value="24">24</option>
+                        <option value="25">25</option>
+                        <option value="26">26</option>
+                        <option value="27">27</option>
+                     </select>
                   </div>
-               </div>
-            </p>
+               </p>
 
-            <p>
-               <div class="input-group">
-                  ROW GND:
-                  <div class="btn-group">
-                     <a href="#" class="btn btn-default" data-flippie-uri="/sr?fp2800a_row_set_gnd=0">0</a>
-                     <a href="#" class="btn btn-default" data-flippie-uri="/sr?fp2800a_row_set_gnd=1">1</a>
-                     <a href="#" class="btn btn-default" data-flippie-uri="/sr?fp2800a_row_set_gnd=2">2</a>
-                     <a href="#" class="btn btn-default" data-flippie-uri="/sr?fp2800a_row_set_gnd=10">10</a>
-                     <a href="#" class="btn btn-default" data-flippie-uri="/sr?fp2800a_row_set_gnd=17">17</a>
-                     <a href="#" class="btn btn-default" data-flippie-uri="/sr?fp2800a_row_set_gnd=18">18</a>
-                     <a href="#" class="btn btn-default" data-flippie-uri="/sr?fp2800a_row_set_gnd=19">19</a>
+               <p>
+                  <div class="input-group">
+                     Row RST
+                     <select name="row_rst" size="1">
+                        <option value="-1">undefined</option>
+                        <option value="0">0</option>
+                        <option value="1">1</option>
+                        <option value="2">2</option>
+                        <option value="3">3</option>
+                        <option value="4">4</option>
+                        <option value="5">5</option>
+                        <option value="6">6</option>
+                        <option value="7">7</option>
+                        <option value="8">8</option>
+                        <option value="9">9</option>
+                        <option value="10">10</option>
+                        <option value="11">11</option>
+                        <option value="12">12</option>
+                        <option value="13">13</option>
+                        <option value="14">14</option>
+                        <option value="15">15</option>
+                        <option value="16">16</option>
+                        <option value="17">17</option>
+                        <option value="18">18</option>
+                        <option value="19">19</option>
+                        <option value="20">20</option>
+                        <option value="21">21</option>
+                        <option value="22">22</option>
+                        <option value="23">23</option>
+                        <option value="24">24</option>
+                        <option value="25">25</option>
+                        <option value="26">26</option>
+                        <option value="27">27</option>
+                     </select>
                   </div>
-               </div>
-            </p>
+               </p>
 
-            <p>
-               ENABLE (+ADDR8): <input id="enable" data-flippie-uri="/sr?fp2800a_enable=1" type="checkbox" data-toggle="toggle" data-on="HIGH" data-off="LOW" data-onstyle="danger" />
-            </p>
+               <p>
+                  D <input name="d" type="radio" value="1" /> 1 or <input name="d" type="radio" value="0" /> 0
+               </p>
 
-            <p>
-               DATA: <input id="enable" data-flippie-uri="/sr?fp2800a_data=1" type="checkbox" data-toggle="toggle" data-on="+VS" data-off="GND" data-onstyle="danger" />
-            </p>
-            <hr />
-            <p>
-               <div class="btn-group btn-group-justified">
-                  <a href="#" class="btn btn-danger" data-flippie-uri="/flipdot?task=clear">Empty whole flipdot display</a>
-               </div>
-            </p>
-            <p>
-               <div class="btn-group btn-group-justified">
-                  <a href="#" class="btn btn-danger" data-flippie-uri="/flipdot?task=inverse">Inverse whole flipdot display</a>
-               </div>
-            </p>
-            <p>
-               <div class="btn-group btn-group-justified">
-                  <a href="#" class="btn btn-danger" data-flippie-uri="/flipdot?task=fill">Fill whole flipdot display</a>
-               </div>
-            </p>
+               <hr />
+
+               <p>
+                  <div id="shiftregister"></div>
+               </p>
+
+               <hr />
+               <div class="errors"></div>
+               <input type="hidden" name="enable" value="0" />
+               <p>
+                  <div class="btn-group btn-group-justified">
+                     <button type="submit" class="btn btn-success" value="fire"><span class="glyphicon glyphicon-exclamation-sign"></span> Fire shift-regsiter</button>
+                  </div>
+               </p>
+               <p>
+                  <div class="btn-group btn-group-justified">
+                     <button type="submit" class="btn btn-danger" value="fire_enable"><span class="glyphicon glyphicon-exclamation-sign"></span> Fire shift-regsiter (FP2800A enable)</button>
+                  </div>
+               </p>
+               <p>
+                  <div class="btn-group btn-group-justified">
+                     <button type="reset" class="btn btn-default"><span class="glyphicon glyphicon-exclamation-sign"></span> Reset shift-regsiter</button>
+                  </div>
+               </p>
+            </form>
          </div>
       </div>
    </div>
@@ -168,42 +361,84 @@ R"D8ESKJ6H4DSKHU(
 
    <script>
    var flippie_config;
-   $.getJSON('/ui/config.json', function(json) {
-      flippie_config = json;
-   });
-   function fire(uri) {
-      console.log(uri);
-      $.get(uri).done(function(data) {
-         $('#status').removeClass('alert-info alert-warning alert-danger').addClass('alert-success').html(data);
+   
+   function fill_form() {
+      $('#flippie input[name="enable"]').val('0');
+      $.each(['led_A', 'led_B', 'led_C', 'address', 'column', 'row_set', 'row_rst', 'd'], function(index, f) {
+         $.getJSON('/ui/flippie?'+ f).done(function(v) {
+            $('[name="' + f + '"]').val(v);
+         }).fail(function() {
+            $('#flippie .errors').append($('<p />').html('Failed getting "' + f + '" content.');
+         });
+      });
+      display_shift_register();
+   }
+   
+   function display_shift_register() {
+      $.getJSON('/ui/flippie?shiftregister').done(function(shiftregister) {
+         $('#shiftregister').empty();
+         for (var i = 0, len = shift_register_string.length; i < len; i++) {
+            $('#shiftregister').append($('<span />').css({color: shift_register_string[i] == '1' ? 'red' : 'black'}).html('&bull;'));
+            if(i%9 == 0) {
+               $('#shiftregister').append('|');
+            }
+         }
       }).fail(function() {
-         $('#status').removeClass('alert-info alert-warning alert-success').addClass('alert-danger').html('Fail');
-      }).always(function() {
-         $('[data-flippie-uri]').attr('disabled', null);
+         $('#flippie .errors').append($('<p />').html('Failed getting shift-register content.');
       });
    }
 
-   $('.btn[data-flippie-uri]').on('click', function(e){
-      var elem = $(e.target);
-      if(elem.parent().hasClass('btn-group')) {
-         elem.parent().children().removeClass('active');
-         elem.addClass('active');
-      }
-      if(elem.prop('id') == 'clear') {
-         $('.btn').removeClass('active');
-         $.each($('[data-flippie-uri][type="checkbox"]'), function(a,b) {
-            if($(this).prop('checked')){
-               $(this).bootstrapToggle('off');
-            }
-         });
-      }
-      $('[data-flippie-uri]').attr('disabled', 'disabled');
-      fire(elem.data('flippieUri'));
-      return false;
-   });
+   $(document).ready(function() {
+      $('#flippie input,select,button,textarea,a').prop('disabled', true);
 
-   $('[data-flippie-uri][type=checkbox]').change(function() {
-      fire($(this).data('flippieUri') + '&state=' + ($(this).prop('checked') ? '1' : '0'));
-   });
+      $.getJSON('/ui/config.json').done(function(json) {
+         flippie_config = json;
+      }).fail(function() {
+         $('#flippie .errors').append($('<p />').html('Failed getting flippie configuration.');
+      }).always(function() {
+         $('#flippie input,select,button,textarea,a').prop('disabled', false);
+      });
+      
+      $('#flippie').on('reset', function(e) {
+         e.preventDefault();
+         $('#flippie input,select,button,textarea,a').prop('disabled', true);
+         var elem = $(e.relatedTarget);
+         elem.removeClass('glyphicon-exclamation-sign').addClass('glyphicon-refresh glyphicon-refresh-animate');
+         $('#flippie .errors').empty();
+         $.post('/ui/flippie', {clear: 1}).done(function(r) {
+            fill_form();
+         }).fail(function() {
+            $('#flippie .errors').append($('<p />').html('Failed resetting shift-register.');
+         }).always(function() {
+            elem.removeClass('glyphicon-refresh glyphicon-refresh-animate').addClass('glyphicon-exclamation-sign');
+            $('#flippie input,select,button,textarea,a').prop('disabled', false);
+         });
+         return false;
+      });
+      
+      $('#flippie').on('submit', function(e) {
+         e.preventDefault();
+         $('#flippie input,select,button,textarea,a').prop('disabled', true);
+         var elem = $(e.relatedTarget);
+         elem.removeClass('glyphicon-exclamation-sign').addClass('glyphicon-refresh glyphicon-refresh-animate');
+         $('#flippie input[name="enable"]').val($('#flippie [type="submit"][clicked="true"]').val() == 'fire_enable' ? '1' : '0');
+         $('#flippie .errors').empty();
+         $.post('/ui/flippie', $('#flippie').serialize()).done(function(r) {
+            fill_form();
+         }).fail(function() {
+            $('#flippie .errors').append($('<p />').html('Failed resetting shift-register.');
+         }).always(function() {
+            elem.removeClass('glyphicon-refresh glyphicon-refresh-animate').addClass('glyphicon-exclamation-sign');
+            $('#flippie input,select,button,textarea,a').prop('disabled', false);
+         });
+         return false;
+      });
+      
+      $('#flippie [type=submit]').click(function() {
+           $('[type=submit]', $('#flippie')).removeAttr('clicked');
+           $(this).attr('clicked', 'true');
+       });
+    });
    </script>
 </body>
 </html>

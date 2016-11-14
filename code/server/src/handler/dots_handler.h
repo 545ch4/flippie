@@ -6,10 +6,10 @@
 
 class DotsHandler : public RequestHandler {
 public:
-  DotsHandler(const char* uri, Flippie* f);
-  bool handle(ESP8266WebServer& server, HTTPMethod requestMethod, String requestUri) override;
+  DotsHandler(Flippie* flippie);
+  bool canHandle(HTTPMethod method, String uri) override;
+  bool handle(ESP8266WebServer& server, HTTPMethod method, String uri) override;
 protected:
-  String _uri;
   Flippie* flippie;
 };
 

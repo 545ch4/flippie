@@ -77,18 +77,18 @@ Download the [Eagle BRD](https://github.com/545ch4/flippie/board/flippie.brd) fi
 | R9   | 100K       | R-SMD-1206    | 1206          | RESISTOR |
 | ..   |            |               |               |          |
 | R22  | 100K       | R-SMD-1206    | 1206          | RESISTOR |
-| U1   | FPF2702MX  | FPF270x       | SO8N          | AccuPower 0.4~2 A current limiter |
+| U1   | FPF2702MX  | FPF270x       | SO8N          | AccuPower <40V 0.4~2A current limiter |
 | U2   | SN74AHC595D| 74HC595       | SO16N         | 8 bit Shift register |
 | ..   |            |               |               |                      |
 | U8   | SN74AHC595D| 74HC595       | SO16N         | 8 bit Shift register |
-| U9   | ULN2803ADW | ULN2803ADW    | SO18N         | NMOS Darlington transistor array |
-| U10  | ULN2803ADW | ULN2803ADW    | SO18N         | NMOS Darlington transistor array |
-| U11  | TD62783AP  | UDN2981LW     | SO18W         | PMOS Darlington transistor array |
-| U12  | TD62783AP  | UDN2981LW     | SO18W         | PMOS Darlington transistor array |
-| U13  | TD62783AP  | UDN2981LW     | SO18W         | PMOS Darlington transistor array |
-| U14  | ULN2803ADW | ULN2803ADW    | SO18N         | NMOS Darlington transistor array |
-| U15  | TD62783AP  | UDN2981LW     | SO18W         | PMOS Darlington transistor array |
-| U16  | TD62783AP  | UDN2981LW     | SO18W         | PMOS Darlington transistor array |
+| U9   | ULN2803AFWG| ULN2803       | SO18N         | NMOS Darlington transistor array |
+| U10  | ULN2803AFWG| ULN2803       | SO18N         | NMOS Darlington transistor array |
+| U11  | TD62783AFG | UDN2981       | SO18W         | PMOS Darlington transistor array |
+| U12  | TD62783AFG | UDN2981       | SO18W         | PMOS Darlington transistor array |
+| U13  | TD62783AFG | UDN2981       | SO18W         | PMOS Darlington transistor array |
+| U14  | ULN2803AFWG| ULN2803       | SO18N         | NMOS Darlington transistor array |
+| U15  | TD62783AFG | UDN2981       | SO18W         | PMOS Darlington transistor array |
+| U16  | TD62783AFG | UDN2981       | SO18W         | PMOS Darlington transistor array |
 | X1   | BROSE-60-PO| 30X02X2MM     | 057-060-1     | CONNECTOR |
 
 ---
@@ -176,7 +176,7 @@ This method reads the content of HTTP (POST/GET) variable `dots` which is a base
 ```
 [row 1 column 1-32* module 1], [row 1 column 1-32* module 2], ..., [row 1 column 1-32* module M], [row 2 column 1-32* module 1], [row 2 column 1-32* module 2], ..., ..., [row R column 1-32* module M]
 ```
-\* max, could be less, ignoring excess bits. Each integer is split into 4 8-bit characters in LSB order.
+\* max, could be less, ignoring unnecessary bits. Each integer is packed as four 8-bit characters in LSB order.
 
 **`/flippie` – Directly alter the shift register at flippie (possibly dangerous)**
 
