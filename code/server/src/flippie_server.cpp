@@ -5,6 +5,9 @@ FlippieServer::FlippieServer(ESP8266WebServer* s) {
    flippie = new Flippie();
    if(flippie->config->verbose)
       Serial.println("Finished initilizing flippie.");
+      
+   Serial.println(flippie->shift_register_as_json_short_string());
+   delay(1000);
 
    server->addHandler(new UIHandler(flippie));
    if(flippie->config->verbose)
@@ -21,4 +24,8 @@ FlippieServer::FlippieServer(ESP8266WebServer* s) {
    server->addHandler(new FlippieHandler(flippie));
    if(flippie->config->verbose)
       Serial.println("Added FlippieHandler");
+
+   server->addHandler(new NotFoundHandler(flippie));
+   if(flippie->config->verbose)
+      Serial.println("Added NotFoundHandler");
 }

@@ -9,7 +9,11 @@ class UIHandler : public RequestHandler {
     bool canHandle(HTTPMethod method, String uri) override;
     bool handle(ESP8266WebServer& server, HTTPMethod method, String uri) override;
   protected:
-    String index_page, low_level_page, paint_page, tasks_page, config_page;
+    static const char index_page[];
+    static const char low_level_page[];
+    static const char paint_page[];
+    static const char tasks_page[];
+    char* config_page;
     Flippie* flippie;
 };
 

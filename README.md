@@ -31,7 +31,7 @@ All data and address lines are at 24V logic level. The +VS line should be curren
 
 ## flippie board
 
-The board was designed to drive every serial assembly of modules or single ones without soldering or modifying the module(s) - simply by connection the proprietary 60-pin BROSE connector. The main MCU [ESP3266](https://espressif.com/en/products/hardware/esp8266ex/overview) is mounted on a USB-interfaced USB-to-Serial converter for convenient programming and WiFi on board. Please see [wemos D1 mini](https://www.wemos.cc/product/d1-mini.html) documentation.
+The board was designed to drive every serial assembly of modules or single ones without soldering or modifying the module(s) - simply by connection the proprietary 60-pin BROSE connector. The main MCU [ESP3266](https://espressif.com/en/products/hardware/esp8266ex/overview) is mounted on a USB-interfaced USB-to-Serial converter for convenient programming and WiFi on board. Please see [wemos D1 mini](https://www.wemos.cc/product/d1-mini.html) documentation. Usually you need some driver for the converter to be detected as serial port depending on your OS. The wemod D1 mini comes with a Jiangsu Qinheng CH340/CH341/CH34X or Silicon Labs CP210x chip.
 
 
 ### Block diagram

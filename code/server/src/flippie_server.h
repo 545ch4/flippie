@@ -6,6 +6,7 @@
 #include "handler/dots_handler.h"
 #include "handler/pixel_handler.h"
 #include "handler/flippie_handler.h"
+#include "handler/not_found_handler.h"
 #include <ESP8266WebServer.h>
 
 

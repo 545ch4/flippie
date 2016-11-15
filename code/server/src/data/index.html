@@ -1,4 +1,4 @@
-R"A3A8ESXTTP0DLL(
+u8R"A3A8ESXTTP0DLL(
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -90,9 +90,9 @@ R"A3A8ESXTTP0DLL(
 
       $.getJSON('/ui/config.json').done(function(json) {
          flippie_config = json;
-         $('#text').html('You configured a flippie board with ' + flippie_config['rows'] + ' rows and ' + flippie_config['column'].length + ' module' + (flippie_config['column'].length > 1 ? 's' : '') + '.');
+         $('#text').html('You configured a flippie board with ' + flippie_config['rows'] + ' rows and ' + flippie_config['columns'].length + ' module' + (flippie_config['columns'].length > 1 ? 's' : '') + '.');
       }).fail(function() {
-         $('#flippie .errors').append($('<p />').html('Failed getting flippie configuration.');
+         $('#flippie .errors').append($('<p />').html('Failed getting flippie configuration.'));
       }).always(function() {
          $('#flippie input,select,button,textarea,a').prop('disabled', false);
       });
@@ -100,4 +100,4 @@ R"A3A8ESXTTP0DLL(
    </script>
 </body>
 </html>
-)A3A8ESXTTP0DLL"
+)A3A8ESXTTP0DLL" "\0"

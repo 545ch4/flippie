@@ -1,19 +1,20 @@
 #include "ui_handler.h"
 
-UIHandler::UIHandler(Flippie* f) {
-   flippie = f;
-   index_page =
+const char UIHandler::index_page[] PROGMEM = 
 #include "data/index.html"
 ;
-low_level_page =
+const char UIHandler::low_level_page[] PROGMEM = 
 #include "data/low_level.html"
 ;
-paint_page =
+const char UIHandler::paint_page[] PROGMEM = 
 #include "data/paint.html"
 ;
-tasks_page =
+const char UIHandler::tasks_page[] PROGMEM = 
 #include "data/tasks.html"
 ;
+
+UIHandler::UIHandler(Flippie* f) {
+   flippie = f;
    char *config_page_temp;
    config_page_temp = (char *)malloc(1024 * sizeof(char));
    unsigned int i = 0;
@@ -23,7 +24,8 @@ tasks_page =
    }
 
    i += sprintf(config_page_temp + i, "\t\t%u\n\t]\n}\n\0", flippie->config->num_columns[flippie->config->num_modules - 1]);
-   config_page = String(config_page_temp);
+   config_page = (char *)malloc(i * sizeof(char));
+   memcpy(config_page, config_page_temp, i);
    free(config_page_temp);
 }
 
@@ -31,6 +33,10 @@ bool UIHandler::handle(ESP8266WebServer& server, HTTPMethod method, String uri) 
    if(!canHandle(method, uri)) {
       return false;
    }
+   
+   if(flippie->config->verbose)
+      Serial.printf("Handle '%s' in UIHandler.\n", uri.c_str());
+      
    if(uri == "/" || strncmp("/ui", uri.c_str(), 3) == 0) {
       if(uri == "/" || uri == "/index.html") {
          server.sendHeader("Location", "/ui/", true);
@@ -45,6 +51,8 @@ bool UIHandler::handle(ESP8266WebServer& server, HTTPMethod method, String uri) 
          server.send(200, "text/html", tasks_page);
       } else if(uri == "/ui/config.json") {
          server.send(200, "application/json", config_page);
+      } else {
+         return false;
       }
       return true;
    }

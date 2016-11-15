@@ -71,26 +71,26 @@ R"A8J378RJ04M78DHW(
             <div id="flippie">
                <div class="errors"></div>
                <p>
-                  <div class="btn-group btn-group-justified">
-                     <a href="#" data-task="clear" class="btn btn-default"><span class="glyphicon glyphicon-exclamation-sign"></span> Clear display</a>
+                  <div class="btn-group btn-block">
+                     <a href="#" data-task="clear" class="btn btn-default btn-block"><span class="glyphicon glyphicon-exclamation-sign"></span> Clear display</a>
                   </div>
                </p>
                
                <p>
-                  <div class="btn-group btn-group-justified">
-                     <a href="#" data-task="fill" class="btn btn-default"><span class="glyphicon glyphicon-exclamation-sign"></span> Fill display</a>
+                  <div class="btn-group btn-block">
+                     <a href="#" data-task="fill" class="btn btn-default btn-block"><span class="glyphicon glyphicon-exclamation-sign"></span> Fill display</a>
                   </div>
                </p>
                            
                <p>
-                  <div class="btn-group btn-group-justified">
+                  <div class="btn-group btn-block">
                      <a href="#" data-task="inverse" class="btn btn-default"><span class="glyphicon glyphicon-exclamation-sign"></span> Inverse display</a>
                   </div>
                </p>
                                        
                <p>
-                  <div class="btn-group btn-group-justified">
-                     <a href="#" data-task="clear" class="btn btn-default"><span class="glyphicon glyphicon-exclamation-sign"></span> Magnetize display</a>
+                  <div class="btn-group btn-block">
+                     <a href="#" data-task="clear" class="btn btn-default btn-block"><span class="glyphicon glyphicon-exclamation-sign"></span> Magnetize display</a>
                   </div>
                </p>
             </div>
@@ -110,7 +110,7 @@ R"A8J378RJ04M78DHW(
       $.getJSON('/ui/config.json').done(function(json) {
          flippie_config = json;
       }).fail(function() {
-         $('#flippie .errors').append($('<p />').html('Failed getting flippie configuration.');
+         $('#flippie .errors').append($('<p />').html('Failed getting flippie configuration.'));
       }).always(function() {
          $('#flippie input,select,button,textarea,a').prop('disabled', false);
       });
@@ -122,7 +122,7 @@ R"A8J378RJ04M78DHW(
          $.post('/ui/flippie', {task: elem.data('task')}).done(function(json) {
             flippie_config = json;
          }).fail(function() {
-            $('#flippie .errors').append($('<p />').html('Failed getting flippie configuration.');
+            $('#flippie .errors').append($('<p />').html('Failed getting flippie configuration.'));
          }).always(function() {
             elem.removeClass('glyphicon-refresh glyphicon-refresh-animate').addClass('glyphicon-exclamation-sign');
             $('#flippie input,select,button,textarea,a').prop('disabled', false);
@@ -133,4 +133,4 @@ R"A8J378RJ04M78DHW(
    </script>
 </body>
 </html>
-)A8J378RJ04M78DHW"
+)A8J378RJ04M78DHW" "\0"

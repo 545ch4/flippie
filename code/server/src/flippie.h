@@ -136,6 +136,7 @@ public:
    void fire_shift_register(bool enable);
    String shift_register_as_string();
    String shift_register_as_json_short_string();
+   String shift_register_as_json();
 
    // access to dots
    unsigned int** get_next_dots() { return _next_dots; };

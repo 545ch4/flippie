@@ -70,9 +70,15 @@ R"D8ESKJ6H4DSKHU(
          <div class="col-xs-12">
             <form action="/flippie" method="POST" id="flippie" onsubmit="return false;">
                <p>
-                  <input name="led_A" value="1" type="checkbox" data-toggle="toggle" data-on="A" data-off="A" data-onstyle="success" />&nbsp;&nbsp;
-                  <input name="led_B" value="1" type="checkbox" data-toggle="toggle" data-on="B" data-off="B" data-onstyle="success" />&nbsp;&nbsp;
-                  <input name="led_C" value="1" type="checkbox" data-toggle="toggle" data-on="C" data-off="C" data-onstyle="success" />
+                  <label class="checkbox-inline">
+                     <input name="led_A" value="1" type="checkbox" data-toggle="toggle" data-onstyle="warning" />
+                  </label>
+                  <label class="checkbox-inline">
+                     <input name="led_B" value="1" type="checkbox" data-toggle="toggle" data-onstyle="warning" />
+                  </label>
+                  <label class="checkbox-inline">
+                     <input name="led_C" value="1" type="checkbox" data-toggle="toggle" data-onstyle="warning" />
+                  </label>
                </p>
                
                <p>
@@ -330,25 +336,25 @@ R"D8ESKJ6H4DSKHU(
                <hr />
 
                <p>
-                  <div id="shiftregister"></div>
+                  <div id="shiftregister" style="font-size:150%"></div>
                </p>
 
                <hr />
                <div class="errors"></div>
                <input type="hidden" name="enable" value="0" />
                <p>
-                  <div class="btn-group btn-group-justified">
-                     <button type="submit" class="btn btn-success" value="fire"><span class="glyphicon glyphicon-exclamation-sign"></span> Fire shift-regsiter</button>
+                  <div class="btn-group btn-block">
+                     <button type="submit" class="btn btn-success btn-block" value="fire"><span class="glyphicon glyphicon-exclamation-sign"></span> Fire shift-regsiter</button>
                   </div>
                </p>
                <p>
-                  <div class="btn-group btn-group-justified">
-                     <button type="submit" class="btn btn-danger" value="fire_enable"><span class="glyphicon glyphicon-exclamation-sign"></span> Fire shift-regsiter (FP2800A enable)</button>
+                  <div class="btn-group btn-block">
+                     <button type="submit" class="btn btn-danger btn-block" value="fire_enable"><span class="glyphicon glyphicon-exclamation-sign"></span> Fire shift-regsiter (FP2800A enable)</button>
                   </div>
                </p>
                <p>
-                  <div class="btn-group btn-group-justified">
-                     <button type="reset" class="btn btn-default"><span class="glyphicon glyphicon-exclamation-sign"></span> Reset shift-regsiter</button>
+                  <div class="btn-group btn-block">
+                     <button type="reset" class="btn btn-default btn-block"><span class="glyphicon glyphicon-exclamation-sign"></span> Reset shift-regsiter</button>
                   </div>
                </p>
             </form>
@@ -364,28 +370,43 @@ R"D8ESKJ6H4DSKHU(
    
    function fill_form() {
       $('#flippie input[name="enable"]').val('0');
-      $.each(['led_A', 'led_B', 'led_C', 'address', 'column', 'row_set', 'row_rst', 'd'], function(index, f) {
-         $.getJSON('/ui/flippie?'+ f).done(function(v) {
-            $('[name="' + f + '"]').val(v);
-         }).fail(function() {
-            $('#flippie .errors').append($('<p />').html('Failed getting "' + f + '" content.');
+      $.getJSON('/flippie', {json: 1}).done(function(r) {
+         $.each(r, function(k, v) {
+            $('[name="' + k + '"]').val(v);
          });
+      }).fail(function( jqxhr, textStatus, error ) {
+         var err = textStatus + ", " + error;
+         console.log( "Request Failed: " + err );
+         $('#flippie .errors').append($('<p />').html('Failed getting flippie json.'));
       });
       display_shift_register();
    }
    
    function display_shift_register() {
-      $.getJSON('/ui/flippie?shiftregister').done(function(shiftregister) {
+      $.getJSON('/flippie', {shiftregister: 1}).done(function(shift_register_string) {
          $('#shiftregister').empty();
          for (var i = 0, len = shift_register_string.length; i < len; i++) {
-            $('#shiftregister').append($('<span />').css({color: shift_register_string[i] == '1' ? 'red' : 'black'}).html('&bull;'));
-            if(i%9 == 0) {
-               $('#shiftregister').append('|');
+            if(i%10 == 0) {
+               $('#shiftregister').append('&nbsp;');
             }
+            $('#shiftregister').append($('<span />').css({color: shift_register_string[i] == '1' ? 'red' : 'black'}).html('&bull;'));
          }
       }).fail(function() {
-         $('#flippie .errors').append($('<p />').html('Failed getting shift-register content.');
+         $('#flippie .errors').append($('<p />').html('Failed getting shift-register content.'));
       });
+   }
+   
+   function form_as_object(selector) {
+      var data = {};
+      $.each($(selector + ' input[type="text"],textarea,input[type="radio"]:checked,select'), function(i, _elem) {
+         var elem = $(_elem);
+         data[elem.prop('name')] = '' + elem.val();
+      });
+      $.each($(selector + ' input[type="checkbox"]'), function(i, _elem) {
+         var elem = $(_elem);
+         data[elem.prop('name')] = elem.prop('checked') ? '1' : '0';
+      });
+      return data;
    }
 
    $(document).ready(function() {
@@ -393,8 +414,9 @@ R"D8ESKJ6H4DSKHU(
 
       $.getJSON('/ui/config.json').done(function(json) {
          flippie_config = json;
+         fill_form();
       }).fail(function() {
-         $('#flippie .errors').append($('<p />').html('Failed getting flippie configuration.');
+         $('#flippie .errors').append($('<p />').html('Failed getting flippie configuration.'));
       }).always(function() {
          $('#flippie input,select,button,textarea,a').prop('disabled', false);
       });
@@ -405,10 +427,10 @@ R"D8ESKJ6H4DSKHU(
          var elem = $(e.relatedTarget);
          elem.removeClass('glyphicon-exclamation-sign').addClass('glyphicon-refresh glyphicon-refresh-animate');
          $('#flippie .errors').empty();
-         $.post('/ui/flippie', {clear: 1}).done(function(r) {
+         $.post('/flippie', {clear: 1}).done(function(r) {
             fill_form();
          }).fail(function() {
-            $('#flippie .errors').append($('<p />').html('Failed resetting shift-register.');
+            $('#flippie .errors').append($('<p />').html('Failed resetting shift-register.'));
          }).always(function() {
             elem.removeClass('glyphicon-refresh glyphicon-refresh-animate').addClass('glyphicon-exclamation-sign');
             $('#flippie input,select,button,textarea,a').prop('disabled', false);
@@ -423,10 +445,10 @@ R"D8ESKJ6H4DSKHU(
          elem.removeClass('glyphicon-exclamation-sign').addClass('glyphicon-refresh glyphicon-refresh-animate');
          $('#flippie input[name="enable"]').val($('#flippie [type="submit"][clicked="true"]').val() == 'fire_enable' ? '1' : '0');
          $('#flippie .errors').empty();
-         $.post('/ui/flippie', $('#flippie').serialize()).done(function(r) {
+         $.post('/flippie', form_as_object('#flippie')).done(function(r) {
             fill_form();
          }).fail(function() {
-            $('#flippie .errors').append($('<p />').html('Failed resetting shift-register.');
+            $('#flippie .errors').append($('<p />').html('Failed resetting shift-register.'));
          }).always(function() {
             elem.removeClass('glyphicon-refresh glyphicon-refresh-animate').addClass('glyphicon-exclamation-sign');
             $('#flippie input,select,button,textarea,a').prop('disabled', false);
@@ -442,4 +464,4 @@ R"D8ESKJ6H4DSKHU(
    </script>
 </body>
 </html>
-)D8ESKJ6H4DSKHU"
+)D8ESKJ6H4DSKHU" "\0"

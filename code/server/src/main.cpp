@@ -8,31 +8,31 @@
 #include "flippie_server.h"
 #include "../lib/functions.h"
 
-WiFiUDP ntpUDP;
-NTPClient timeClient(ntpUDP, "europe.pool.ntp.org", 3600, 60000);
+//WiFiUDP ntpUDP;
+//NTPClient timeClient(ntpUDP, "europe.pool.ntp.org", 3600, 60000);
 
 ESP8266WebServer* server;
 
 void setup(void){
-   Serial.begin(115200);
+   Serial.begin(74880);
    Serial.println();
    Serial.println("Booting...");
 
    // TODO: What's the SSID of your WiFi?
    const char* ssid = "wifi";
    // TODO: What's the PASSWORD of your WiFi?
-   const char* password = "blablablabla";
+   const char* password = "secret";
    // TODO: If you don't want to use DHCP, provide a static IP (and uncomment). Othewise leave this commented.
 
-   IPAddress ip(192, 168, 1, 250);
-   IPAddress gateway(192, 168, 1, 1);
-   IPAddress subnet(255, 255, 255, 0);
-   WiFi.config(ip, gateway, subnet);
+   //IPAddress ip(192, 168, 1, 250);
+   //IPAddress gateway(192, 168, 1, 1);
+   //IPAddress subnet(255, 255, 255, 0);
+   //WiFi.config(ip, gateway, subnet);
 
-//WiFi.mode(WIFI_AP_STA);
-//WiFi.begin(ssid, password);
-   WiFi.mode(WIFI_AP);
-   WiFi.softAP(ssid, password);
+   WiFi.mode(WIFI_AP_STA);
+   WiFi.begin(ssid, password);
+   //WiFi.mode(WIFI_AP);
+   //WiFi.softAP(ssid, password);
 
    // Wait for connection
    while (WiFi.status() != WL_CONNECTED) {
@@ -60,6 +60,5 @@ void setup(void){
 
 void loop(void){
    server->handleClient();
-   delay(1000);
-   Serial.printf(".");
+//   Serial.printf(".");
 }

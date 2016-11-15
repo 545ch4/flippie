@@ -434,12 +434,12 @@ String Flippie::shift_register_as_string() {
 
    tmp_pos += sprintf(tmp + tmp_pos, "SRA: ");
    for(unsigned int i = NUMBER_OF_SHIFT_REGISTERS * 8; 0 < i--;) {
-      tmp_pos += sprintf(tmp + tmp_pos, "%hhu", i/8);
+      tmp_pos += sprintf(tmp + tmp_pos, "%u", i/8);
    }
 
    tmp_pos += sprintf(tmp + tmp_pos, "\nSRA: ");
    for(unsigned int i = NUMBER_OF_SHIFT_REGISTERS * 8; 0 < i--;) {
-      tmp_pos += sprintf(tmp + tmp_pos, "%hhu", i%8);
+      tmp_pos += sprintf(tmp + tmp_pos, "%u", i%8);
    }
 
    tmp_pos += sprintf(tmp + tmp_pos, "\nSRD: ");
@@ -448,7 +448,9 @@ String Flippie::shift_register_as_string() {
       tmp_pos++;
    }
    sprintf(tmp + tmp_pos, "\n\0");
-   return String(tmp);
+   String s(tmp);
+   free(tmp);
+   return s;
 }
 
 // return shift-register in shortend form as json string
@@ -464,7 +466,18 @@ String Flippie::shift_register_as_json_short_string() {
    }
    bit_string[l] = '"';
    bit_string[l + 1] = '\0';
-   return String(bit_string);
+   String s(bit_string);
+   free(bit_string);
+   return s;
+}
+
+// return shift-register in shortend form as json string
+String Flippie::shift_register_as_json() {
+   char* r = (char *)malloc(1024);
+   unsigned int r_len = sprintf(r, "{\n\t\"address\": %i,\n\t\"column\": %i,\n\t\"row_set\": %i,\n\t\"row_rst\": %i,\n\t\"led_A\": %u,\n\t\"led_B\": %u,\n\t\"led_C\": %u,\n\t\"d\": %u\n}\n\0", get_address(), get_column(), get_row_set(), get_row_rst(), led_A_on ? 1 : 0, led_B_on ? 1 : 0, led_C_on ? 1 : 0, get_d());
+   String s(r);
+   free(r);
+   return s;
 }
 
 

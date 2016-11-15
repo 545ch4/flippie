@@ -8,10 +8,35 @@ bool FlippieHandler::handle(ESP8266WebServer& server, HTTPMethod method, String 
    if(!canHandle(method, uri)) {
       return false;
    }
+
+   if(flippie->config->verbose) {
+      char* tmp = (char*)malloc(1024);
+      unsigned int tmp_i = 0, j;
+      for(unsigned int i = 0; i < server.args(); i++) {
+         if(i > 0) {
+            tmp[tmp_i++] = '&';
+         }
+         j = server.argName(i).length();
+         memcpy(tmp + tmp_i, server.argName(i).c_str(), j);
+         tmp_i += j;
+         
+         tmp[tmp_i++] = '=';
+         
+         j = server.arg(i).length();
+         memcpy(tmp + tmp_i, server.arg(i).c_str(), j);
+         tmp_i += j;
+      }
+      tmp[tmp_i] = '\0';
+      Serial.printf("Handle '%s' ? '%s' (%s) in FlippieHandler...", uri.c_str(), tmp, method == HTTP_GET ? "GET" : "POST");
+      free(tmp);
+   }
+
    if(method == HTTP_GET) {
       char *tmp = new char[16];
       if(server.hasArg("shiftregister")) {
          server.send(200, "application/json", flippie->shift_register_as_json_short_string());
+      } else if(server.hasArg("json")) {
+            server.send(200, "application/json", flippie->shift_register_as_json());
       } else if(server.hasArg("led_A")) {
          server.send(200, "application/json", flippie->led_A_on ? "1" : "0");
       } else if(server.hasArg("led_B")) {
@@ -19,18 +44,18 @@ bool FlippieHandler::handle(ESP8266WebServer& server, HTTPMethod method, String 
       } else if(server.hasArg("led_C")) {
          server.send(200, "application/json", flippie->led_C_on ? "1" : "0");
       } else if(server.hasArg("address")) {
-         sprintf(tmp, "%hhu\0", flippie->get_address() & 127);
+         sprintf(tmp, "%u\0", flippie->get_address() & 127);
          server.send(200, "application/json", String(tmp));
       } else if(server.hasArg("column")) {
-         sprintf(tmp, "%hhu\0", flippie->get_column() & 32);
+         sprintf(tmp, "%u\0", flippie->get_column() & 32);
          server.send(200, "application/json", String(tmp));
       } else if(server.hasArg("d")) {
          server.send(200, "application/json", flippie->get_d() ? "true" : "false");
       } else if(server.hasArg("row_set")) {
-         sprintf(tmp, "%hhu\0", flippie->get_row_set() & 32);
+         sprintf(tmp, "%u\0", flippie->get_row_set() & 32);
          server.send(200, "application/json", String(tmp));
       } else if(server.hasArg("row_rst")) {
-         sprintf(tmp, "%hhu\0", flippie->get_row_rst() & 32);
+         sprintf(tmp, "%u\0", flippie->get_row_rst() & 32);
          server.send(200, "application/json", String(tmp));
       } else {
          server.send(405, "application/json", "\"Unknown get command\"");
@@ -52,51 +77,66 @@ bool FlippieHandler::handle(ESP8266WebServer& server, HTTPMethod method, String 
             server.send(405, "application/json", "\"Unknown task\"");
          }
       } else {
+         int x = 0;
          if(server.hasArg("led_mode")) {
-            flippie->config->led_mode = server.arg("led_mode").toInt();
+            flippie->config->led_mode = server.arg("led_mode").charAt(0) == '1' ? 1 : 0;
             goto send_message;
          }
          if(server.hasArg("verbose")) {
-            flippie->config->verbose = (server.arg("verbose").toInt() & 1) == 1;
+            flippie->config->verbose = server.arg("verbose").charAt(0) == '1';
             goto send_message;
          }
-         if(server.hasArg("clear") && server.arg("clear").toInt() == 1) {
-            flippie->clear_shift_register(true);
+         if(server.hasArg("clear") && server.arg("clear").charAt(0) == '1') {
+            flippie->clear_shift_register(false);
             goto send_message;
          }
          if(server.hasArg("led_A")) {
-            flippie->led_A_on = (server.arg("led_A").toInt() & 1) == 1 ? true : false;
+            flippie->led_A_on = server.arg("led_A").charAt(0) == '1' ? true : false;
          }
          if(server.hasArg("led_B")) {
-            flippie->led_B_on = (server.arg("led_B").toInt() & 1) == 1 ? true : false;
+            flippie->led_B_on = server.arg("led_B").charAt(0) == '1' ? true : false;
          }
          if(server.hasArg("led_C")) {
             if(flippie->config->led_mode == LED_MODE_NONE) {
-               flippie->led_C_on = (server.arg("led_C").toInt() & 1) == 1 ? true : false;
+               flippie->led_C_on = server.arg("led_C").charAt(0) == '1' ? true : false;
             } else {
                json_verb = false;
             }
          }
          if(server.hasArg("address")) {
-            flippie->set_address(server.arg("address").toInt() & 127);
+            x = server.arg("address").toInt();
+            if(x >= 0 && x <= 127) {
+               flippie->set_address(x);
+            }
          }
          if(server.hasArg("column")) {
-            flippie->set_column(server.arg("column").toInt() & 32);
+            x = server.arg("column").toInt();
+            if(x >= 0 && x < FP2800A_MAX_COLUMNS) {
+               flippie->set_column(x);
+            }
          }
          if(server.hasArg("d")) {
-            flippie->set_d(server.arg("d").toInt() & 1);
+            flippie->set_d(server.arg("d").charAt(0) == '1' ? 1 : 0);
          }
          if(server.hasArg("row_set")) {
-            flippie->set_row_set(server.arg("row_set").toInt() & 32);
+            x = server.arg("row_set").toInt();
+            if(x >= 0 && x < BROSE_MAX_ROWS) {
+               flippie->set_row_set(x);
+            }
          }
          if(server.hasArg("row_rst")) {
-            flippie->set_row_rst(server.arg("row_rst").toInt() & 32);
+            x = server.arg("row_rst").toInt();
+            if(x >= 0 && x < BROSE_MAX_ROWS) {
+               flippie->set_row_rst(x);
+            }
          }
-         flippie->fire_shift_register(server.hasArg("enable") && (server.arg("enable").toInt() & 1) == 1);
+         flippie->fire_shift_register(server.hasArg("enable") && server.arg("enable").charAt(0) == '1');
       }
 send_message:
       server.send(200, "application/json", json_verb ? "true" : "false");
    }
+   if(flippie->config->verbose)
+      Serial.println("DONE.");
    return true;
 }
 

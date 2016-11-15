@@ -1,4 +1,4 @@
-R"C897ND7ZDT24Z7(
+R"D8ESKJ6H4DSKHU(
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -74,20 +74,20 @@ R"C897ND7ZDT24Z7(
                </canvas>
                <div class="errors"></div>
                <p>
-                  <div class="btn-group btn-group-justified">
-                     <a href="#" data-task="clear" class="btn btn-default"><span class="glyphicon glyphicon-exclamation-sign"></span> Clear display</a>
+                  <div class="btn-group btn-block">
+                     <a href="#" data-task="clear" class="btn btn-default btn-block"><span class="glyphicon glyphicon-exclamation-sign"></span> Clear display</a>
                   </div>
                </p>
 
                <p>
-                  <div class="btn-group btn-group-justified">
-                     <a href="#" data-task="fill" class="btn btn-default"><span class="glyphicon glyphicon-exclamation-sign"></span> Fill display</a>
+                  <div class="btn-group btn-block">
+                     <a href="#" data-task="fill" class="btn btn-default btn-block"><span class="glyphicon glyphicon-exclamation-sign"></span> Fill display</a>
                   </div>
                </p>
 
                <p>
-                  <div class="btn-group btn-group-justified">
-                     <a href="#" data-task="inverse" class="btn btn-default"><span class="glyphicon glyphicon-exclamation-sign"></span> Inverse display</a>
+                  <div class="btn-group btn-block">
+                     <a href="#" data-task="inverse" class="btn btn-default btn-block"><span class="glyphicon glyphicon-exclamation-sign"></span> Inverse display</a>
                   </div>
                </p>
             </div>
@@ -101,8 +101,8 @@ R"C897ND7ZDT24Z7(
    <script type="text/javascript">
    var flippie_config = {};
 
-   var canvas = null; //canvas object
-   var context = null; //canvas's context object
+   var canvas = null;
+   var context = null;
    var hold_down = false;
    var last_x = -1;
    var last_y = -1;
@@ -258,7 +258,7 @@ R"C897ND7ZDT24Z7(
          flippie_config = json;
          initialize_canvas();
       }).fail(function() {
-         $('#flippie .errors').append($('<p />').html('Failed getting flippie configuration.');
+         $('#flippie .errors').append($('<p />').html('Failed getting flippie configuration.'));
       }).always(function() {
          $('#flippie input,select,button,textarea,a').prop('disabled', false);
       });
@@ -270,7 +270,7 @@ R"C897ND7ZDT24Z7(
          $.post('/ui/flippie', {task: elem.data('task')}).done(function(json) {
             flippie_config = json;
          }).fail(function() {
-            $('#flippie .errors').append($('<p />').html('Failed getting flippie configuration.');
+            $('#flippie .errors').append($('<p />').html('Failed getting flippie configuration.'));
          }).always(function() {
             elem.removeClass('glyphicon-refresh glyphicon-refresh-animate').addClass('glyphicon-exclamation-sign');
             $('#flippie input,select,button,textarea,a').prop('disabled', false);
@@ -333,4 +333,4 @@ R"C897ND7ZDT24Z7(
 </script>
 </body>
 </html>
-)C897ND7ZDT24Z7"
+)D8ESKJ6H4DSKHU" "\0"
