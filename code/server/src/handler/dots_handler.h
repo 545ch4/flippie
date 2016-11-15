@@ -1,7 +1,7 @@
 #ifndef DOTS_HANDLER_H
 #define DOTS_HANDLER_H
+#include "../base64.h"
 #include "../flippie.h"
-#include "../../lib/base64.h"
 #include <ESP8266WebServer.h>
 
 class DotsHandler : public RequestHandler {

@@ -1,7 +1,6 @@
 #ifndef PIXEL_HANDLER_H
 #define PIXEL_HANDLER_H
 #include "../flippie.h"
-#include "../flippie.h"
 #include <ESP8266WebServer.h>
 
 class PixelHandler : public RequestHandler {

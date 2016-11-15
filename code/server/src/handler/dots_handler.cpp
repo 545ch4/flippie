@@ -75,7 +75,7 @@ bool DotsHandler::handle(ESP8266WebServer& server, HTTPMethod method, String uri
             dots_bytes[pos++] = (k>>24) & 255;
          }
       }
-      dots_string_length = b64.encode(dots_bytes, dots_bytes_length, dots_string + 1, dots_string_length);
+      b64.encode(dots_bytes, dots_bytes_length, dots_string + 1, &dots_string_length);
       dots_string[0] = '"';
       dots_string[dots_string_length] = '"';
       dots_string[dots_string_length + 1] = '\0';

@@ -15,39 +15,39 @@ unsigned char Base64::d[256] = {
    66,66,66,66,66,66
 };
 
-int Base64::encode(const void* data_buf, size_t dataLength, char* result, size_t resultSize) {
-   const uint8_t *data = (const uint8_t *)data_buf;
-   size_t resultIndex = 0;
-   size_t x;
-   uint32_t n = 0;
+int Base64::encode(const void* data_buf, unsigned int dataLength, char* result, unsigned int *resultSize) {
+   const unsigned char *data = (const unsigned char *)data_buf;
+   unsigned int resultIndex = 0;
+   unsigned int x;
+   unsigned int n = 0;
    int padCount = dataLength % 3;
-   uint8_t n0, n1, n2, n3;
+   unsigned char n0, n1, n2, n3;
 
    /* increment over the length of the string, three characters at a time */
    for (x = 0; x < dataLength; x += 3)
    {
       /* these three 8-bit (ASCII) characters become one 24-bit number */
-      n = ((uint32_t)data[x]) << 16; //parenthesis needed, compiler depending on flags can do the shifting before conversion to uint32_t, resulting to 0
+      n = ((unsigned int)data[x]) << 16; //parenthesis needed, compiler depending on flags can do the shifting before conversion to unsigned int, resulting to 0
 
       if((x+1) < dataLength)
-         n += ((uint32_t)data[x+1]) << 8;//parenthesis needed, compiler depending on flags can do the shifting before conversion to uint32_t, resulting to 0
+         n += ((unsigned int)data[x+1]) << 8;//parenthesis needed, compiler depending on flags can do the shifting before conversion to unsigned int, resulting to 0
 
       if((x+2) < dataLength)
          n += data[x+2];
 
       /* this 24-bit number gets separated into four 6-bit numbers */
-      n0 = (uint8_t)(n >> 18) & 63;
-      n1 = (uint8_t)(n >> 12) & 63;
-      n2 = (uint8_t)(n >> 6) & 63;
-      n3 = (uint8_t)n & 63;
+      n0 = (unsigned char)(n >> 18) & 63;
+      n1 = (unsigned char)(n >> 12) & 63;
+      n2 = (unsigned char)(n >> 6) & 63;
+      n3 = (unsigned char)n & 63;
 
       /*
        * if we have one unsigned char available, then its encoding is spread
        * out over two characters
        */
-      if(resultIndex >= resultSize) return 1;   /* indicate failure: buffer too small */
+      if(resultIndex >= *resultSize) return 1;   /* indicate failure: buffer too small */
       result[resultIndex++] = base64chars[n0];
-      if(resultIndex >= resultSize) return 1;   /* indicate failure: buffer too small */
+      if(resultIndex >= *resultSize) return 1;   /* indicate failure: buffer too small */
       result[resultIndex++] = base64chars[n1];
 
       /*
@@ -56,7 +56,7 @@ int Base64::encode(const void* data_buf, size_t dataLength, char* result, size_t
        */
       if((x+1) < dataLength)
       {
-         if(resultIndex >= resultSize) return 1;   /* indicate failure: buffer too small */
+         if(resultIndex >= *resultSize) return 1;   /* indicate failure: buffer too small */
          result[resultIndex++] = base64chars[n2];
       }
 
@@ -66,7 +66,7 @@ int Base64::encode(const void* data_buf, size_t dataLength, char* result, size_t
        */
       if((x+2) < dataLength)
       {
-         if(resultIndex >= resultSize) return 1;   /* indicate failure: buffer too small */
+         if(resultIndex >= *resultSize) return 1;   /* indicate failure: buffer too small */
          result[resultIndex++] = base64chars[n3];
       }
    }
@@ -79,20 +79,21 @@ int Base64::encode(const void* data_buf, size_t dataLength, char* result, size_t
    {
       for (; padCount < 3; padCount++)
       {
-         if(resultIndex >= resultSize) return 1;   /* indicate failure: buffer too small */
+         if(resultIndex >= *resultSize) return 1;   /* indicate failure: buffer too small */
          result[resultIndex++] = '=';
       }
    }
-   if(resultIndex >= resultSize) return 1;   /* indicate failure: buffer too small */
+   if(resultIndex >= *resultSize) return 1;   /* indicate failure: buffer too small */
    result[resultIndex] = 0;
+   *resultSize = resultIndex;
    return 0;   /* indicate success */
 }
 
-int Base64::decode(char *in, size_t inLen, unsigned char *out, size_t *outLen) {
+int Base64::decode(char *in, unsigned int inLen, unsigned char *out, unsigned int *outLen) {
     char *end = in + inLen;
     char iter = 0;
-    uint32_t buf = 0;
-    size_t len = 0;
+    unsigned int buf = 0;
+    unsigned int len = 0;
 
     while (in < end) {
         unsigned char c = d[*in++];

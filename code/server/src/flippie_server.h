@@ -3,9 +3,9 @@
 
 #include "flippie.h"
 #include "handler/ui_handler.h"
-// #include "handler/dots_handler.h"
-// #include "handler/pixel_handler.h"
-// #include "handler/flippie_handler.h"
+#include "handler/dots_handler.h"
+#include "handler/pixel_handler.h"
+#include "handler/flippie_handler.h"
 #include <ESP8266WebServer.h>
 
 

@@ -1,16 +1,14 @@
 #include "flippie_handler.h"
-#include "../flippie.h"
-#include <ESP8266WebServer.h>
 
-FlippieHandler::FlippieHandler(const char* uri, Flippie* f) : _uri(uri) {
+FlippieHandler::FlippieHandler(Flippie* f) {
    flippie = f;
 }
 
-bool FlippieHandler::handle(ESP8266WebServer& server, HTTPMethod requestMethod, String requestUri) {
-   if (requestUri != _uri) {
+bool FlippieHandler::handle(ESP8266WebServer& server, HTTPMethod method, String uri) {
+   if(!canHandle(method, uri)) {
       return false;
    }
-   if(requestMethod == HTTP_GET) {
+   if(method == HTTP_GET) {
       char *tmp = new char[16];
       if(server.hasArg("shiftregister")) {
          server.send(200, "application/json", flippie->shift_register_as_json_short_string());
@@ -38,7 +36,7 @@ bool FlippieHandler::handle(ESP8266WebServer& server, HTTPMethod requestMethod, 
          server.send(405, "application/json", "\"Unknown get command\"");
       }
       free(tmp);
-   } else if(requestMethod == HTTP_POST) {
+   } else if(method == HTTP_POST) {
       bool json_verb = true;
       if(server.hasArg("task")) {
          if(server.arg("task").equals("clear")) {
@@ -100,4 +98,12 @@ send_message:
       server.send(200, "application/json", json_verb ? "true" : "false");
    }
    return true;
+}
+
+
+bool FlippieHandler::canHandle(HTTPMethod method, String uri) {
+   if (uri == "/flippie" && (method == HTTP_GET || method == HTTP_POST)) {
+      return true;
+   }
+   return false;
 }

@@ -2,9 +2,9 @@
 -I/Users/sascha/.platformio/packages/framework-arduinoespressif8266/tools/sdk/lwip/include
 -I/Users/sascha/.platformio/packages/framework-arduinoespressif8266/cores/esp8266
 -I/Users/sascha/.platformio/packages/framework-arduinoespressif8266/variants/nodemcu
--I/TEMP/flippie/code/server/.piolibdeps/NTPClient
 -I/Users/sascha/.platformio/packages/framework-arduinoespressif8266/libraries/ESP8266WiFi/src
 -I/Users/sascha/.platformio/packages/framework-arduinoespressif8266/libraries/ESP8266WebServer/src
+-I/TEMP/flippie/code/server/.piolibdeps/NTPClient
 -I/TEMP/flippie/code/server/src
 -I/TEMP/flippie/code/server/.piolibdeps/NTPClient
 -I/TEMP/flippie/code/server/.piolibdeps/NTPClient_ID551
