@@ -62,13 +62,13 @@ Flippie::Flippie() {
       _int_bit_array[i] = 1<<i;
    }
    // init fast bit-wise comparator array (byte-sized)
-   _byte_bit_array = (byte *)malloc(8 * sizeof(byte));
+   _byte_bit_array = (unsigned char *)malloc(8 * sizeof(unsigned char));
    for(i = 0; i < 8; ++i) {
       _byte_bit_array[i] = 1<<i;
    }
 
    // initialze shift-register as NUMBER_OF_SHIFT_REGISTERS * SHIFT_REGISTER_WIDTH
-   _shift_register = (byte *)calloc(NUMBER_OF_SHIFT_REGISTERS, SHIFT_REGISTER_WIDTH);
+   _shift_register = (unsigned char *)calloc(NUMBER_OF_SHIFT_REGISTERS, SHIFT_REGISTER_WIDTH);
 
 
    // shift-register LED_A, LED_B and LED_C
@@ -145,7 +145,8 @@ void Flippie::paint(bool override_former_dot_state) {
       for(unsigned int j = 0; j < config->num_modules; ++j) {
          for(unsigned int k = 0; k < config->num_columns[j]; ++k) {
             if(override_former_dot_state || (_dots[i][j] & _int_bit_array[k]) != (_next_dots[i][j] & _int_bit_array[k])) {
-               set_shift_register_and_fire(i, j, k, (_next_dots[i][j] & _int_bit_array[k]) == _int_bit_array[k] ? 1 : 0);
+               _set_dot(i, j, k, (_next_dots[i][j] & _int_bit_array[k]) == _int_bit_array[k] ? 1 : 0, false);
+               fire_shift_register(true);
             }
          }
       }
@@ -159,7 +160,7 @@ void Flippie::paint() {
    paint(false);
 }
 // set content of _next_dots and paint (cleverly only setting changed dots)
-void Flippie::paint(unsigned int ** dots) {
+void Flippie::paint(unsigned int** dots) {
    memcpy(_next_dots, dots, config->num_rows * sizeof(unsigned int *));
    for(unsigned int i = 0; i < config->num_rows; ++i) {
       memcpy(_next_dots[i], dots[i], config->num_modules * sizeof(unsigned int));
@@ -173,13 +174,12 @@ void Flippie::magnetize(unsigned int repeats) {
       for(unsigned int i = 0; i < config->num_rows; ++i) {
          for(unsigned int j = 0; j < config->num_modules; ++j) {
             for(unsigned int k = 0; k < config->num_columns[j]; ++k) {
-               set_shift_register_and_fire(i, j, k, _dots[i][j]);
+               _set_dot(i, j, k, _dots[i][j], false);
+               fire_shift_register(true);
             }
          }
       }
    }
-   // _next_dots are the new _dots
-   cycle_dots();
    if(config->verbose)
       Serial.printf("Done magnetizing display %d times.\n", repeats);
 }
@@ -192,7 +192,8 @@ void Flippie::clear() {
          _next_dots[i][j] = 0;
          _dots[i][j] = 0;
          for(unsigned int k = 0; k < config->num_columns[j]; ++k) {
-            set_shift_register_and_fire(i, j, k, 0);
+            _set_dot(i, j, k, 0, false);
+            fire_shift_register(true);
          }
       }
    }
@@ -205,9 +206,10 @@ void Flippie::inverse() {
    unsigned int x = 0;
    for(unsigned int i = 0; i < config->num_rows; ++i) {
       for(unsigned int j = 0; j < config->num_modules; ++j) {
-         _next_dots[i][j] = UINT_MAX - _dots[i][j];
+         _dots[i][j] = UINT_MAX - _dots[i][j];
          for(unsigned int k = 0; k < config->num_columns[j]; ++k) {
-            set_shift_register_and_fire(i, j, k, _next_dots[i][j]);
+            _set_dot(i, j, k, _next_dots[i][j], false);
+            fire_shift_register(true);
          }
       }
    }
@@ -220,10 +222,10 @@ void Flippie::fill() {
    unsigned int x = 0;
    for(unsigned int i = 0; i < config->num_rows; ++i) {
       for(unsigned int j = 0; j < config->num_modules; ++j) {
-         _next_dots[i][j] = UINT_MAX;
          _dots[i][j] = UINT_MAX;
          for(unsigned int k = 0; k < config->num_columns[j]; ++k) {
-            set_shift_register_and_fire(i, j, k, _next_dots[i][j]);
+            _set_dot(i, j, k, _dots[i][j], false);
+            fire_shift_register(true);
          }
       }
    }
@@ -287,15 +289,15 @@ int Flippie::get_column() {
 }
 
 // set/get address (ADDR1-ADDR7)
-void Flippie::set_address(byte address) {
+void Flippie::set_address(unsigned char address) {
    for(unsigned int i = 0; i < BROSE_ADDR_LINES - 1; ++i) {
       if((address>>i) & 1 == 1) {
          _shift_register[config->sr_address_pins[i]/8] |= _byte_bit_array[config->sr_address_pins[i]%8];
       }
    }
 }
-byte Flippie::get_address() {
-   byte address = 0x00;
+unsigned char Flippie::get_address() {
+   unsigned char address = 0x00;
    for(int i = BROSE_ADDR_LINES - 2; i >= 0 ; i--) {
       if((_shift_register[config->sr_address_pins[i]/8] & _byte_bit_array[config->sr_address_pins[i]%8]) == _byte_bit_array[config->sr_address_pins[i]%8]) {
          address |= 1;
@@ -330,7 +332,7 @@ void Flippie::clear_shift_register(bool fire_after_clear) {
 
 // assemble the shift-register for a specific dotsand fire it
 // resetting shift-register and set all output to low afterwards
-void Flippie::set_shift_register_and_fire(unsigned int row, unsigned int module, unsigned int column, unsigned int state) {
+void Flippie::_set_dot(unsigned int row, unsigned int module, unsigned int column, unsigned int state, bool save) {
    unsigned int i;
 
    // clear shift-register
@@ -379,8 +381,19 @@ void Flippie::set_shift_register_and_fire(unsigned int row, unsigned int module,
       _shift_register[config->sr_led_c_pin/8] |= _byte_bit_array[config->sr_led_c_pin%8];
    }
 
-   // firing shift-register
-   fire_shift_register(true);
+   if(save) {
+      if(state & 1 == 1) {
+         _dots[row][module] |= 1<<column;
+      } else {
+         _dots[row][module] -= 1<<column;
+      }
+   }
+}
+void Flippie::set_dot(unsigned int row, unsigned int module, unsigned int column, unsigned int state) {
+   _set_dot(row, module, column, state, true);
+}
+unsigned int Flippie::get_dot(unsigned int row, unsigned int module, unsigned int column) {
+   return _dots[row][module]<<column & 1;
 }
 
 // fire a given shift-register according to pins given
@@ -391,7 +404,7 @@ void Flippie::fire_shift_register(bool enable) {
    digitalWrite(config->clear_pin, LOW);
    digitalWrite(config->clear_pin, HIGH);
 
-   // shift out (reverse order) shift-register byte array
+   // shift out (reverse order) shift-register unsigned char array
    for(unsigned int i = NUMBER_OF_SHIFT_REGISTERS * 8; 0 < i--;) {
       digitalWrite(config->serial_data_pin, (_shift_register[i/8] & _byte_bit_array[i%8]) == _byte_bit_array[i%8] ? HIGH : LOW);
       digitalWrite(config->clock_pin, HIGH);

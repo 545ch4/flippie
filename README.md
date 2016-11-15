@@ -172,7 +172,7 @@ Flippie is basically a simple web server at port 80 serving the following access
 A simple index page with browser UI controlling the flip-dot. All javascript and stylesheets are loaded from an external CDN, not from the ESP8266 itself. Except the flip-dot configuration, this will be rendered as JSON.
 
 **`/dots` – A receiver of base64 encoded dots vector**  
-This method reads the content of HTTP (POST/GET) variable `dots` which is a base64 encoded string. This string is build of four  from four 8-bit characters of a 32-bit wide integer where each bit (0-31) represents the state of one column. Those integers are ordered by rows and then modules:
+This method reads the content of HTTP (POST/GET) variable `dots` which is a base64 encoded string. This string is build of 32-bit wide integers (four bytes) where each bit (0-31) represents the state of one column. Those integers are ordered by rows and then modules:
 ```
 [row 1 column 1-32* module 1], [row 1 column 1-32* module 2], ..., [row 1 column 1-32* module M], [row 2 column 1-32* module 1], [row 2 column 1-32* module 2], ..., ..., [row R column 1-32* module M]
 ```
@@ -203,7 +203,7 @@ Basic mechanism to set a dot (column 2, row 3) at module 0 with address 0x01 (DI
 $ telnet <flippie IP> 80
 > POST /flippie HTTP/1.0
 > Content-Length: 41
-> 
+>
 > address=1&column=1&row_set=2&d=1&enable=1
 ```
 

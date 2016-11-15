@@ -1,23 +1,20 @@
 #ifndef BASE64_H
 #define BASE64_H
+#include <stdio.h>
+#include <stdlib.h>
+#include <inttypes.h>
+#include <string.h>
+
+#define WHITESPACE 64
+#define EQUALS     65
+#define INVALID    66
 
 class Base64 {
 public:
-   int encode(unsigned char* in, unsigned int length, char* out);
-   int decode(char* in, unsigned int length, unsigned char* out);
-protected:
-  /** Static Base64 character encoding lookup table */
-  const char encodeCharacterTable[65] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
-
-  /** Static Base64 character decoding lookup table */
-  const unsigned char decodeCharacterTable[256] = {
-      255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255
-      ,255,62,255,255,255,63,52,53,54,55,56,57,58,59,60,61,255,255,255,255,255,255,255,0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21
-      ,22,23,24,25,255,255,255,255,255,255,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,255,255,255,255,255,
-      255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,
-      255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255
-      ,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,
-      255,255,255}; 
+   int encode(const void* data_buf, size_t dataLength, char* result, size_t resultSize);
+   int decode(char *in, size_t inLen, unsigned char *out, size_t *outLen);
+   static char base64chars[65];
+   static unsigned char d[256];
 };
 
 #endif

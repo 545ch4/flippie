@@ -85,12 +85,13 @@ typedef struct {
 class Flippie {
 
 private:
-   unsigned int ** _dots;
-   unsigned int ** _next_dots;
-   byte * _shift_register;
-   unsigned int * _int_bit_array;
-   byte * _byte_bit_array;
+   unsigned int** _dots;
+   unsigned int** _next_dots;
+   unsigned char* _shift_register;
+   unsigned int* _int_bit_array;
+   unsigned char* _byte_bit_array;
    void cycle_dots();
+   void _set_dot(unsigned int row, unsigned int module, unsigned int column, unsigned int state, bool save);
 
 public:
    Flippie();
@@ -113,27 +114,32 @@ public:
    // paint _dots in different flavours
    void paint();
    void paint(bool override_former_dot_state);
-   void paint(unsigned int ** dots);
+   void paint(unsigned int** dots);
 
    // setter and getter of shift-register parts
    void clear_shift_register(bool fire_after_clear);
    void set_row_set(unsigned int row);
    void set_row_rst(unsigned int row);
    void set_column(unsigned int column);
-   void set_address(byte address);
+   void set_address(unsigned char address);
    void set_d(unsigned int state);
+   void set_dot(unsigned int row, unsigned int module, unsigned int column, unsigned int state);
    int get_row_set();
    int get_row_rst();
    int get_column();
-   byte get_address();
+   unsigned char get_address();
    unsigned int get_d();
+   unsigned int get_dot(unsigned int row, unsigned int module, unsigned int column);
 
    // low-level fire shift-register (optional set FP2800A enable)
    void fire_shift_register();
    void fire_shift_register(bool enable);
-   void set_shift_register_and_fire(unsigned int row, unsigned int module, unsigned int column, unsigned int state);
    String shift_register_as_string();
    String shift_register_as_json_short_string();
+
+   // access to dots
+   unsigned int** get_next_dots() { return _next_dots; };
+   unsigned int** get_dots() { return _dots; };
 
    //   void test(unsigned int test_bit, unsigned int state);
 };

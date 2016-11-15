@@ -9,15 +9,15 @@ FlippieServer::FlippieServer(ESP8266WebServer* s) {
    server->addHandler(new UIHandler(flippie));
    if(flippie->config->verbose)
       Serial.println("Added UIHandler");
-      
+
    server.addHandler(new DotsHandler(flippie));
    if(flippie->config->verbose)
       Serial.println("Added DotsHandler");
-      
+
    server.addHandler(new PixelHandler(flippie));
    if(flippie->config->verbose)
       Serial.println("Added PixelHandler");
-      
+
    server.addHandler(new FlippieHandler(flippie));
    if(flippie->config->verbose)
       Serial.println("Added FlippieHandler");

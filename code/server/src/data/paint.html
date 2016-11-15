@@ -30,12 +30,12 @@ R"C897ND7ZDT24Z7(
       -animation: spin .7s infinite linear;
       -webkit-animation: spin2 .7s infinite linear;
    }
-   
+
    @-webkit-keyframes spin2 {
       from { -webkit-transform: rotate(0deg);}
       to { -webkit-transform: rotate(360deg);}
    }
-   
+
    @keyframes spin {
       from { transform: scale(1) rotate(0deg);}
       to { transform: scale(1) rotate(360deg);}
@@ -78,13 +78,13 @@ R"C897ND7ZDT24Z7(
                      <a href="#" data-task="clear" class="btn btn-default"><span class="glyphicon glyphicon-exclamation-sign"></span> Clear display</a>
                   </div>
                </p>
-               
+
                <p>
                   <div class="btn-group btn-group-justified">
                      <a href="#" data-task="fill" class="btn btn-default"><span class="glyphicon glyphicon-exclamation-sign"></span> Fill display</a>
                   </div>
                </p>
-               
+
                <p>
                   <div class="btn-group btn-group-justified">
                      <a href="#" data-task="inverse" class="btn btn-default"><span class="glyphicon glyphicon-exclamation-sign"></span> Inverse display</a>
@@ -94,13 +94,13 @@ R"C897ND7ZDT24Z7(
          </div>
       </div>
    </div>
-   
+
    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
    <script src="https://gitcdn.github.io/bootstrap-toggle/2.2.2/js/bootstrap-toggle.min.js"></script>
-   
+
    <script type="text/javascript">
    var flippie_config = {};
-   
+
    var canvas = null; //canvas object
    var context = null; //canvas's context object
    var hold_down = false;
@@ -108,7 +108,46 @@ R"C897ND7ZDT24Z7(
    var last_y = -1;
    var delta = 3;
    var delta_half = 0.5 * delta;
-   
+
+   var ajaxManager = (function() {
+      var requests = [];
+
+      return {
+         addReq:  function(opt) {
+            requests.push(opt);
+         },
+         removeReq:  function(opt) {
+            if( $.inArray(opt, requests) > -1 )
+            requests.splice($.inArray(opt, requests), 1);
+         },
+         run: function() {
+            var self = this,
+            oriSuc;
+
+            if( requests.length ) {
+               oriSuc = requests[0].complete;
+
+               requests[0].complete = function() {
+                  if( typeof(oriSuc) === 'function' ) oriSuc();
+                  requests.shift();
+                  self.run.apply(self, []);
+               };
+
+               $.ajax(requests[0]);
+            } else {
+               self.tid = setTimeout(function() {
+                  self.run.apply(self, []);
+               }, 1000);
+            }
+         },
+         stop:  function() {
+            requests = [];
+            clearTimeout(this.tid);
+         }
+      };
+   }());
+   ajaxManager.run();
+
    function clear_canvas() {
       context.clearRect(0, 0, canvas.width, canvas.height);
       for(var x = 0; x < width; x++) {
@@ -120,7 +159,7 @@ R"C897ND7ZDT24Z7(
          }
       }
    }
-   
+
    function initilaize_canvas(evt) {
       var width = 0;
       $.each(flippie_config['columns'], function(){
@@ -128,15 +167,16 @@ R"C897ND7ZDT24Z7(
       });
       canvas.width = width * delta;
       canvas.height = flippie_config['rows'] * delta;
-      
-      $.getJSON('/dots').done(function(dots_as_string) {
-         var r, m, x = 0, c, pos = 0;
+
+      $.getJSON('/dots').done(function(json) {
+         var dots = base64_decode(json);
+         var r, m, x = 0, c, pos = 0, c_value = 0;
          for(r = 0; r < flippie_config['rows']; r++;) {
             for(m = 0; m < flippie_config['columns'].length; m++;) {
                for(c = 0; c < flippie_config['columns'][m]; c++;) {
                   context.beginPath();
                   context.arc(x, r * delta + delta_half, delta_half, 0, 2 * Math.PI, false);
-                  if((dots_as_string.charCodeAt(pos + Math.floor(c/8))>>(c%8)) & 1 == 1) {
+                  if(((dots.charCodeAt(pos + Math.floor(c/8))>>(c%8)) & 1) == 1) {
                      context.fillStyle = 'yellow';
                   } else {
                      context.fillStyle = 'black';
@@ -153,12 +193,67 @@ R"C897ND7ZDT24Z7(
          $('#flippie input,select,button,textarea,a').prop('disabled', false);
       });
    }
-   
+
+   function get_dots_hash_by_x_y(x, y, c_value, state) {
+      var x = Math.floor(x / delta);
+      var c = 0;
+      var m = 0;
+      var c_sum = 0;
+
+      for(var i = 0; i < flippie_config['columns'].length; i++) {
+         if(c_sum <= x && x < (c_sum + flippie_config['columns'][i])) {
+            m = i;
+            c = x - c_sum;
+            break;
+         }
+         c_sum += flippie_config['columns'][i];
+      }
+      return {r: Math.floor(y / delta), m: m, c: c, state: state};
+   }
+
+   function base64_encode(s) {
+      var base64chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+      var r = "";
+      var p = "";
+      var c = s.length % 3;
+
+      if (c > 0) {
+         for (; c < 3; c++) {
+            p += '=';
+            s += "\0";
+         }
+      }
+
+      for (c = 0; c < s.length; c += 3) {
+         if (c > 0 && (c / 3 * 4) % 76 == 0) {
+            r += "\r\n";
+         }
+         var n = (s.charCodeAt(c) << 16) + (s.charCodeAt(c+1) << 8) + s.charCodeAt(c+2);
+         n = [(n >>> 18) & 63, (n >>> 12) & 63, (n >>> 6) & 63, n & 63];
+         r += base64chars[n[0]] + base64chars[n[1]] + base64chars[n[2]] + base64chars[n[3]];
+      }
+      return r.substring(0, r.length - p.length) + p;
+   }
+
+   function base64_decode(s) {
+      s = s.replace(new RegExp('[^'+base64chars.join("")+'=]', 'g'), "");
+      var p = (s.charAt(s.length-1) == '=' ?
+      (s.charAt(s.length-2) == '=' ? 'AA' : 'A') : "");
+      var r = "";
+      s = s.substr(0, s.length - p.length) + p;
+      for (var c = 0; c < s.length; c += 4) {
+         var n = (base64inv[s.charAt(c)] << 18) + (base64inv[s.charAt(c+1)] << 12) +
+         (base64inv[s.charAt(c+2)] << 6) + base64inv[s.charAt(c+3)];
+         r += String.fromCharCode((n >>> 16) & 255, (n >>> 8) & 255, n & 255);
+      }
+      return r.substring(0, r.length - p.length);
+   }
+
    $(document).ready(function() {
       canvas = $('#paintBox');
       context = canvas.getContext('2d');
       $('#flippie input,select,button,textarea,a').prop('disabled', true);
-      
+
       $.getJSON('/ui/config.json').done(function(json) {
          flippie_config = json;
          initialize_canvas();
@@ -167,7 +262,7 @@ R"C897ND7ZDT24Z7(
       }).always(function() {
          $('#flippie input,select,button,textarea,a').prop('disabled', false);
       });
-      
+
       $('#flippie a[data-task]').on('click', function(e) {
          $('#flippie input,select,button,textarea,a').prop('disabled', true);
          var elem = $(e.target);
@@ -188,9 +283,18 @@ R"C897ND7ZDT24Z7(
          var last_y = Math.floor(e.touches[0].pageY / delta) * delta + delta_half;
          if(!hold_down) {
             var data = context.getImageData(last_x, last_y, 1, 1).data;
+            c_value = data[0] == 0 && data[1] == 0 && data[2] == 0 && data[3] == 255 ? 1 : 0;
+            ajaxManager.addReq({
+               type: 'POST',
+               url: '/pixel',
+               data: get_dots_hash_by_x_y(e.touches[0].pageX, e.touches[0].pageY, c_value),
+               success: function(data){
+                  // do stuff
+               }
+            });
             context.beginPath();
             context.arc(last_x, last_y, delta_half, 0, 2 * Math.PI, false);
-            if(data[0] == 0 && data[1] == 0 && data[2] == 0 && data[3] == 255) {
+            if(c_value == 1) {
                context.fillStyle = 'yellow';
             } else {
                context.fillStyle = 'black';
@@ -198,35 +302,35 @@ R"C897ND7ZDT24Z7(
             context.fill();
             hold_down = true;
          }
-         
+
       });
       canvas.on('touchmove', function(e){
          e.preventDefault();
          var x = Math.floor(e.touches[0].pageX / delta) * delta + delta_half;
          var y = Math.floor(e.touches[0].pageY / delta) * delta + delta_half;
          if(hold_down && (x != last_x || y != last_y)) {
-               last_x = x;
-               last_y = y;
-               var data = context.getImageData(x, y, 1, 1).data;
-               context.beginPath();
-               context.arc(x, y, delta_half, 0, 2 * Math.PI, false);
-               if(data[0] == 0 && data[1] == 0 && data[2] == 0 && data[3] == 255) {
-                  context.fillStyle = 'yellow';
-               } else {
-                  context.fillStyle = 'black';
-               }
-               context.fill();
+            last_x = x;
+            last_y = y;
+            var data = context.getImageData(x, y, 1, 1).data;
+            context.beginPath();
+            context.arc(x, y, delta_half, 0, 2 * Math.PI, false);
+            if(data[0] == 0 && data[1] == 0 && data[2] == 0 && data[3] == 255) {
+               context.fillStyle = 'yellow';
+            } else {
+               context.fillStyle = 'black';
             }
+            context.fill();
          }
-      });
-      canvas.on('touchend', function(e){
-         e.preventDefault();
-         last_y = -1;
-         last_x = -1;
-         hold_down = false;
-      });
+      }
    });
-   </script>
-   </body>
-   </html>
+   canvas.on('touchend', function(e){
+      e.preventDefault();
+      last_y = -1;
+      last_x = -1;
+      hold_down = false;
+   });
+});
+</script>
+</body>
+</html>
 )C897ND7ZDT24Z7"

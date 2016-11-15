@@ -6,10 +6,10 @@
 
 class PixelHandler : public RequestHandler {
 public:
-  PixelHandler(const char* uri, Flippie* f);
-  bool handle(ESP8266WebServer& server, HTTPMethod requestMethod, String requestUri) override;
+  PixelHandler(Flippie* f);
+  bool canHandle(HTTPMethod method, String uri) override;
+  bool handle(ESP8266WebServer& server, HTTPMethod method, String uri) override;
 protected:
-  String _uri;
   Flippie* flippie;
 };
 
