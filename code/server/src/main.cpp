@@ -1,3 +1,4 @@
+#include "debug.h"
 #include <Arduino.h>
 #include <WiFiUdp.h>
 #include <NTPClient.h>
@@ -19,9 +20,9 @@ void setup(void){
    Serial.println("Booting...");
 
    // TODO: What's the SSID of your WiFi?
-   const char* ssid = "wifi";
+   const char* ssid = "network";
    // TODO: What's the PASSWORD of your WiFi?
-   const char* password = "secret";
+   const char* password = "forensicgenetics";
    // TODO: If you don't want to use DHCP, provide a static IP (and uncomment). Othewise leave this commented.
 
    //IPAddress ip(192, 168, 1, 250);

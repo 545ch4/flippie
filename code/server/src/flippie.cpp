@@ -29,7 +29,7 @@ Flippie::Flippie() {
    // SR42 - SR46 A0-B1
    config->sr_column_code_pins = new unsigned int[FP2800A_COLUMN_CODE_LINES]{45, 44, 43, 42, 41};
    // SR47 - SR53 ADDR1-ADDR7
-   config->sr_address_pins = new unsigned int[BROSE_ADDR_LINES - 1]{52, 51, 50, 49, 48, 47, 46};
+   config->sr_address_pins = new unsigned int[BROSE_ADDR_LINES]{52, 51, 50, 49, 48, 47, 46};
    // SR54 LED A
    config->sr_led_a_pin = 53;
    // SR55 LED B
@@ -131,7 +131,7 @@ Flippie::Flippie() {
 
 
 // copy current state _next_dots to _dots
-void Flippie::cycle_dots() {
+inline void Flippie::cycle_dots() {
    memcpy(_dots, _next_dots, config->num_rows * sizeof(unsigned int *));
    for(unsigned int i = 0; i < config->num_rows; ++i) {
       memcpy(_dots[i], _next_dots[i], config->num_modules * sizeof(unsigned int));
@@ -141,6 +141,7 @@ void Flippie::cycle_dots() {
 // paint content of _next_dots
 // only paint differnces to _dots unless override is true (default = false)
 void Flippie::paint(bool override_former_dot_state) {
+   debug_printf("Start painting with override=%s ... ", override_former_dot_state ? "true" : "false");
    for(unsigned int i = 0; i < config->num_rows; ++i) {
       for(unsigned int j = 0; j < config->num_modules; ++j) {
          for(unsigned int k = 0; k < config->num_columns[j]; ++k) {
@@ -153,23 +154,24 @@ void Flippie::paint(bool override_former_dot_state) {
    }
    // _next_dots are the new _dots
    cycle_dots();
-   if(config->verbose)
+   if(DEBUG)
+      debug_printf(" DONE.\n");
+   else if(config->verbose)
       Serial.printf("Done painting _next_dots.\n");
-}
-void Flippie::paint() {
-   paint(false);
+   
 }
 // set content of _next_dots and paint (cleverly only setting changed dots)
-void Flippie::paint(unsigned int** dots) {
+void Flippie::paint(unsigned int** dots, bool override_former_dot_state) {
    memcpy(_next_dots, dots, config->num_rows * sizeof(unsigned int *));
    for(unsigned int i = 0; i < config->num_rows; ++i) {
       memcpy(_next_dots[i], dots[i], config->num_modules * sizeof(unsigned int));
    }
-   paint();
+   paint(override_former_dot_state);
 }
 
 // repaint (magnetize) the whole display
 void Flippie::magnetize(unsigned int repeats) {
+   debug_printf("Start magnetizing %d times ... ", repeats);
    for(unsigned int r = 0; r < repeats; r++) {
       for(unsigned int i = 0; i < config->num_rows; ++i) {
          for(unsigned int j = 0; j < config->num_modules; ++j) {
@@ -180,13 +182,16 @@ void Flippie::magnetize(unsigned int repeats) {
          }
       }
    }
-   if(config->verbose)
+   if(DEBUG)
+      debug_printf(" DONE.\n");
+   else if(config->verbose)
       Serial.printf("Done magnetizing display %d times.\n", repeats);
 }
 
 
 // clear all dots and paint
 void Flippie::clear() {
+   debug_printf("Start clearing the display ... ");
    for(unsigned int i = 0; i < config->num_rows; ++i) {
       for(unsigned int j = 0; j < config->num_modules; ++j) {
          _next_dots[i][j] = 0;
@@ -197,12 +202,15 @@ void Flippie::clear() {
          }
       }
    }
-   if(config->verbose)
+   if(DEBUG)
+      debug_printf(" DONE.\n");
+   else if(config->verbose)
       Serial.printf("Done clearing display.\n");
 }
 
 // calc inverse of _dots, save to _next_dots and paint
 void Flippie::inverse() {
+   debug_printf("Start inversing the display ... ");
    unsigned int x = 0;
    for(unsigned int i = 0; i < config->num_rows; ++i) {
       for(unsigned int j = 0; j < config->num_modules; ++j) {
@@ -213,12 +221,15 @@ void Flippie::inverse() {
          }
       }
    }
-   if(config->verbose)
+   if(DEBUG)
+      debug_printf(" DONE.\n");
+   else if(config->verbose)
       Serial.printf("Done inversing display.\n");
 }
 
 // fill all dots, save to _next_dots and paint
 void Flippie::fill() {
+   debug_printf("Start filling the display ... ");
    unsigned int x = 0;
    for(unsigned int i = 0; i < config->num_rows; ++i) {
       for(unsigned int j = 0; j < config->num_modules; ++j) {
@@ -229,98 +240,122 @@ void Flippie::fill() {
          }
       }
    }
-   if(config->verbose)
+   if(DEBUG)
+      debug_printf(" DONE.\n");
+   else if(config->verbose)
       Serial.printf("Done filling display.\n");
 }
 
 // set/get row_set
-void Flippie::set_row_set(unsigned int row) {
+inline void Flippie::set_row_set(unsigned int row) {
+   debug_printf("Setting ROW_SET %u ... ", row);
    // reset all RST rows
-   for(unsigned int i = 0; i < config->num_rows; ++i) {
-      _shift_register[config->sr_row_rst_pins[i]/8] &= (255 - _byte_bit_array[config->sr_row_rst_pins[i]%8]);
+   if(row < BROSE_MAX_ROWS) {
+      set_row_rst(BROSE_MAX_ROWS);
    }
-   _shift_register[config->sr_row_set_pins[row]/8] |= _byte_bit_array[config->sr_row_set_pins[row]%8];
+   for(unsigned int i = 0; i < config->num_rows; ++i) {
+      if(i == row) {
+         _shift_register[config->sr_row_set_pins[row]/8] |= _byte_bit_array[config->sr_row_set_pins[row]%8];
+      } else {
+         _shift_register[config->sr_row_set_pins[row]/8] &= 255 - _byte_bit_array[config->sr_row_set_pins[row]%8];
+      }
+   }
+   debug_printf("DONE.\n");
 }
-int Flippie::get_row_set() {
+unsigned int Flippie::get_row_set() {
    for(unsigned int row = 0; row < BROSE_MAX_ROWS; row++) {
-      if((_shift_register[config->sr_row_set_pins[row]/8] & _byte_bit_array[config->sr_row_set_pins[row]%8]) == _byte_bit_array[config->sr_row_set_pins[row]%8])
+      if((_shift_register[config->sr_row_set_pins[row]/8] & _byte_bit_array[config->sr_row_set_pins[row]%8])> 0)
          return row;
    }
-   return -1;
+   return BROSE_MAX_ROWS;
 }
 
 // set/get row_rst
-void Flippie::set_row_rst(unsigned int row) {
+inline void Flippie::set_row_rst(unsigned int row) {
+   debug_printf("Setting ROW_RST %u ... ", row);
    // reset all SET rows
-   for(unsigned int i = 0; i < config->num_rows; ++i) {
-      _shift_register[config->sr_row_set_pins[i]/8] &= (255 - _byte_bit_array[config->sr_row_set_pins[i]%8]);
+   if(row < BROSE_MAX_ROWS) {
+      set_row_set(BROSE_MAX_ROWS);
    }
-   _shift_register[config->sr_row_rst_pins[row]/8] |= _byte_bit_array[config->sr_row_rst_pins[row]%8];
+   for(unsigned int i = 0; i < config->num_rows; ++i) {
+      if(i == row) {
+         _shift_register[config->sr_row_rst_pins[row]/8] |= _byte_bit_array[config->sr_row_rst_pins[row]%8];
+      } else {
+         _shift_register[config->sr_row_rst_pins[row]/8] &= 255 - _byte_bit_array[config->sr_row_rst_pins[row]%8];
+      }
+   }
+   debug_printf("DONE.\n");
 }
-int Flippie::get_row_rst() {
+unsigned int Flippie::get_row_rst() {
    for(unsigned int row = 0; row < BROSE_MAX_ROWS; row++) {
-      if((_shift_register[config->sr_row_rst_pins[row]/8] & _byte_bit_array[config->sr_row_rst_pins[row]%8]) == _byte_bit_array[config->sr_row_rst_pins[row]%8])
+      if((_shift_register[config->sr_row_rst_pins[row]/8] & _byte_bit_array[config->sr_row_rst_pins[row]%8]) > 0)
          return row;
    }
-   return -1;
+   return BROSE_MAX_ROWS;
 }
 
 // set/get coolumn
-void Flippie::set_column(unsigned int column) {
+inline void Flippie::set_column(unsigned int column) {
+   debug_printf("Setting COLUMN %u ... ", column);
    for(unsigned int i = 0; i < FP2800A_COLUMN_CODE_LINES; i++) {
-      if(FP2800A_COLUMN_CODES[column][i] == 1) {
+      if(column < FP2800A_MAX_COLUMNS && FP2800A_COLUMN_CODES[column][i] == 1) {
          _shift_register[config->sr_column_code_pins[i]/8] |= _byte_bit_array[config->sr_column_code_pins[i]%8];
       } else {
          _shift_register[config->sr_column_code_pins[i]/8] &= (255 - _byte_bit_array[config->sr_column_code_pins[i]%8]);
       }
    }
+   debug_printf("DONE.\n");
 }
-int Flippie::get_column() {
+unsigned int Flippie::get_column() {
    bool found = true;
    for(unsigned int column = 0; column < FP2800A_MAX_COLUMNS; column++) {
       found = true;
       for(unsigned int i = 0; i < FP2800A_COLUMN_CODE_LINES; i++) {
-         found &= ((_shift_register[config->sr_column_code_pins[i]/8] & _byte_bit_array[config->sr_column_code_pins[i]%8]) == _byte_bit_array[config->sr_column_code_pins[i]%8]);
+         found &= ((FP2800A_COLUMN_CODES[column][i] == 1 & ((_shift_register[config->sr_column_code_pins[i]/8] & _byte_bit_array[config->sr_column_code_pins[i]%8]) > 0)) || (FP2800A_COLUMN_CODES[column][i] == 0 & ((_shift_register[config->sr_column_code_pins[i]/8] & _byte_bit_array[config->sr_column_code_pins[i]%8]) == 0)));
       }
       if(found)
          return column;
    }
-   return -1;
+   return FP2800A_MAX_COLUMNS;
 }
 
 // set/get address (ADDR1-ADDR7)
-void Flippie::set_address(unsigned char address) {
-   for(unsigned int i = 0; i < BROSE_ADDR_LINES - 1; ++i) {
-      if((address>>i) & 1 == 1) {
+inline void Flippie::set_address(unsigned char address) {
+   debug_printf("Setting ADDRESS %u ... ", address);
+   for(unsigned int i = 0; i < BROSE_ADDR_LINES; ++i) {
+      if(address & _byte_bit_array[i] > 0) {
          _shift_register[config->sr_address_pins[i]/8] |= _byte_bit_array[config->sr_address_pins[i]%8];
       }
    }
+   debug_printf("DONE.\n");
 }
 unsigned char Flippie::get_address() {
-   unsigned char address = 0x00;
-   for(int i = BROSE_ADDR_LINES - 2; i >= 0 ; i--) {
-      if((_shift_register[config->sr_address_pins[i]/8] & _byte_bit_array[config->sr_address_pins[i]%8]) == _byte_bit_array[config->sr_address_pins[i]%8]) {
-         address |= 1;
+   unsigned char address = 0;
+   for(unsigned int i = 0; i < BROSE_ADDR_LINES; i++) {
+      if((_shift_register[config->sr_address_pins[i]/8] & _byte_bit_array[config->sr_address_pins[i]%8]) > 0) {
+         address |= _byte_bit_array[i];
       }
-      address<<1;
    }
    return address;
 }
 
 // set FP2800A direction 1 => switches +VS, 0 switches GND
-void Flippie::set_d(unsigned int state) {
-   if(state == 1) {
+inline void Flippie::set_d(unsigned int d) {
+   debug_printf("Setting D %u ... ", d);
+   if(d == 1) {
       _shift_register[config->sr_d_pin/8] |= _byte_bit_array[config->sr_d_pin%8];
    } else {
       _shift_register[config->sr_d_pin/8] &= (255 - _byte_bit_array[config->sr_d_pin%8]);
    }
+   debug_printf("DONE.\n");
 }
 unsigned int Flippie::get_d() {
-   return ((_shift_register[config->sr_d_pin/8] & _byte_bit_array[config->sr_d_pin%8]) == _byte_bit_array[config->sr_d_pin%8]) ? 1 : 0;
+   return ((_shift_register[config->sr_d_pin/8] & _byte_bit_array[config->sr_d_pin%8]) > 0) ? 1 : 0;
 }
 
 // clear shift-registers
 void Flippie::clear_shift_register(bool fire_after_clear) {
+   debug_printf("Clearing shift-register %s... ", fire_after_clear ? "and fire afeterwards " : " ");
    for(unsigned int i = 0; i < NUMBER_OF_SHIFT_REGISTERS; ++i) {
       _shift_register[i] = 0;
    }
@@ -328,6 +363,7 @@ void Flippie::clear_shift_register(bool fire_after_clear) {
    if(fire_after_clear) {
       fire_shift_register(false);
    }
+   debug_printf("DONE.\n");
 }
 
 // assemble the shift-register for a specific dotsand fire it
@@ -355,8 +391,8 @@ void Flippie::_set_dot(unsigned int row, unsigned int module, unsigned int colum
    }
 
    // set address (ADDR1-ADDR7)
-   for(i = 0; i < BROSE_ADDR_LINES - 1; ++i) {
-      if(config->addresses[module]>>i & 1 == 1) {
+   for(i = 0; i < BROSE_ADDR_LINES; i++) {
+      if(config->addresses[module] & _byte_bit_array[i] > 0) {
          _shift_register[config->sr_address_pins[i]/8] |= _byte_bit_array[config->sr_address_pins[i]%8];
       }
    }
@@ -382,10 +418,10 @@ void Flippie::_set_dot(unsigned int row, unsigned int module, unsigned int colum
    }
 
    if(save) {
-      if(state & 1 == 1) {
+      if(state & 1 > 0) {
          _dots[row][module] |= 1<<column;
       } else {
-         _dots[row][module] -= 1<<column;
+         _dots[row][module] &= (UINT32_MAX - (1<<column));
       }
    }
 }

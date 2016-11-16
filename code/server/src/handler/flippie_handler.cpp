@@ -9,7 +9,7 @@ bool FlippieHandler::handle(ESP8266WebServer& server, HTTPMethod method, String 
       return false;
    }
 
-   if(flippie->config->verbose) {
+   if(DEBUG) {
       char* tmp = (char*)malloc(1024);
       unsigned int tmp_i = 0, j;
       for(unsigned int i = 0; i < server.args(); i++) {

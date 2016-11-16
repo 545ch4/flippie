@@ -1,3 +1,4 @@
+#include "debug.h"
 #include <Arduino.h>
 #include "fp2800a.h"
 #include "brose.h"
@@ -112,9 +113,8 @@ public:
    void magnetize(unsigned int repeats);
 
    // paint _dots in different flavours
-   void paint();
    void paint(bool override_former_dot_state);
-   void paint(unsigned int** dots);
+   void paint(unsigned int** dots, bool override_former_dot_state);
 
    // setter and getter of shift-register parts
    void clear_shift_register(bool fire_after_clear);
@@ -124,9 +124,9 @@ public:
    void set_address(unsigned char address);
    void set_d(unsigned int state);
    void set_dot(unsigned int row, unsigned int module, unsigned int column, unsigned int state);
-   int get_row_set();
-   int get_row_rst();
-   int get_column();
+   unsigned int get_row_set();
+   unsigned int get_row_rst();
+   unsigned int get_column();
    unsigned char get_address();
    unsigned int get_d();
    unsigned int get_dot(unsigned int row, unsigned int module, unsigned int column);

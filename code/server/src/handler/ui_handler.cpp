@@ -18,11 +18,13 @@ UIHandler::UIHandler(Flippie* f) {
    char *config_page_temp;
    config_page_temp = (char *)malloc(1024 * sizeof(char));
    unsigned int i = 0;
-   i = sprintf(config_page_temp + i, "{\n\t\"rows\": %u,\n\t\"columns\": [\n", flippie->config->num_rows);
+   i = sprintf(config_page_temp + i, "{\n\t\"rows\": %u,\n", flippie->config->num_rows);
+   i += sprintf(config_page_temp + i, "\t\"max_columns\": %i,\n", FP2800A_MAX_COLUMNS);
+   i += sprintf(config_page_temp + i, "\t\"max_rows\": %i,\n", BROSE_MAX_ROWS);
+   i += sprintf(config_page_temp + i, "\t\"columns\": [\n");
    for(int j = 0; j < flippie->config->num_modules - 1; j++) {
       i += sprintf(config_page_temp + i, "\t\t%u,\n", flippie->config->num_columns[j]);
    }
-
    i += sprintf(config_page_temp + i, "\t\t%u\n\t]\n}\n\0", flippie->config->num_columns[flippie->config->num_modules - 1]);
    config_page = (char *)malloc(i * sizeof(char));
    memcpy(config_page, config_page_temp, i);
