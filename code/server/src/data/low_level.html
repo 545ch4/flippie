@@ -80,12 +80,11 @@ R"D8ESKJ6H4DSKHU(
                      <input name="led_C" value="1" type="checkbox" data-toggle="toggle" data-onstyle="warning" />
                   </label>
                </p>
-               
+
                <p>
                   <div class="input-group">
                      Address
                      <select name="address" size="1">
-                        <option value="-1">undefined</option>
                         <option value="0">0: 0-0-0-0-0-0-0</option>
                         <option value="1">1: 1-0-0-0-0-0-0</option>
                         <option value="2">2: 0-1-0-0-0-0-0</option>
@@ -217,12 +216,12 @@ R"D8ESKJ6H4DSKHU(
                      </select>
                   </div>
                </p>
-               
+
                <p>
                   <div class="input-group">
                      Column
                      <select name="column" size="1">
-                        <option value="-1">undefined</option>
+                        <option value="28">undefined</option>
                         <option value="0">0</option>
                         <option value="1">1</option>
                         <option value="2">2</option>
@@ -259,7 +258,7 @@ R"D8ESKJ6H4DSKHU(
                   <div class="input-group">
                      Row SET
                      <select name="row_set" size="1">
-                        <option value="-1">undefined</option>
+                        <option value="20">undefined</option>
                         <option value="0">0</option>
                         <option value="1">1</option>
                         <option value="2">2</option>
@@ -280,14 +279,6 @@ R"D8ESKJ6H4DSKHU(
                         <option value="17">17</option>
                         <option value="18">18</option>
                         <option value="19">19</option>
-                        <option value="20">20</option>
-                        <option value="21">21</option>
-                        <option value="22">22</option>
-                        <option value="23">23</option>
-                        <option value="24">24</option>
-                        <option value="25">25</option>
-                        <option value="26">26</option>
-                        <option value="27">27</option>
                      </select>
                   </div>
                </p>
@@ -296,7 +287,7 @@ R"D8ESKJ6H4DSKHU(
                   <div class="input-group">
                      Row RST
                      <select name="row_rst" size="1">
-                        <option value="-1">undefined</option>
+                        <option value="20">undefined</option>
                         <option value="0">0</option>
                         <option value="1">1</option>
                         <option value="2">2</option>
@@ -317,14 +308,6 @@ R"D8ESKJ6H4DSKHU(
                         <option value="17">17</option>
                         <option value="18">18</option>
                         <option value="19">19</option>
-                        <option value="20">20</option>
-                        <option value="21">21</option>
-                        <option value="22">22</option>
-                        <option value="23">23</option>
-                        <option value="24">24</option>
-                        <option value="25">25</option>
-                        <option value="26">26</option>
-                        <option value="27">27</option>
                      </select>
                   </div>
                </p>
@@ -344,17 +327,17 @@ R"D8ESKJ6H4DSKHU(
                <input type="hidden" name="enable" value="0" />
                <p>
                   <div class="btn-group btn-block">
-                     <button type="submit" class="btn btn-success btn-block" value="fire"><span class="glyphicon glyphicon-exclamation-sign"></span> Fire shift-regsiter</button>
+                     <button type="submit" class="btn btn-success btn-block" value="fire"><span class="glyphicon glyphicon-arrow-right"></span> Fire shift-regsiter</button>
                   </div>
                </p>
                <p>
                   <div class="btn-group btn-block">
-                     <button type="submit" class="btn btn-danger btn-block" value="fire_enable"><span class="glyphicon glyphicon-exclamation-sign"></span> Fire shift-regsiter (FP2800A enable)</button>
+                     <button type="submit" class="btn btn-danger btn-block" value="fire_enable"><span class="glyphicon glyphicon-arrow-right"></span> Fire shift-regsiter (FP2800A enable)</button>
                   </div>
                </p>
                <p>
                   <div class="btn-group btn-block">
-                     <button type="reset" class="btn btn-default btn-block"><span class="glyphicon glyphicon-exclamation-sign"></span> Reset shift-regsiter</button>
+                     <button type="reset" class="btn btn-default btn-block"><span class="glyphicon glyphicon-arrow-right"></span> Reset shift-regsiter</button>
                   </div>
                </p>
             </form>
@@ -367,12 +350,31 @@ R"D8ESKJ6H4DSKHU(
 
    <script>
    var flippie_config;
-   
+
    function fill_form() {
       $('#flippie input[name="enable"]').val('0');
       $.getJSON('/flippie', {json: 1}).done(function(r) {
          $.each(r, function(k, v) {
-            $('[name="' + k + '"]').val(v);
+            var elem = $('[name="' + k + '"]');
+            if(elem[0].tagName == 'INPUT') {
+               if(elem.prop('type') == 'radio') {
+                  $('input[type="radio"][name="' + k + '"][value="' + v + '"]').prop('checked', true);
+               } else if(elem.prop('type') == 'checkbox') {
+                  if(parseInt(v) == 1) {
+                     elem.prop('checked', true);
+                     elem.bootstrapToggle('on');
+                  } else {
+                     elem.prop('checked', false);
+                     elem.bootstrapToggle('off');
+                  }
+               } else {
+                  elem.val(v);
+               }
+            } else if(elem[0].tagName == 'SELECT') {
+               elem.find('option[value="' + v + '"]').prop('selected', 'selected');
+            } else {
+               elem.val(v);
+            }
          });
       }).fail(function( jqxhr, textStatus, error ) {
          var err = textStatus + ", " + error;
@@ -381,12 +383,12 @@ R"D8ESKJ6H4DSKHU(
       });
       display_shift_register();
    }
-   
+
    function display_shift_register() {
       $.getJSON('/flippie', {shiftregister: 1}).done(function(shift_register_string) {
          $('#shiftregister').empty();
          for (var i = 0, len = shift_register_string.length; i < len; i++) {
-            if(i%10 == 0) {
+            if(i%8 == 0) {
                $('#shiftregister').append('&nbsp;');
             }
             $('#shiftregister').append($('<span />').css({color: shift_register_string[i] == '1' ? 'red' : 'black'}).html('&bull;'));
@@ -395,7 +397,7 @@ R"D8ESKJ6H4DSKHU(
          $('#flippie .errors').append($('<p />').html('Failed getting shift-register content.'));
       });
    }
-   
+
    function form_as_object(selector) {
       var data = {};
       $.each($(selector + ' input[type="text"],textarea,input[type="radio"]:checked,select'), function(i, _elem) {
@@ -420,7 +422,7 @@ R"D8ESKJ6H4DSKHU(
       }).always(function() {
          $('#flippie input,select,button,textarea,a').prop('disabled', false);
       });
-      
+
       $('#flippie').on('reset', function(e) {
          e.preventDefault();
          $('#flippie input,select,button,textarea,a').prop('disabled', true);
@@ -437,12 +439,11 @@ R"D8ESKJ6H4DSKHU(
          });
          return false;
       });
-      
+
       $('#flippie').on('submit', function(e) {
          e.preventDefault();
          $('#flippie input,select,button,textarea,a').prop('disabled', true);
-         var elem = $(e.relatedTarget);
-         elem.removeClass('glyphicon-exclamation-sign').addClass('glyphicon-refresh glyphicon-refresh-animate');
+         $('#flippie [type="submit"][clicked="true"] .glyphicon').removeClass('glyphicon-arrow-right').addClass('glyphicon-refresh glyphicon-refresh-animate');
          $('#flippie input[name="enable"]').val($('#flippie [type="submit"][clicked="true"]').val() == 'fire_enable' ? '1' : '0');
          $('#flippie .errors').empty();
          $.post('/flippie', form_as_object('#flippie')).done(function(r) {
@@ -450,12 +451,13 @@ R"D8ESKJ6H4DSKHU(
          }).fail(function() {
             $('#flippie .errors').append($('<p />').html('Failed resetting shift-register.'));
          }).always(function() {
-            elem.removeClass('glyphicon-refresh glyphicon-refresh-animate').addClass('glyphicon-exclamation-sign');
+            $('#flippie [type="submit"][clicked="true"] .glyphicon').removeClass('glyphicon-refresh glyphicon-refresh-animate').addClass('glyphicon-arrow-right');
+            $('[type=submit]', $('#flippie')).removeAttr('clicked');
             $('#flippie input,select,button,textarea,a').prop('disabled', false);
          });
          return false;
       });
-      
+
       $('#flippie [type=submit]').click(function() {
            $('[type=submit]', $('#flippie')).removeAttr('clicked');
            $(this).attr('clicked', 'true');

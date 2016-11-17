@@ -19,9 +19,9 @@ bool FlippieHandler::handle(ESP8266WebServer& server, HTTPMethod method, String 
          j = server.argName(i).length();
          memcpy(tmp + tmp_i, server.argName(i).c_str(), j);
          tmp_i += j;
-         
+
          tmp[tmp_i++] = '=';
-         
+
          j = server.arg(i).length();
          memcpy(tmp + tmp_i, server.arg(i).c_str(), j);
          tmp_i += j;
@@ -44,18 +44,18 @@ bool FlippieHandler::handle(ESP8266WebServer& server, HTTPMethod method, String 
       } else if(server.hasArg("led_C")) {
          server.send(200, "application/json", flippie->led_C_on ? "1" : "0");
       } else if(server.hasArg("address")) {
-         sprintf(tmp, "%u\0", flippie->get_address() & 127);
+         sprintf(tmp, "%u\0", flippie->get_address());
          server.send(200, "application/json", String(tmp));
       } else if(server.hasArg("column")) {
-         sprintf(tmp, "%u\0", flippie->get_column() & 32);
+         sprintf(tmp, "%u\0", flippie->get_column());
          server.send(200, "application/json", String(tmp));
       } else if(server.hasArg("d")) {
          server.send(200, "application/json", flippie->get_d() ? "true" : "false");
       } else if(server.hasArg("row_set")) {
-         sprintf(tmp, "%u\0", flippie->get_row_set() & 32);
+         sprintf(tmp, "%u\0", flippie->get_row_set());
          server.send(200, "application/json", String(tmp));
       } else if(server.hasArg("row_rst")) {
-         sprintf(tmp, "%u\0", flippie->get_row_rst() & 32);
+         sprintf(tmp, "%u\0", flippie->get_row_rst());
          server.send(200, "application/json", String(tmp));
       } else {
          server.send(405, "application/json", "\"Unknown get command\"");
@@ -77,7 +77,7 @@ bool FlippieHandler::handle(ESP8266WebServer& server, HTTPMethod method, String 
             server.send(405, "application/json", "\"Unknown task\"");
          }
       } else {
-         int x = 0;
+         unsigned char x = 0;
          if(server.hasArg("led_mode")) {
             flippie->config->led_mode = server.arg("led_mode").charAt(0) == '1' ? 1 : 0;
             goto send_message;
@@ -105,13 +105,13 @@ bool FlippieHandler::handle(ESP8266WebServer& server, HTTPMethod method, String 
          }
          if(server.hasArg("address")) {
             x = server.arg("address").toInt();
-            if(x >= 0 && x <= 127) {
+            if(x >= 0 && x <= BROSE_MAX_ADDR) {
                flippie->set_address(x);
             }
          }
          if(server.hasArg("column")) {
             x = server.arg("column").toInt();
-            if(x >= 0 && x < FP2800A_MAX_COLUMNS) {
+            if(x >= 0 && x <= FP2800A_MAX_COLUMNS) {
                flippie->set_column(x);
             }
          }
@@ -120,13 +120,13 @@ bool FlippieHandler::handle(ESP8266WebServer& server, HTTPMethod method, String 
          }
          if(server.hasArg("row_set")) {
             x = server.arg("row_set").toInt();
-            if(x >= 0 && x < BROSE_MAX_ROWS) {
+            if(x >= 0 && x <= BROSE_MAX_ROWS) {
                flippie->set_row_set(x);
             }
          }
          if(server.hasArg("row_rst")) {
             x = server.arg("row_rst").toInt();
-            if(x >= 0 && x < BROSE_MAX_ROWS) {
+            if(x >= 0 && x <= BROSE_MAX_ROWS) {
                flippie->set_row_rst(x);
             }
          }

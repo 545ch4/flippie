@@ -20,9 +20,9 @@ void setup(void){
    Serial.println("Booting...");
 
    // TODO: What's the SSID of your WiFi?
-   const char* ssid = "network";
+   const char* ssid = "wifi";
    // TODO: What's the PASSWORD of your WiFi?
-   const char* password = "forensicgenetics";
+   const char* password = "secret";
    // TODO: If you don't want to use DHCP, provide a static IP (and uncomment). Othewise leave this commented.
 
    //IPAddress ip(192, 168, 1, 250);

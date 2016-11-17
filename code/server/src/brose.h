@@ -4,5 +4,6 @@
 #define BROSE_MAX_ROWS 20
 #define BROSE_ADDR_LINES 7
 #define BROSE_ADDR_LINES_WITH_EN 8
+#define BROSE_MAX_ADDR 127
 
 #endif
