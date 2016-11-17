@@ -1,6 +1,7 @@
 require 'uri'
 require 'net/http'
 require 'tco'
+require 'base64'
 
 # fonts
 require "#{File.dirname(__FILE__)}/fonts.rb"
@@ -12,7 +13,7 @@ class FlippieClient
    def initialize(ip = '192.168.1.10', rows = 18, columns = [28], debug = false)
       @rows = rows.to_i
       @columns = columns
-      throw ArgumentException(':columns supposed to be an array.') unless @columns.kind_of?(Array)
+      throw ArgumentException('"columns" supposed to be an array.') unless @columns.kind_of?(Array)
       @ip = ip
       @debug = debug == true
    end
@@ -139,35 +140,27 @@ class FlippieClient
       end
 
       # print int array (debug)
-      puts @rows.times.map{|r| @columns.size.times.map{ |m| "%010u"%(int_output[r][m])}.join(' | ')}.join("\n")  if @debug
+      puts @rows.times.map{|r| @columns.size.times.map{ |m| "%010u"%(int_output[r][m])}.join(' | ')}.join("\n") if @debug
 
       # build byte array for submission
-      dots_query_string = ''
-      current_byte = 0
-      current_byte_s = ''
-      print 'dots(int)=[' if @debug
+      dots_query_string = StringIO.new
       @rows.times do |r|
          @columns.size.times do |m|
             [0, 8, 16, 24].each do |shift|
-              current_byte = (int_output[r][m]>>shift) & 255
-              print '%u '%(current_byte) if @debug
-              current_byte_s = current_byte.to_s(16)
-              dots_query_string << '0' if current_byte_s.size == 1
-              dots_query_string << current_byte_s
+              dots_query_string.putc((int_output[r][m]>>shift) & 255)
             end
-            print '| ' if @debug
          end
       end
-      puts ']' if @debug
 
-      puts "dots_query_string(#{dots_query_string.length}) = #{dots_query_string.inspect}"  if @debug
+      puts "dots_query_string(#{dots_query_string.string.length}) = #{dots_query_string.string.inspect} = #{Base64.encode64(dots_query_string.string)}" if @debug
+      
 
       # HTTP connect to flippie and POST dots query
       if fire
-         uri = URI("http://#{flippie_ip}/dots")
+         uri = URI("http://#{@ip}/dots")
          http = Net::HTTP.new(uri.host, uri.port, nil, nil)
          request = Net::HTTP::Post.new(uri.path)
-         request.set_form_data({'dots' => dots_query_string})
+         request.set_form_data({'dots' => Base64.encode64(dots_query_string.string)})
          puts http.request(request)  if @debug
 
       #   uri = URI("http://#{flippie_ip}/dots")

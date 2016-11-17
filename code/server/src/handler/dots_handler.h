@@ -2,9 +2,10 @@
 #define DOTS_HANDLER_H
 #include "../base64.h"
 #include "../flippie.h"
+#include "abstract_handler.h"
 #include <ESP8266WebServer.h>
 
-class DotsHandler : public RequestHandler {
+class DotsHandler : public AbstractHandler {
 public:
   DotsHandler(Flippie* flippie);
   bool canHandle(HTTPMethod method, String uri) override;

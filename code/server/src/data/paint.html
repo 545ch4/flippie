@@ -11,6 +11,7 @@ R"D8ESKJ6H4DSKHU(
    <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet" />
    <link href="https://gitcdn.github.io/bootstrap-toggle/2.2.2/css/bootstrap-toggle.min.css" rel="stylesheet" />
    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
+   <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/Base64/1.0.0/base64.js"></script>
    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
    <!--[if lt IE 9]>
@@ -75,19 +76,19 @@ R"D8ESKJ6H4DSKHU(
                <div class="errors"></div>
                <p>
                   <div class="btn-group btn-block">
-                     <a href="#" data-task="clear" class="btn btn-default btn-block"><span class="glyphicon glyphicon-exclamation-sign"></span> Clear display</a>
+                     <a href="#" data-task="clear" class="btn btn-default btn-block"><span class="glyphicon glyphicon-arrow-right"></span> Clear display</a>
                   </div>
                </p>
 
                <p>
                   <div class="btn-group btn-block">
-                     <a href="#" data-task="fill" class="btn btn-default btn-block"><span class="glyphicon glyphicon-exclamation-sign"></span> Fill display</a>
+                     <a href="#" data-task="fill" class="btn btn-default btn-block"><span class="glyphicon glyphicon-arrow-right"></span> Fill display</a>
                   </div>
                </p>
 
                <p>
                   <div class="btn-group btn-block">
-                     <a href="#" data-task="inverse" class="btn btn-default btn-block"><span class="glyphicon glyphicon-exclamation-sign"></span> Inverse display</a>
+                     <a href="#" data-task="inverse" class="btn btn-default btn-block"><span class="glyphicon glyphicon-arrow-right"></span> Inverse display</a>
                   </div>
                </p>
             </div>
@@ -99,238 +100,209 @@ R"D8ESKJ6H4DSKHU(
    <script src="https://gitcdn.github.io/bootstrap-toggle/2.2.2/js/bootstrap-toggle.min.js"></script>
 
    <script type="text/javascript">
-   var flippie_config = {};
+      var flippie_config = {};
 
-   var canvas = null;
-   var context = null;
-   var hold_down = false;
-   var last_x = -1;
-   var last_y = -1;
-   var delta = 3;
-   var delta_half = 0.5 * delta;
+      var canvas = null;
+      var context = null;
+      var hold_down = false;
+      var last_x = -1;
+      var last_y = -1;
+      var delta = 3.0;
+      var delta_half = 0.5 * delta;
 
-   var ajaxManager = (function() {
-      var requests = [];
+      var ajaxManager = (function() {
+         var requests = [];
 
-      return {
-         addReq:  function(opt) {
-            requests.push(opt);
-         },
-         removeReq:  function(opt) {
-            if( $.inArray(opt, requests) > -1 )
-            requests.splice($.inArray(opt, requests), 1);
-         },
-         run: function() {
-            var self = this,
-            oriSuc;
+         return {
+            addReq:  function(opt) {
+               requests.push(opt);
+            },
+            removeReq:  function(opt) {
+               if( $.inArray(opt, requests) > -1 )
+               requests.splice($.inArray(opt, requests), 1);
+            },
+            run: function() {
+               var self = this,
+               oriSuc;
 
-            if( requests.length ) {
-               oriSuc = requests[0].complete;
+               if( requests.length ) {
+                  oriSuc = requests[0].complete;
 
-               requests[0].complete = function() {
-                  if( typeof(oriSuc) === 'function' ) oriSuc();
-                  requests.shift();
-                  self.run.apply(self, []);
-               };
+                  requests[0].complete = function() {
+                     if( typeof(oriSuc) === 'function' ) oriSuc();
+                     requests.shift();
+                     self.run.apply(self, []);
+                  };
 
-               $.ajax(requests[0]);
-            } else {
-               self.tid = setTimeout(function() {
-                  self.run.apply(self, []);
-               }, 1000);
-            }
-         },
-         stop:  function() {
-            requests = [];
-            clearTimeout(this.tid);
-         }
-      };
-   }());
-   ajaxManager.run();
-
-   function clear_canvas() {
-      context.clearRect(0, 0, canvas.width, canvas.height);
-      for(var x = 0; x < width; x++) {
-         for(var y = 0; y < flippie_config['rows']; y++) {
-            context.beginPath();
-            context.arc(x * delta + delta_half, y  * delta + delta_half, delta_half, 0, 2.0 * Math.PI, false);
-            context.fillStyle = 'black';
-            context.fill();
-         }
-      }
-   }
-
-   function initilaize_canvas(evt) {
-      var width = 0;
-      $.each(flippie_config['columns'], function(){
-         width += parseInt(this) || 0;
-      });
-      canvas.width = width * delta;
-      canvas.height = flippie_config['rows'] * delta;
-
-      $.getJSON('/dots').done(function(json) {
-         var dots = base64_decode(json);
-         var r, m, x = 0, c, pos = 0, c_value = 0;
-         for(r = 0; r < flippie_config['rows']; r++;) {
-            for(m = 0; m < flippie_config['columns'].length; m++;) {
-               for(c = 0; c < flippie_config['columns'][m]; c++;) {
-                  context.beginPath();
-                  context.arc(x, r * delta + delta_half, delta_half, 0, 2 * Math.PI, false);
-                  if(((dots.charCodeAt(pos + Math.floor(c/8))>>(c%8)) & 1) == 1) {
-                     context.fillStyle = 'yellow';
-                  } else {
-                     context.fillStyle = 'black';
-                  }
-                  context.fill();
-                  x++;
-                  pos+=4;
+                  $.ajax(requests[0]);
+               } else {
+                  self.tid = setTimeout(function() {
+                     self.run.apply(self, []);
+                  }, 1000);
                }
+            },
+            stop:  function() {
+               requests = [];
+               clearTimeout(this.tid);
+            }
+         };
+      }());
+
+      function clear_canvas() {
+         context.clearRect(0, 0, canvas.width, canvas.height);
+         for(var x = 0; x < width; x++) {
+            for(var y = 0; y < flippie_config['rows']; y++) {
+               context.beginPath();
+               context.arc(x * delta + delta_half, y  * delta + delta_half, delta_half, 0, 2.0 * Math.PI, false);
+               context.fillStyle = 'black';
+               context.fill();
             }
          }
-      }).fail(function() {
-         $('#flippie .errors').append($('<p />').html('Failed getting dots.');
-      }).always(function() {
-         $('#flippie input,select,button,textarea,a').prop('disabled', false);
-      });
-   }
+      }
 
-   function get_dots_hash_by_x_y(x, y, c_value, state) {
-      var x = Math.floor(x / delta);
-      var c = 0;
-      var m = 0;
-      var c_sum = 0;
+      function initialize_canvas() {
+         var width = 0;
+         $.each(flippie_config['columns'], function(){
+            width += parseInt(this) || 0;
+         });
+         canvas.width = delta * width;
+         canvas.height = delta * flippie_config['rows'];
+         context.clearRect(0, 0, canvas.width, canvas.height);
 
-      for(var i = 0; i < flippie_config['columns'].length; i++) {
-         if(c_sum <= x && x < (c_sum + flippie_config['columns'][i])) {
-            m = i;
-            c = x - c_sum;
-            break;
+         $.getJSON('/dots').done(function(json) {
+            var dots = atob(json);
+            var row = 0.0, m, x = 0.0, c, pos = 0, c_value = 0, rows = 0.0 + flippie_config['rows'];
+            for(row = 0.0; row < rows; row += 1.0) {
+               console.log(row);
+               x = 0.0;
+               var row_string = '';
+               for(m = 0; m < flippie_config['columns'].length; m++) {
+                  for(c = 0; c < flippie_config['columns'][m]; c++) {
+                     context.beginPath();
+                     context.arc(x * delta + delta_half, row * delta + delta_half, delta_half, 0, 2 * Math.PI, false);
+                     if(((dots.charCodeAt(pos + Math.floor(c/8))>>(c%8)) & 1) == 1) {
+                        context.fillStyle = 'yellow';
+                        row_string += '*';
+                     } else {
+                        context.fillStyle = 'red';
+                        row_string += ' ';
+                     }
+                     context.fill();
+                     x += 1.0;
+                  }
+                  pos += 4;
+               }
+               console.log(row_string);
+            }
+         }).fail(function() {
+            $('#flippie .errors').append($('<p />').html('Failed getting dots.'));
+         }).always(function() {
+            $('#flippie input,select,button,textarea,a').prop('disabled', false);
+         });
+      }
+
+      function get_dots_hash_by_x_y(x, y, c_value, state) {
+         var x = Math.floor(x / delta);
+         var c = 0;
+         var m = 0;
+         var c_sum = 0;
+
+         for(var i = 0; i < flippie_config['columns'].length; i++) {
+            if(c_sum <= x && x < (c_sum + flippie_config['columns'][i])) {
+               m = i;
+               c = x - c_sum;
+               break;
+            }
+            c_sum += flippie_config['columns'][i];
          }
-         c_sum += flippie_config['columns'][i];
-      }
-      return {r: Math.floor(y / delta), m: m, c: c, state: state};
-   }
-
-   function base64_encode(s) {
-      var base64chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
-      var r = "";
-      var p = "";
-      var c = s.length % 3;
-
-      if (c > 0) {
-         for (; c < 3; c++) {
-            p += '=';
-            s += "\0";
-         }
+         return {r: Math.floor(y / delta), m: m, c: c, state: state};
       }
 
-      for (c = 0; c < s.length; c += 3) {
-         if (c > 0 && (c / 3 * 4) % 76 == 0) {
-            r += "\r\n";
-         }
-         var n = (s.charCodeAt(c) << 16) + (s.charCodeAt(c+1) << 8) + s.charCodeAt(c+2);
-         n = [(n >>> 18) & 63, (n >>> 12) & 63, (n >>> 6) & 63, n & 63];
-         r += base64chars[n[0]] + base64chars[n[1]] + base64chars[n[2]] + base64chars[n[3]];
-      }
-      return r.substring(0, r.length - p.length) + p;
-   }
-
-   function base64_decode(s) {
-      s = s.replace(new RegExp('[^'+base64chars.join("")+'=]', 'g'), "");
-      var p = (s.charAt(s.length-1) == '=' ?
-      (s.charAt(s.length-2) == '=' ? 'AA' : 'A') : "");
-      var r = "";
-      s = s.substr(0, s.length - p.length) + p;
-      for (var c = 0; c < s.length; c += 4) {
-         var n = (base64inv[s.charAt(c)] << 18) + (base64inv[s.charAt(c+1)] << 12) +
-         (base64inv[s.charAt(c+2)] << 6) + base64inv[s.charAt(c+3)];
-         r += String.fromCharCode((n >>> 16) & 255, (n >>> 8) & 255, n & 255);
-      }
-      return r.substring(0, r.length - p.length);
-   }
-
-   $(document).ready(function() {
-      canvas = $('#paintBox');
-      context = canvas.getContext('2d');
-      $('#flippie input,select,button,textarea,a').prop('disabled', true);
-
-      $.getJSON('/ui/config.json').done(function(json) {
-         flippie_config = json;
-         initialize_canvas();
-      }).fail(function() {
-         $('#flippie .errors').append($('<p />').html('Failed getting flippie configuration.'));
-      }).always(function() {
-         $('#flippie input,select,button,textarea,a').prop('disabled', false);
-      });
-
-      $('#flippie a[data-task]').on('click', function(e) {
+      $(document).ready(function(){
+         ajaxManager.run();
+         canvas = document.getElementById('paintBox');
+         context = canvas.getContext('2d');
          $('#flippie input,select,button,textarea,a').prop('disabled', true);
-         var elem = $(e.target);
-         elem.removeClass('glyphicon-exclamation-sign').addClass('glyphicon-refresh glyphicon-refresh-animate');
-         $.post('/ui/flippie', {task: elem.data('task')}).done(function(json) {
+
+         $.getJSON('/ui/config.json').done(function(json) {
             flippie_config = json;
+            initialize_canvas();
          }).fail(function() {
             $('#flippie .errors').append($('<p />').html('Failed getting flippie configuration.'));
          }).always(function() {
-            elem.removeClass('glyphicon-refresh glyphicon-refresh-animate').addClass('glyphicon-exclamation-sign');
             $('#flippie input,select,button,textarea,a').prop('disabled', false);
          });
-      });
 
-      canvas.on('touchstart', function(e){
-         e.preventDefault();
-         var last_x = Math.floor(e.touches[0].pageX / delta) * delta + delta_half;
-         var last_y = Math.floor(e.touches[0].pageY / delta) * delta + delta_half;
-         if(!hold_down) {
-            var data = context.getImageData(last_x, last_y, 1, 1).data;
-            c_value = data[0] == 0 && data[1] == 0 && data[2] == 0 && data[3] == 255 ? 1 : 0;
-            ajaxManager.addReq({
-               type: 'POST',
-               url: '/pixel',
-               data: get_dots_hash_by_x_y(e.touches[0].pageX, e.touches[0].pageY, c_value),
-               success: function(data){
-                  // do stuff
-               }
+         $('#flippie a[data-task]').on('click', function(e) {
+            $('#flippie input,select,button,textarea,a').prop('disabled', true);
+            var elem = $(e.target);
+            elem.find('.glyphicon').removeClass('glyphicon-arrow-right').addClass('glyphicon-refresh glyphicon-refresh-animate');
+            $.post('/flippie', {task: elem.data('task')}).done(function(json) {
+               flippie_config = json;
+            }).fail(function() {
+               $('#flippie .errors').append($('<p />').html('Failed getting flippie configuration.'));
+            }).always(function() {
+               initialize_canvas();
+               $('.glyphicon-refresh-animate').removeClass('glyphicon-refresh glyphicon-refresh-animate').addClass('glyphicon-arrow-right');
+               $('#flippie input,select,button,textarea,a').prop('disabled', false);
             });
-            context.beginPath();
-            context.arc(last_x, last_y, delta_half, 0, 2 * Math.PI, false);
-            if(c_value == 1) {
-               context.fillStyle = 'yellow';
-            } else {
-               context.fillStyle = 'black';
-            }
-            context.fill();
-            hold_down = true;
-         }
+         });
 
-      });
-      canvas.on('touchmove', function(e){
-         e.preventDefault();
-         var x = Math.floor(e.touches[0].pageX / delta) * delta + delta_half;
-         var y = Math.floor(e.touches[0].pageY / delta) * delta + delta_half;
-         if(hold_down && (x != last_x || y != last_y)) {
-            last_x = x;
-            last_y = y;
-            var data = context.getImageData(x, y, 1, 1).data;
-            context.beginPath();
-            context.arc(x, y, delta_half, 0, 2 * Math.PI, false);
-            if(data[0] == 0 && data[1] == 0 && data[2] == 0 && data[3] == 255) {
-               context.fillStyle = 'yellow';
-            } else {
-               context.fillStyle = 'black';
+         $(canvas).on('touchstart', function(e){
+            e.preventDefault();
+            var last_x = Math.floor(e.touches[0].pageX / delta) * delta + delta_half;
+            var last_y = Math.floor(e.touches[0].pageY / delta) * delta + delta_half;
+            if(!hold_down) {
+               var data = context.getImageData(last_x, last_y, 1, 1).data;
+               c_value = data[0] == 0 && data[1] == 0 && data[2] == 0 && data[3] == 255 ? 1 : 0;
+               ajaxManager.addReq({
+                  type: 'POST',
+                  url: '/pixel',
+                  data: get_dots_hash_by_x_y(e.touches[0].pageX, e.touches[0].pageY, c_value),
+                  success: function(data){
+                     // do stuff
+                  }
+               });
+               context.beginPath();
+               context.arc(last_x, last_y, delta_half, 0, 2 * Math.PI, false);
+               if(c_value == 1) {
+                  context.fillStyle = 'yellow';
+               } else {
+                  context.fillStyle = 'black';
+               }
+               context.fill();
+               hold_down = true;
             }
-            context.fill();
-         }
-      }
-   });
-   canvas.on('touchend', function(e){
-      e.preventDefault();
-      last_y = -1;
-      last_x = -1;
-      hold_down = false;
-   });
-});
-</script>
+
+         });
+         
+         $(canvas).on('touchmove', function(e){
+            e.preventDefault();
+            var x = Math.floor(e.touches[0].pageX / delta) * delta + delta_half;
+            var y = Math.floor(e.touches[0].pageY / delta) * delta + delta_half;
+            if(hold_down && (x != last_x || y != last_y)) {
+               last_x = x;
+               last_y = y;
+               var data = context.getImageData(x, y, 1, 1).data;
+               context.beginPath();
+               context.arc(x, y, delta_half, 0, 2 * Math.PI, false);
+               if(data[0] == 0 && data[1] == 0 && data[2] == 0 && data[3] == 255) {
+                  context.fillStyle = 'yellow';
+               } else {
+                  context.fillStyle = 'black';
+               }
+               context.fill();
+            }
+         });
+
+         $(canvas).on('touchend', function(e){
+            e.preventDefault();
+            last_y = -1;
+            last_x = -1;
+            hold_down = false;
+         });
+      });
+   </script>
 </body>
 </html>
 )D8ESKJ6H4DSKHU" "\0"

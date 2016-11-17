@@ -1,0 +1,13 @@
+GEM
+  remote: https://rubygems.org/
+  specs:
+    tco (0.1.8)
+
+PLATFORMS
+  ruby
+
+DEPENDENCIES
+  tco
+
+BUNDLED WITH
+   1.13.6

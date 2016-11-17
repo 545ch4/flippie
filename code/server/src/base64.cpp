@@ -85,7 +85,7 @@ int Base64::encode(const void* data_buf, unsigned int dataLength, char* result, 
    }
    if(resultIndex >= *resultSize) return 1;   /* indicate failure: buffer too small */
    result[resultIndex] = 0;
-   *resultSize = resultIndex;
+   *resultSize = resultIndex + 1;
    return 0;   /* indicate success */
 }
 
