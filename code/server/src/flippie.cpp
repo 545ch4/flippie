@@ -155,6 +155,7 @@ void Flippie::cycle_dots() {
 // paint content of _next_dots
 // only paint differnces to _dots unless override is true (default = false)
 void Flippie::paint(bool override_former_dot_state) {
+  debug_printf("%s", dots_as_string(_dots).c_str());
   debug_printf("Start painting with override=%s ... ",
                override_former_dot_state ? "true" : "false");
   for (unsigned char i = 0; i < config->num_rows; ++i) {
@@ -179,12 +180,13 @@ void Flippie::paint(bool override_former_dot_state) {
     debug_printf(" DONE.\n");
   else if (config->verbose)
     Serial.printf("Done painting _next_dots.\n");
+    debug_printf("%s", dots_as_string(_dots).c_str());
 }
 // set content of _next_dots and paint (cleverly only setting changed dots)
-void Flippie::paint(unsigned int **dots, bool override_former_dot_state) {
+void Flippie::set_next_and_paint(unsigned int **dots, bool override_former_dot_state) {
   // memcpy(_next_dots, dots, config->num_rows * sizeof(unsigned int*));
   for (unsigned char i = 0; i < config->num_rows; ++i) {
-    memcpy(&_next_dots[i], &dots[i],
+    memcpy(_next_dots[i], dots[i],
            config->num_modules * sizeof(unsigned int));
   }
   paint(override_former_dot_state);
@@ -640,20 +642,44 @@ String Flippie::binary_array_as_bit_string(unsigned char *arr, unsigned int len,
 
 String Flippie::dots_as_string(unsigned int **dots) {
   unsigned int c_len = 0;
-  for (unsigned char j = 0; j < config->num_modules; ++j) {
+  unsigned char i, j, k;
+  for (j = 0; j < config->num_modules; ++j) {
     c_len += config->num_columns[j];
   }
-  c_len = (c_len + 1) * config->num_rows + 1;
+  c_len = ((c_len + 10) * (config->num_rows + 3)) + 1;
+  
   char *c = (char *)malloc(c_len);
   c_len = 0;
-  for (unsigned char i = 0; i < config->num_rows; ++i) {
-    for (unsigned char j = 0; j < config->num_modules; ++j) {
-      for (unsigned char k = 0; k < config->num_columns[j]; ++k) {
-        c[c_len++] = ((dots[i][j] & 1 << k) == 1 << k) ? '*' : ' ';
+
+  c_len += sprintf(c + c_len, "\nMM ");
+  for (j = 0; j < config->num_modules; ++j) {
+    for (k = 0; k < config->num_columns[j]; ++k) {
+      c_len += sprintf(c + c_len, "%1u", j);
+    }
+  }
+
+  c_len += sprintf(c + c_len, "\nCC ");
+  for (j = 0; j < config->num_modules; ++j) {
+    for (k = 0; k < config->num_columns[j]; ++k) {
+      c_len += sprintf(c + c_len, "%1u", k/10);
+    }
+  }
+  c_len += sprintf(c + c_len, "\nCC ");
+  for (j = 0; j < config->num_modules; ++j) {
+    for (k = 0; k < config->num_columns[j]; ++k) {
+      c_len += sprintf(c + c_len, "%1u", k%10);
+    }
+  }
+
+  for (i = 0; i < config->num_rows; ++i) {
+    c_len += sprintf(c + c_len, "\n%2u ", i);
+    for (j = 0; j < config->num_modules; ++j) {
+      for (k = 0; k < config->num_columns[j]; ++k) {
+        c[c_len++] = ((dots[i][j] & 1 << k) == 1 << k) ? '@' : '.';
       }
     }
-    c[c_len++] = '\n';
   }
+  c[c_len++] = '\n';
   c[c_len] = 0;
   String s(c);
   free(c);

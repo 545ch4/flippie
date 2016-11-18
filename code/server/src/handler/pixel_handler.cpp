@@ -5,6 +5,7 @@ PixelHandler::PixelHandler(Flippie* f) {
 }
 
 bool PixelHandler::handle(ESP8266WebServer& server, HTTPMethod method, String uri) {
+   Serial.printf("PIXEL!\n");
    if(!canHandle(method, uri) || !server.hasArg("r") || !server.hasArg("m") || !server.hasArg("c")) {
       return false;
    }
