@@ -7,10 +7,10 @@ require "#{File.dirname(__FILE__)}/lib/flippie_client.rb"
 
 # initialize new flippie client
 fc = FlippieClient.new(
-   '192.168.1.42',    # IP address of your flippie board
-   20,                # number of rows of your flip-dot display
-   [25, 15],          # number of columns per module (usually some 28ers an one 21er)
-   true               # debug => true
+   '192.168.1.199',     # IP address of your flippie board
+   18,                  # number of rows of your flip-dot display
+   [21],                # number of columns per module (usually some 28ers an one 21er)
+   false                # debug => true
 )
 
 # sent text to flippie

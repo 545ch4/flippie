@@ -5,16 +5,16 @@ Flippie::Flippie() {
   unsigned char i;
 
   // TODO: How many modules does your display consists of?
-  const unsigned char num_modules = 2;
+  const unsigned char num_modules = 1;
   config->num_modules = num_modules;
   // TODO: What are the addresses (as byte) of the modules? (see DIP-switches at
   // each module)
-  config->addresses = new unsigned char[num_modules]{1, 127};
+  config->addresses = new unsigned char[num_modules]{1};
   // TODO: How many rows does your display have? (equal over all modules)
-  config->num_rows = 20;
+  config->num_rows = 21;
   // TODO: How many columns does each module of your display have? (same order
   // as the addresses)
-  config->num_columns = new unsigned char[num_modules]{25, 15};
+  config->num_columns = new unsigned char[num_modules]{21};
   // TODO: Should LED C toggle on each shift-register firing?
   config->led_mode = LED_MODE_FLASHING;
   // TODO: Verbose outputs on serial line?
@@ -47,20 +47,24 @@ Flippie::Flippie() {
   // shift-register input
   // 74*595 shift-register clear pin [normal:high, clear:low] (MR, SRCLR, SCLR,
   // SCL)
-  config->clear_pin = 16; // wemos D1 mini D0 => GPIO16
+  config->not_clear_pin = 16; // wemos D1 mini D0 => GPIO16
   // 74*595 shift-register clock pin (SH_CP, SRCLK, SCK)
   config->clock_pin = 14; // wemos D1 mini D5 => GPIO14
   // 74*595 shift-register storage register clock pin (latch) (ST_CP, RCLK, RCK)
   config->latch_pin = 12; // wemos D1 mini D6 => GPIO12
   // 74*595 shift-register output enable pin [normal:low, tristate output:high]
   // (G, OE)
-  config->output_enable_pin = 13; // wemos D1 mini D7 => GPIO13
+  config->not_output_enable_pin = 13; // wemos D1 mini D7 => GPIO13
   // 74*595 shift-register serial data input pin (DS, SER, A, SI)
-  config->serial_data_pin = 4; // wemos D1 mini D2 => GPIO4
-  // +VS enable (ON pin at current limiter FPF2702MX circuit) pin
-  config->vs_enable_pin = 2; // wemos D1 mini D4 => GPIO2
+  config->serial_data_pin = 4; // wemos D1 mini D2 => GPIO
+// ~EN_POWER_RAILS pin (eg. ON pin at current limiter FPF2702MX circuit)
+#ifdef REV8
+  config->not_enable_power_rails_pin = 2; // wemos D1 mini D4 => GPIO2
+#else
+  config->not_enable_power_rails_pin = 0; // wemos D1 mini D3 => GPIO0
+#endif
   // NOT_EN and ADDRSHIFT_REGISTER_WIDTH@FP2800A
-  config->enable_pin = 5; // wemos D1 mini D1 => GPIO5
+  config->not_enable_pin = 5; // wemos D1 mini D1 => GPIO5
   if (config->verbose)
     Serial.println("Finished configure flippie.");
 
@@ -87,34 +91,42 @@ Flippie::Flippie() {
   led_C_on = false;
 
   // define pins (not srPins) as outputs
-  pinMode(config->output_enable_pin, OUTPUT);
-  pinMode(config->clock_pin, OUTPUT);
-  pinMode(config->serial_data_pin, OUTPUT);
-  pinMode(config->latch_pin, OUTPUT);
-  pinMode(config->clear_pin, OUTPUT);
-  pinMode(config->enable_pin, OUTPUT);
-  // don't enable
-  digitalWrite(config->enable_pin, HIGH);
-  // enable +VS
-  digitalWrite(config->vs_enable_pin, LOW);
 
-  if (config->verbose)
-    Serial.println("Finished defining all output pins.");
+  pinMode(config->not_output_enable_pin, OUTPUT);
+  // tri-state all outputs of the shift-register
+  digitalWrite(config->not_output_enable_pin, HIGH);
+
+  pinMode(config->clock_pin, OUTPUT);
+  digitalWrite(config->clock_pin, LOW);
+
+  pinMode(config->serial_data_pin, OUTPUT);
+  digitalWrite(config->serial_data_pin, LOW);
+
+  pinMode(config->latch_pin, OUTPUT);
+  digitalWrite(config->latch_pin, LOW);
+
+  pinMode(config->not_clear_pin, OUTPUT);
+  digitalWrite(config->not_clear_pin, HIGH);
+
+  // don't enable FP2800A
+  pinMode(config->not_enable_pin, OUTPUT);
+  digitalWrite(config->not_enable_pin, HIGH);
 
   // reset shift-register
-  digitalWrite(config->clear_pin, LOW);
-  delayMicroseconds(SHIFT_REGISTER_CLEAR_TIME_IN_USEC);
-  digitalWrite(config->clear_pin, HIGH);
+  digitalWrite(config->not_clear_pin, LOW);
+  digitalWrite(config->not_clear_pin, HIGH);
 
-  // init shift-register to tristate all outputs
-  digitalWrite(config->output_enable_pin, HIGH);
-  digitalWrite(config->clock_pin, LOW);
-  digitalWrite(config->serial_data_pin, LOW);
-  digitalWrite(config->latch_pin, LOW);
-  digitalWrite(config->clear_pin, LOW);
+  // enable all power rails
+  pinMode(config->not_enable_power_rails_pin, OUTPUT);
+  digitalWrite(config->not_enable_power_rails_pin, LOW);
 
-  // init shift-register to ALL-LOW and just flash LED_A, LED_B and LED_C three
-  // times
+  // enable all outputs of the shift-register
+  digitalWrite(config->not_output_enable_pin, LOW);
+
+  if (config->verbose)
+    Serial.println("Finished defining and setting all output pins.");
+
+  // init shift-register to LOW except flash LED_A, LED_B and LED_C three times
   for (i = 0; i < 3; ++i) {
     led_A_on = true;
     led_B_on = true;
@@ -127,8 +139,12 @@ Flippie::Flippie() {
     fire_shift_register(false);
     delay(700);
   }
+  if (config->led_mode == LED_MODE_FLASHING) {
+    flashing_led_C_on = false;
+  }
+
   if (config->verbose)
-    Serial.println("\nFinished initilizing shift-register.");
+    Serial.println("\nFinished first test of shift-register.");
 
   // initialze _dots and _next_dots
   // array of rows => array of modules => columns are encoded bit-wise in an
@@ -155,7 +171,6 @@ void Flippie::cycle_dots() {
 // paint content of _next_dots
 // only paint differnces to _dots unless override is true (default = false)
 void Flippie::paint(bool override_former_dot_state) {
-  debug_printf("%s", dots_as_string(_dots).c_str());
   debug_printf("Start painting with override=%s ... ",
                override_former_dot_state ? "true" : "false");
   for (unsigned char i = 0; i < config->num_rows; ++i) {
@@ -180,14 +195,13 @@ void Flippie::paint(bool override_former_dot_state) {
     debug_printf(" DONE.\n");
   else if (config->verbose)
     Serial.printf("Done painting _next_dots.\n");
-    debug_printf("%s", dots_as_string(_dots).c_str());
 }
 // set content of _next_dots and paint (cleverly only setting changed dots)
-void Flippie::set_next_and_paint(unsigned int **dots, bool override_former_dot_state) {
+void Flippie::set_next_and_paint(unsigned int **dots,
+                                 bool override_former_dot_state) {
   // memcpy(_next_dots, dots, config->num_rows * sizeof(unsigned int*));
   for (unsigned char i = 0; i < config->num_rows; ++i) {
-    memcpy(_next_dots[i], dots[i],
-           config->num_modules * sizeof(unsigned int));
+    memcpy(_next_dots[i], dots[i], config->num_modules * sizeof(unsigned int));
   }
   paint(override_former_dot_state);
 }
@@ -199,7 +213,10 @@ void Flippie::magnetize(unsigned char repeats) {
     for (unsigned char i = 0; i < config->num_rows; ++i) {
       for (unsigned char j = 0; j < config->num_modules; ++j) {
         for (unsigned char k = 0; k < config->num_columns[j]; ++k) {
-          _set_dot(i, j, k, _dots[i][j], false);
+          _set_dot(i, j, k,
+                   ((_dots[i][j] & _int_bit_array[j]) == _int_bit_array[j]) ? 1
+                                                                            : 0,
+                   false);
           fire_shift_register(true);
           debug_printf(".");
         }
@@ -240,7 +257,10 @@ void Flippie::inverse() {
     for (unsigned char j = 0; j < config->num_modules; ++j) {
       _dots[i][j] = UINT_MAX - _dots[i][j];
       for (unsigned char k = 0; k < config->num_columns[j]; ++k) {
-        _set_dot(i, j, k, _next_dots[i][j], false);
+        _set_dot(i, j, k,
+                 ((_dots[i][j] & _int_bit_array[j]) == _int_bit_array[j]) ? 1
+                                                                          : 0,
+                 false);
         fire_shift_register(true);
         debug_printf(".");
       }
@@ -260,7 +280,7 @@ void Flippie::fill() {
     for (unsigned char j = 0; j < config->num_modules; ++j) {
       _dots[i][j] = UINT_MAX;
       for (unsigned char k = 0; k < config->num_columns[j]; ++k) {
-        _set_dot(i, j, k, _dots[i][j], false);
+        _set_dot(i, j, k, 1, false);
         fire_shift_register(true);
         debug_printf(".");
       }
@@ -294,7 +314,7 @@ void Flippie::set_row_set(unsigned char row) {
   debug_printf("DONE.\n");
 }
 unsigned char Flippie::get_row_set() {
-  for (unsigned char row = 0; row < BROSE_MAX_ROWS; row++) {
+  for (unsigned char row = 0; row < BROSE_MAX_ROWS; ++row) {
     if ((_shift_register[config->sr_row_set_pins[row] / SHIFT_REGISTER_WIDTH] &
          _byte_bit_array[config->sr_row_set_pins[row] % SHIFT_REGISTER_WIDTH]) >
         FP2800A_LOW)
@@ -325,7 +345,7 @@ void Flippie::set_row_rst(unsigned char row) {
   debug_printf("DONE.\n");
 }
 unsigned char Flippie::get_row_rst() {
-  for (unsigned char row = 0; row < BROSE_MAX_ROWS; row++) {
+  for (unsigned char row = 0; row < BROSE_MAX_ROWS; ++row) {
     if ((_shift_register[config->sr_row_rst_pins[row] / SHIFT_REGISTER_WIDTH] &
          _byte_bit_array[config->sr_row_rst_pins[row] %
                          SHIFT_REGISTER_WIDTH]) ==
@@ -361,7 +381,7 @@ void Flippie::set_column(unsigned char column) {
 }
 unsigned char Flippie::get_column() {
   bool found = true;
-  for (unsigned char column = 0; column < FP2800A_MAX_COLUMNS; column++) {
+  for (unsigned char column = 0; column < FP2800A_MAX_COLUMNS; ++column) {
     found = true;
     for (unsigned char i = 0; i < FP2800A_COLUMN_CODE_LINES; ++i) {
       found &= ((FP2800A_COLUMN_CODES[column][i] == FP2800A_HGH &
@@ -448,8 +468,23 @@ void Flippie::clear_shift_register(bool fire_after_clear) {
   debug_printf("DONE.\n");
 }
 
-// assemble the shift-register for a specific dotsand fire it
-// resetting shift-register and set all output to low afterwards
+// fill shift-registers
+void Flippie::fill_shift_register(bool fire_after_fill) {
+  debug_printf("Filling shift-register %s... ",
+               fire_after_fill ? "and fire afeterwards " : " ");
+  debug_printf("\n%s\n", shift_register_as_json_short_string().c_str());
+  for (unsigned char i = 0; i < NUMBER_OF_SHIFT_REGISTERS; ++i) {
+    _shift_register[i] = UCHAR_MAX;
+  }
+  // fireing shift-register if requested
+  if (fire_after_fill) {
+    fire_shift_register(false);
+  }
+  debug_printf("\n%s\n", shift_register_as_json_short_string().c_str());
+  debug_printf("DONE.\n");
+}
+
+// assemble the shift-register for a specific dots
 void Flippie::_set_dot(unsigned char row, unsigned char module,
                        unsigned char column, unsigned char state, bool save) {
   unsigned char i;
@@ -494,12 +529,6 @@ void Flippie::_set_dot(unsigned char row, unsigned char module,
         _byte_bit_array[config->sr_d_pin % SHIFT_REGISTER_WIDTH];
   }
 
-  // set LEDs
-  // if configured flash automatically
-  if (config->led_mode == LED_MODE_FLASHING) {
-    led_C_on = !led_C_on;
-  }
-
   if (save) {
     if (state == 1) {
       _dots[row][module] |= _int_bit_array[column];
@@ -511,6 +540,7 @@ void Flippie::_set_dot(unsigned char row, unsigned char module,
 void Flippie::set_dot(unsigned char row, unsigned char module,
                       unsigned char column, unsigned char state) {
   _set_dot(row, module, column, state, true);
+  fire_shift_register(true);
 }
 unsigned char Flippie::get_dot(unsigned char row, unsigned char module,
                                unsigned char column) {
@@ -519,6 +549,8 @@ unsigned char Flippie::get_dot(unsigned char row, unsigned char module,
 
 // fire a given shift-register according to pins given
 void Flippie::fire_shift_register(bool enable) {
+  debug_printf("Fireing shift-register (enable=%s)... ",
+               enable ? "true" : "false");
   // set LEDs
   if (led_A_on) {
     _shift_register[config->sr_led_a_pin / SHIFT_REGISTER_WIDTH] |=
@@ -534,6 +566,10 @@ void Flippie::fire_shift_register(bool enable) {
     _shift_register[config->sr_led_b_pin / SHIFT_REGISTER_WIDTH] &=
         255 - _byte_bit_array[config->sr_led_b_pin % SHIFT_REGISTER_WIDTH];
   }
+  if (config->led_mode == LED_MODE_FLASHING) {
+    led_C_on = flashing_led_C_on;
+    flashing_led_C_on = !flashing_led_C_on;
+  }
   if (led_C_on) {
     _shift_register[config->sr_led_c_pin / SHIFT_REGISTER_WIDTH] |=
         _byte_bit_array[config->sr_led_c_pin % SHIFT_REGISTER_WIDTH];
@@ -544,13 +580,15 @@ void Flippie::fire_shift_register(bool enable) {
 
   // just in case => defined start point
   digitalWrite(config->clock_pin, LOW);
+  digitalWrite(config->latch_pin, LOW);
+
   // just in case => clear shift-register
-  digitalWrite(config->clear_pin, LOW);
-  digitalWrite(config->clear_pin, HIGH);
+  digitalWrite(config->not_clear_pin, LOW);
+  digitalWrite(config->not_clear_pin, HIGH);
 
   // shift out (reverse order) shift-register unsigned char array
-  for (unsigned char i = NUMBER_OF_SHIFT_REGISTERS * SHIFT_REGISTER_WIDTH;
-       0 < i--;) {
+  for (int i = (NUMBER_OF_SHIFT_REGISTERS * SHIFT_REGISTER_WIDTH) - 1; i >= 0;
+       --i) {
     digitalWrite(config->serial_data_pin,
                  (_shift_register[i / SHIFT_REGISTER_WIDTH] &
                   _byte_bit_array[i % SHIFT_REGISTER_WIDTH]) ==
@@ -560,19 +598,43 @@ void Flippie::fire_shift_register(bool enable) {
     digitalWrite(config->clock_pin, HIGH);
     digitalWrite(config->clock_pin, LOW);
   }
+  // storage register
   digitalWrite(config->latch_pin, HIGH);
   digitalWrite(config->latch_pin, LOW);
+  //  delay(1000);
 
   if (enable) {
     // fire using ADDRSHIFT_REGISTER_WIDTH aka NOT_EN => FP2800A enable (E)
-    digitalWrite(config->enable_pin, HIGH);
-    delayMicroseconds(FP2800A_ACTIVE_TIME_IN_USEC);
-    digitalWrite(config->enable_pin, LOW);
+    digitalWrite(config->not_enable_pin, LOW);
+    delay(FP2800A_ACTIVE_TIME_IN_MSEC);
+    digitalWrite(config->not_enable_pin, HIGH);
   }
+
+  // preserve state of LEDS
+  // clear shift-register
+  digitalWrite(config->serial_data_pin, led_C_on ? HIGH : LOW);
+  digitalWrite(config->clock_pin, HIGH);
+  digitalWrite(config->clock_pin, LOW);
+  digitalWrite(config->serial_data_pin, led_B_on ? HIGH : LOW);
+  digitalWrite(config->clock_pin, HIGH);
+  digitalWrite(config->clock_pin, LOW);
+  digitalWrite(config->serial_data_pin, led_A_on ? HIGH : LOW);
+  digitalWrite(config->clock_pin, HIGH);
+  digitalWrite(config->clock_pin, LOW);
+  digitalWrite(config->serial_data_pin, LOW);
+  for (int i = (NUMBER_OF_SHIFT_REGISTERS * SHIFT_REGISTER_WIDTH) - 1; i >= 3;
+       --i) {
+    digitalWrite(config->clock_pin, HIGH);
+    digitalWrite(config->clock_pin, LOW);
+  }
+  // storage register
+  digitalWrite(config->latch_pin, HIGH);
+  digitalWrite(config->latch_pin, LOW);
 
   if (config->verbose)
     Serial.print(enable ? "X" : "x");
 
+  debug_printf("DONE.\n");
   yield();
 }
 
@@ -647,7 +709,7 @@ String Flippie::dots_as_string(unsigned int **dots) {
     c_len += config->num_columns[j];
   }
   c_len = ((c_len + 10) * (config->num_rows + 3)) + 1;
-  
+
   char *c = (char *)malloc(c_len);
   c_len = 0;
 
@@ -661,13 +723,13 @@ String Flippie::dots_as_string(unsigned int **dots) {
   c_len += sprintf(c + c_len, "\nCC ");
   for (j = 0; j < config->num_modules; ++j) {
     for (k = 0; k < config->num_columns[j]; ++k) {
-      c_len += sprintf(c + c_len, "%1u", k/10);
+      c_len += sprintf(c + c_len, "%1u", k / 10);
     }
   }
   c_len += sprintf(c + c_len, "\nCC ");
   for (j = 0; j < config->num_modules; ++j) {
     for (k = 0; k < config->num_columns[j]; ++k) {
-      c_len += sprintf(c + c_len, "%1u", k%10);
+      c_len += sprintf(c + c_len, "%1u", k % 10);
     }
   }
 
@@ -700,23 +762,25 @@ String Flippie::shift_register_as_json() {
   return s;
 }
 
-// // set all possible shift-register outputs (filling the shift-register and
+// set all possible shift-register outputs (filling the shift-register and
 // fire it)
-// void Flippie::test(unsigned char test_bit, unsigned char state) {
-//    if(state == 0) {
-//       _shift_register[test_bit/SHIFT_REGISTER_WIDTH] &=
-//       (SHIFT_REGISTER_MAXVAL -
-//       _byte_bit_array[test_bit%SHIFT_REGISTER_WIDTH]);
-//    } else {
-//       _shift_register[test_bit/SHIFT_REGISTER_WIDTH] |=
-//       _byte_bit_array[test_bit%SHIFT_REGISTER_WIDTH];
-//    }
-//    Serial.printf("set bit-position %u(%u,%u) to %u => [ %u", test_bit,
-//    test_bit/SHIFT_REGISTER_WIDTH, test_bit%SHIFT_REGISTER_WIDTH, state,
-//    _shift_register[0]);
-//    for(unsigned char i = 1; i < NUMBER_OF_SHIFT_REGISTERS; ++i) {
-//       Serial.printf(", %u", _shift_register[i]);
-//    }
-//    Serial.println("]");
-//    fire_shift_register_with_print(false);
-// }
+void Flippie::test(unsigned char test_bit, unsigned char state) {
+  if (DEBUG) {
+    if (state == 0) {
+      _shift_register[test_bit / SHIFT_REGISTER_WIDTH] &=
+          (SHIFT_REGISTER_MAXVAL -
+           _byte_bit_array[test_bit % SHIFT_REGISTER_WIDTH]);
+    } else {
+      _shift_register[test_bit / SHIFT_REGISTER_WIDTH] |=
+          _byte_bit_array[test_bit % SHIFT_REGISTER_WIDTH];
+    }
+    Serial.printf("set bit-position %u(%u,%u) to %u => [ %u", test_bit,
+                  test_bit / SHIFT_REGISTER_WIDTH,
+                  test_bit % SHIFT_REGISTER_WIDTH, state, _shift_register[0]);
+    for (unsigned char i = 1; i < NUMBER_OF_SHIFT_REGISTERS; ++i) {
+      Serial.printf(", %u", _shift_register[i]);
+    }
+    Serial.println("]");
+    fire_shift_register(false);
+  }
+}

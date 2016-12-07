@@ -153,7 +153,7 @@ class FlippieClient
       end
 
       puts "dots_query_string(#{dots_query_string.string.length}) = #{dots_query_string.string.inspect} = #{Base64.encode64(dots_query_string.string)}" if @debug
-      
+
 
       # HTTP connect to flippie and POST dots query
       if fire
@@ -161,7 +161,7 @@ class FlippieClient
          http = Net::HTTP.new(uri.host, uri.port, nil, nil)
          request = Net::HTTP::Post.new(uri.path)
          request.set_form_data({'dots' => Base64.encode64(dots_query_string.string)})
-         puts http.request(request)  if @debug
+         puts http.request(request) if @debug
 
       #   uri = URI("http://#{flippie_ip}/dots")
       #   request = Net::HTTP::Post::Multipart.new(uri.path, {'dots' => dots_query_string})

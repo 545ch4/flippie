@@ -13,7 +13,7 @@ class UIHandler : public RequestHandler {
     static const char low_level_page[];
     static const char paint_page[];
     static const char tasks_page[];
-    char* config_page;
+    String config_page;
     Flippie* flippie;
 };
 

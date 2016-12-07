@@ -17,6 +17,8 @@
 #define LED_MODE_NONE 0
 #define LED_MODE_FLASHING 1
 
+#define REV8
+
 typedef struct {
   // number of modules connected (127 modules BROSE connector limit)
   unsigned char num_modules;
@@ -71,19 +73,19 @@ typedef struct {
 
   // 74*595 shift-register clear pin [normal:high, clear:low] (MR, SRCLR, SCLR,
   // SCL)
-  unsigned char clear_pin;
+  unsigned char not_clear_pin;
 
   // 74*595 shift-register output enable pin [normal:low, tristate output:high]
   // (G, OE)
-  unsigned char output_enable_pin;
+  unsigned char not_output_enable_pin;
 
   // +VS enable (ON pin at current limiter circuit) pin
-  unsigned char vs_enable_pin;
+  unsigned char not_enable_power_rails_pin;
 
   // pin of the last (SHIFT_REGISTER_WIDTHth) BROSE module comparator adress pin
   // and FP2800A enable (E)
   // set it on the DIP switches to "ON" to archive a enable-like functionality
-  unsigned char enable_pin;
+  unsigned char not_enable_pin;
 
   // set the led mode
   unsigned char led_mode;
@@ -100,6 +102,7 @@ private:
   unsigned char *_shift_register;
   unsigned int *_int_bit_array;
   unsigned char *_byte_bit_array;
+  bool flashing_led_C_on;
   void cycle_dots();
   void _set_dot(unsigned char row, unsigned char module, unsigned char column,
                 unsigned char state, bool save);
@@ -130,6 +133,7 @@ public:
 
   // setter and getter of shift-register parts
   void clear_shift_register(bool fire_after_clear);
+  void fill_shift_register(bool fire_after_fill);
   void set_row_set(unsigned char row);
   void set_row_rst(unsigned char row);
   void set_column(unsigned char column);
@@ -157,7 +161,8 @@ public:
   unsigned int **get_dots() { return _dots; };
   String dots_as_string(unsigned int **dots);
 
-  //   void test(unsigned char test_bit, unsigned char state);
+  // tests
+  void test(unsigned char test_bit, unsigned char state);
 };
 
 #endif

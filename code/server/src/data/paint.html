@@ -31,12 +31,12 @@ R"D8ESKJ6H4DSKHU(
       -animation: spin .7s infinite linear;
       -webkit-animation: spin2 .7s infinite linear;
    }
-   
+
    @-webkit-keyframes spin2 {
       from { -webkit-transform: rotate(0deg);}
       to { -webkit-transform: rotate(360deg);}
    }
-   
+
    @keyframes spin {
       from { transform: scale(1) rotate(0deg);}
       to { transform: scale(1) rotate(360deg);}
@@ -62,6 +62,7 @@ R"D8ESKJ6H4DSKHU(
                <li><a href="/ui/tasks.html">Tasks</a></li>
                <li><a href="/ui/low_level.html">Low-Level</a></li>
                <li class="active"><a href="/ui/paint.html">Paint</a></li>
+               <li><a href="/ui/tests.html">Tests</a></li>
             </ul>
          </div><!--/.nav-collapse -->
       </div>
@@ -79,13 +80,13 @@ R"D8ESKJ6H4DSKHU(
                      <a href="#" data-task="clear" class="btn btn-default btn-block"><span class="glyphicon glyphicon-arrow-right"></span> Clear display</a>
                   </div>
                </p>
-               
+
                <p>
                   <div class="btn-group btn-block">
                      <a href="#" data-task="fill" class="btn btn-default btn-block"><span class="glyphicon glyphicon-arrow-right"></span> Fill display</a>
                   </div>
                </p>
-               
+
                <p>
                   <div class="btn-group btn-block">
                      <a href="#" data-task="inverse" class="btn btn-default btn-block"><span class="glyphicon glyphicon-arrow-right"></span> Inverse display</a>
@@ -95,13 +96,13 @@ R"D8ESKJ6H4DSKHU(
          </div>
       </div>
    </div>
-   
+
    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
    <script src="https://gitcdn.github.io/bootstrap-toggle/2.2.2/js/bootstrap-toggle.min.js"></script>
-   
+
    <script type="text/javascript">
    var flippie_config = {};
-   
+
    var canvas = null;
    var context = null;
    var hold_down = false;
@@ -109,10 +110,10 @@ R"D8ESKJ6H4DSKHU(
    var last_y = -1;
    var delta = 0.0;
    var delta_half = 0.0;
-   
+
    var ajaxManager = (function() {
       var requests = [];
-      
+
       return {
          addReq:  function(opt) {
             requests.push(opt);
@@ -124,16 +125,16 @@ R"D8ESKJ6H4DSKHU(
          run: function() {
             var self = this,
             oriSuc;
-            
+
             if( requests.length ) {
                oriSuc = requests[0].complete;
-               
+
                requests[0].complete = function() {
                   if( typeof(oriSuc) === 'function' ) oriSuc();
                   requests.shift();
                   self.run.apply(self, []);
                };
-               
+
                $.ajax(requests[0]);
             } else {
                self.tid = setTimeout(function() {
@@ -147,7 +148,7 @@ R"D8ESKJ6H4DSKHU(
          }
       };
    }());
-   
+
    function clear_canvas() {
       context.clearRect(0, 0, canvas.width, canvas.height);
       for(var x = 0; x < flippie_config['columns_sum']; x++) {
@@ -159,7 +160,7 @@ R"D8ESKJ6H4DSKHU(
          }
       }
    }
-   
+
    function initialize_canvas() {
       if(delta <= 0.0 || delta_half <= 0.0) {
          delta = Math.floor($('#paintBox').parent().width() / flippie_config['columns_sum']);
@@ -170,7 +171,7 @@ R"D8ESKJ6H4DSKHU(
       context.clearRect(0, 0, canvas.width, canvas.height);
       paint_canvas_from_server_dots();
    }
-   
+
    function paint_canvas_from_server_dots() {
       $.getJSON('/dots').done(function(json) {
          var dots = atob(json);
@@ -198,13 +199,13 @@ R"D8ESKJ6H4DSKHU(
          $('#flippie input,select,button,textarea,a').prop('disabled', false);
       });
    }
-   
+
    function get_dots_hash_by_point(point, state) {
       var x = Math.floor(point.x / delta);
       var c = 0;
       var m = 0;
       var c_sum = 0;
-      
+
       for(var i = 0; i < flippie_config['columns'].length; i++) {
          if(c_sum <= x && x < (c_sum + flippie_config['columns'][i])) {
             m = i;
@@ -215,13 +216,13 @@ R"D8ESKJ6H4DSKHU(
       }
       return {r: Math.floor(point.y / delta), m: m, c: c, state: state};
    }
-   
+
    $(document).ready(function(){
       ajaxManager.run();
       canvas = document.getElementById('paintBox');
       context = canvas.getContext('2d');
       $('#flippie input,select,button,textarea,a').prop('disabled', true);
-      
+
       $.getJSON('/ui/config.json').done(function(json) {
          flippie_config = json;
          flippie_config['columns_sum'] = 0;
@@ -234,7 +235,7 @@ R"D8ESKJ6H4DSKHU(
       }).always(function() {
          $('#flippie input,select,button,textarea,a').prop('disabled', false);
       });
-      
+
       $('#flippie a[data-task]').on('click', function(e) {
          $('#flippie input,select,button,textarea,a').prop('disabled', true);
          var elem = $(e.target);
@@ -251,7 +252,7 @@ R"D8ESKJ6H4DSKHU(
             $('#flippie input,select,button,textarea,a').prop('disabled', false);
          });
       });
-      
+
       function pointerEventToXY(e) {
          var out = {x:0, y:0};
          if(e.type == 'touchstart' || e.type == 'touchmove' || e.type == 'touchend' || e.type == 'touchcancel'){
@@ -266,7 +267,7 @@ R"D8ESKJ6H4DSKHU(
          out.y = Math.floor(out.y - $('#paintBox').offset().top);
          return out;
       }
-      
+
       function trigger_dot(point) {
          last_x = Math.floor(Math.floor(point.x / delta) * delta + delta_half);
          last_y = Math.floor(Math.floor(point.y / delta) * delta + delta_half);
@@ -289,7 +290,7 @@ R"D8ESKJ6H4DSKHU(
          }
          context.fill();
       }
-      
+
       $(canvas).on('mousedown touchstart', function(e){
          e.preventDefault();
          if(!hold_down) {
@@ -297,7 +298,7 @@ R"D8ESKJ6H4DSKHU(
             hold_down = true;
          }
       });
-      
+
       $(canvas).on('mousemove touchmove', function(e){
          e.preventDefault();
          var point = pointerEventToXY(e);
@@ -307,7 +308,7 @@ R"D8ESKJ6H4DSKHU(
             trigger_dot(point);
          }
       });
-      
+
       $(canvas).on('mouseup touchend', function(e){
          e.preventDefault();
          last_y = -1;

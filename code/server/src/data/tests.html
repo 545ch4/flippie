@@ -1,8 +1,8 @@
-R"A8J378RJ04M78DHW(
+R"S3SN734Z738ZT2(
 <!DOCTYPE html>
 <html lang="en">
 <head>
-   <title>flippie - tasks</title>
+   <title>flippie - tests</title>
    <meta charset="utf-8" />
    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
    <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -58,10 +58,10 @@ R"A8J378RJ04M78DHW(
          <div id="navbar" class="navbar-collapse collapse">
             <ul class="nav navbar-nav">
                <li><a href="/ui/index.html">Start</a></li>
-               <li class="active"><a href="/ui/tasks.html">Tasks</a></li>
+               <li><a href="/ui/tasks.html">Tasks</a></li>
                <li><a href="/ui/low_level.html">Low-Level</a></li>
                <li><a href="/ui/paint.html">Paint</a></li>
-               <li><a href="/ui/tests.html">Tests</a></li>
+               <li class="active"><a href="/ui/tests.html">Tests</a></li>
             </ul>
          </div><!--/.nav-collapse -->
       </div>
@@ -71,27 +71,23 @@ R"A8J378RJ04M78DHW(
          <div class="col-xs-12">
             <div id="flippie">
                <div class="errors"></div>
+               <div id="shiftregister" style="font-size:200%"></div>
+
                <p>
                   <div class="btn-group btn-block">
-                     <a href="#" data-task="clear" class="btn btn-default btn-block"><span class="glyphicon glyphicon-arrow-right"></span> Clear display</a>
+                     <a href="#" data-task="clear" class="btn btn-default btn-block"><span class="glyphicon glyphicon-arrow-right"></span> Clear shift-register</a>
                   </div>
                </p>
 
                <p>
                   <div class="btn-group btn-block">
-                     <a href="#" data-task="fill" class="btn btn-default btn-block"><span class="glyphicon glyphicon-arrow-right"></span> Fill display</a>
+                     <a href="#" data-task="fill" class="btn btn-default btn-block"><span class="glyphicon glyphicon-arrow-right"></span> Fill shift-register</a>
                   </div>
                </p>
 
                <p>
                   <div class="btn-group btn-block">
-                     <a href="#" data-task="inverse" class="btn btn-default btn-block"><span class="glyphicon glyphicon-arrow-right"></span> Inverse display</a>
-                  </div>
-               </p>
-
-               <p>
-                  <div class="btn-group btn-block">
-                     <a href="#" data-task="clear" class="btn btn-default btn-block"><span class="glyphicon glyphicon-arrow-right"></span> Magnetize display</a>
+                     <a href="#" data-task="loop" class="btn btn-default btn-block"><span class="glyphicon glyphicon-arrow-right"></span> Loop single bit through shift-register</a>
                   </div>
                </p>
             </div>
@@ -100,13 +96,38 @@ R"A8J378RJ04M78DHW(
    </div>
 
    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
-   <script src="https://gitcdn.github.io/bootstrap-toggle/2.2.2/js/bootstrap-toggle.min.js"></script>
 
    <script>
    var flippie_config;
 
+   function render_shiftregister() {
+      $.getJSON('/flippie', {shiftregister: 1}).done(function(shift_register_string) {
+         $('#shiftregister').empty();
+         for (var i = 0, len = shift_register_string.length; i < len; i++) {
+            if(i%8 == 0) {
+               $('#shiftregister').append('<br />');
+            }
+            var link = $('<a />').addClass(shift_register_string[i] == '1' ? 'high' : 'low'}).html('&bull;').on('click', function(e){
+               var elem = $(e.taget);
+               if(elem.hasClass('high')) {
+                  elem.removeClass('high').addClass('low');
+               } else {
+                  
+               }
+
+            })
+            $('#shiftregister').append(link);
+         }
+      }).fail(function() {
+         $('#flippie .errors').append($('<p />').html('Failed getting shift-register content.'));
+      });
+   }
+
    $(document).ready(function() {
       $('#flippie input,select,button,textarea,a').prop('disabled', true);
+
+
+      $('#shiftregister')
 
       $.getJSON('/ui/config.json').done(function(json) {
          flippie_config = json;
@@ -120,10 +141,10 @@ R"A8J378RJ04M78DHW(
          $('#flippie input,select,button,textarea,a').prop('disabled', true);
          var elem = $(e.target);
          elem.find('.glyphicon').removeClass('glyphicon-arrow-right').addClass('glyphicon-refresh glyphicon-refresh-animate');
-         $.post('/flippie', {task: elem.data('task')}).done(function(json) {
-            // DONE.
+         $.post('/test', {task: elem.data('task')}).done(function(json) {
+            flippie_config = json;
          }).fail(function() {
-            $('#flippie .errors').append($('<p />').html('Failed posing flippie task "' + elem.data('task') + '"."'));
+            $('#flippie .errors').append($('<p />').html('Failed getting flippie configuration.'));
          }).always(function() {
             $('.glyphicon-refresh-animate').removeClass('glyphicon-refresh glyphicon-refresh-animate').addClass('glyphicon-arrow-right');
             $('#flippie input,select,button,textarea,a').prop('disabled', false);
@@ -134,4 +155,4 @@ R"A8J378RJ04M78DHW(
    </script>
 </body>
 </html>
-)A8J378RJ04M78DHW" "\0"
+)S3SN734Z738ZT2" "\0"

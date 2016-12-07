@@ -6,18 +6,18 @@ bool DotsHandler::handle(ESP8266WebServer &server, HTTPMethod method, String uri
    if (!canHandle(method, uri)) {
       return false;
    }
-   
+
    debug_printf("Handle '%s' ? '%s' (%s) in DotsHandler...", uri.c_str(), argsToString(server).c_str(), method == HTTP_GET ? "GET" : "POST");
-   
+
    if (method == HTTP_POST && server.hasArg("dots")) {
       String dots = server.arg("dots");
       unsigned char *dots_bytes = (unsigned char *)malloc(dots.length() * sizeof(unsigned char));
       unsigned int dots_bytes_length = dots.length(), i = 0, j = 0, k = 0;
       char *dots_string = (char *)malloc(dots.length());
       memcpy(dots_string, dots.c_str(), dots.length());
-      
+
       b64.decode(dots_string, dots.length(), dots_bytes, &dots_bytes_length);
-      
+
       if (dots_bytes_length != (flippie->config->num_rows * flippie->config->num_modules * 4)) {
          char *tmp = (char*)malloc(256);
          sprintf(tmp, "Size mismatch: 'dots' is %u instead of %u bytes (%u rows X %u modules X 32-bit-int(4 bytes)) long!\0", dots_bytes_length, (flippie->config->num_rows * flippie->config->num_modules * 4), flippie->config->num_rows, flippie->config->num_modules, flippie->config->num_rows, flippie->config->num_modules);
@@ -27,7 +27,7 @@ bool DotsHandler::handle(ESP8266WebServer &server, HTTPMethod method, String uri
          server.send(500, "text/plain", s);
          return false;
       }
-      
+
       unsigned int **int_dots = (unsigned int **)malloc(flippie->config->num_rows * sizeof(unsigned int *));
       unsigned int ptr = 0;
       for (i = 0; i < flippie->config->num_rows; i++) {
@@ -38,7 +38,6 @@ bool DotsHandler::handle(ESP8266WebServer &server, HTTPMethod method, String uri
          }
       }
       debug_printf("%s", flippie->dots_as_string(int_dots).c_str());
-
       
       flippie->set_next_and_paint(int_dots, true);
 
@@ -52,11 +51,11 @@ bool DotsHandler::handle(ESP8266WebServer &server, HTTPMethod method, String uri
       debug_printf("%s", flippie->dots_as_string(flippie->get_dots()).c_str());
       unsigned int dots_bytes_length = flippie->config->num_rows * flippie->config->num_modules * 4;
       unsigned char *dots_bytes = (unsigned char *)malloc(dots_bytes_length);
-      
+
       unsigned int dots_string_length =
       flippie->config->num_rows * flippie->config->num_modules * 16 + 3;
       char *dots_string = (char *)malloc(dots_string_length);
-      
+
       unsigned int i, j, pos = 0, k;
       unsigned int **dots = flippie->get_dots();
       for (i = 0; i < flippie->config->num_rows; ++i) {
