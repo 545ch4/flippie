@@ -191,7 +191,11 @@ Well done! You're ready to use your flippie! Simply head over to "Paint" and dra
 Flippie is basically a simple web server at port 80 serving the following access points:
 
 **`/ui` – UI pages**  
-A simple index page with browser UI controlling the flip-dot. All javascript and stylesheets are loaded from an external CDN, not from the ESP8266 itself. Except the flip-dot configuration, this will be rendered as JSON.
+A simple index page with browser UI controlling the flip-dot. All javascript and stylesheets are loaded from an external CDN, not from the ESP8266 itself. So, you need to be connected to the internet... (Yes, it's an TODO.)
+
+The UI does have a nice drawing pane, where every pixel can be set/reset like painting using a HTML5 canvas.
+
+![flippie ui paint pane](https://github.com/545ch4/flippie/raw/master/board/ui_paint.png "flippie ui paint pane")
 
 **`/dots` – A receiver of base64 encoded dots vector**  
 This method reads the content of HTTP (POST/GET) variable `dots` which is a base64 encoded string. This string is build of 32-bit wide integers (four bytes) where each bit (0-31) represents the state of one column. Those integers are ordered by rows and then modules:
