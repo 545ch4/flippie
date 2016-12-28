@@ -195,7 +195,7 @@ A simple index page with browser UI controlling the flip-dot. All javascript and
 
 The UI does have a nice drawing pane, where every pixel can be set/reset like painting using a HTML5 canvas.
 
-![flippie ui paint pane](https://github.com/545ch4/flippie/raw/master/board/ui_paint.png "flippie ui paint pane")
+<img src="https://github.com/545ch4/flippie/raw/master/board/ui_paint.png" alt="flippie ui paint pane" title="flippie ui paint pane" width="320px" />
 
 **`/dots` – A receiver of base64 encoded dots vector**  
 This method reads the content of HTTP (POST/GET) variable `dots` which is a base64 encoded string. This string is build of 32-bit wide integers (four bytes) where each bit (0-31) represents the state of one column. Those integers are ordered by rows and then modules:
