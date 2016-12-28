@@ -253,7 +253,16 @@ gem install bundler
 bundle install
 ```
 
-Adjust flippies IP in `cli.rb` and give it a go.
+Adjust flippies credentials in `cli.rb`:
+```ruby
+# initialize new flippie client
+fc = FlippieClient.new(
+   '192.168.1.65',     # IP address of your flippie board
+   18,                  # number of rows of your flip-dot display
+   [21],                # number of columns per module (usually some 28ers an one 21er)
+   false                # debug => true
+)
+```
 
 You are now ready to send messages/text to your flippie board using the ruby tool. Example:
 ```shell
