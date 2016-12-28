@@ -152,6 +152,7 @@ public:
   // low-level fire shift-register (optional set FP2800A enable)
   void fire_shift_register();
   void fire_shift_register(bool enable);
+  void fire_shift_register(bool enable, bool persistant);
   String shift_register_as_string();
   String shift_register_as_json_short_string();
   String shift_register_as_json();

@@ -11,7 +11,7 @@ Flippie::Flippie() {
   // each module)
   config->addresses = new unsigned char[num_modules]{1};
   // TODO: How many rows does your display have? (equal over all modules)
-  config->num_rows = 21;
+  config->num_rows = 16;
   // TODO: How many columns does each module of your display have? (same order
   // as the addresses)
   config->num_columns = new unsigned char[num_modules]{21};
@@ -36,7 +36,7 @@ Flippie::Flippie() {
       new unsigned char[FP2800A_COLUMN_CODE_LINES]{45, 44, 43, 42, 41};
   // SR47 - SR53 ADDR1-ADDR7
   config->sr_address_pins =
-      new unsigned char[BROSE_ADDR_LINES]{52, 51, 50, 49, 48, 47, 46};
+      new unsigned char[BROSE_ADDR_LINES]{46, 47, 48, 49, 50, 51, 52};
   // SR54 LED A
   config->sr_led_a_pin = 53;
   // SR55 LED B
@@ -45,26 +45,25 @@ Flippie::Flippie() {
   config->sr_led_c_pin = 55;
 
   // shift-register input
-  // 74*595 shift-register clear pin [normal:high, clear:low] (MR, SRCLR, SCLR,
-  // SCL)
-  config->not_clear_pin = 16; // wemos D1 mini D0 => GPIO16
+  // 74*595 shift-register clear pin [normal:high, clear:low] (~MR, ~SRCLR,
+  // ~SCLR, ~SCL)
+  config->not_clear_pin = D8;
   // 74*595 shift-register clock pin (SH_CP, SRCLK, SCK)
-  config->clock_pin = 14; // wemos D1 mini D5 => GPIO14
+  config->clock_pin = D5;
   // 74*595 shift-register storage register clock pin (latch) (ST_CP, RCLK, RCK)
-  config->latch_pin = 12; // wemos D1 mini D6 => GPIO12
+  config->latch_pin = D6;
   // 74*595 shift-register output enable pin [normal:low, tristate output:high]
-  // (G, OE)
-  config->not_output_enable_pin = 13; // wemos D1 mini D7 => GPIO13
+  // (~G, ~OE)
+  config->not_output_enable_pin = D7;
   // 74*595 shift-register serial data input pin (DS, SER, A, SI)
-  config->serial_data_pin = 4; // wemos D1 mini D2 => GPIO
-// ~EN_POWER_RAILS pin (eg. ON pin at current limiter FPF2702MX circuit)
-#ifdef REV8
-  config->not_enable_power_rails_pin = 2; // wemos D1 mini D4 => GPIO2
-#else
-  config->not_enable_power_rails_pin = 0; // wemos D1 mini D3 => GPIO0
-#endif
-  // NOT_EN and ADDRSHIFT_REGISTER_WIDTH@FP2800A
-  config->not_enable_pin = 5; // wemos D1 mini D1 => GPIO5
+  config->serial_data_pin = D2;
+
+  // ~EN_POWER_RAILS pin (eg. ON pin at current limiter FPF2702MX circuit)
+  config->not_enable_power_rails_pin = D1;
+
+  // ~EN and ADDR8@FP2800A
+  config->not_enable_pin = D3;
+
   if (config->verbose)
     Serial.println("Finished configure flippie.");
 
@@ -122,6 +121,9 @@ Flippie::Flippie() {
 
   // enable all outputs of the shift-register
   digitalWrite(config->not_output_enable_pin, LOW);
+
+  // disable internal LED
+  digitalWrite(D4, HIGH);
 
   if (config->verbose)
     Serial.println("Finished defining and setting all output pins.");
@@ -524,7 +526,7 @@ void Flippie::_set_dot(unsigned char row, unsigned char module,
   }
 
   // set D
-  if (state == 0) {
+  if (state == 1) {
     _shift_register[config->sr_d_pin / SHIFT_REGISTER_WIDTH] |=
         _byte_bit_array[config->sr_d_pin % SHIFT_REGISTER_WIDTH];
   }
@@ -548,9 +550,9 @@ unsigned char Flippie::get_dot(unsigned char row, unsigned char module,
 }
 
 // fire a given shift-register according to pins given
-void Flippie::fire_shift_register(bool enable) {
-  debug_printf("Fireing shift-register (enable=%s)... ",
-               enable ? "true" : "false");
+void Flippie::fire_shift_register(bool enable, bool persistant) {
+  debug_printf("Fireing shift-register (enable=%s, persistant=%s)... ",
+               enable ? "true" : "false", persistant ? "true" : "false");
   // set LEDs
   if (led_A_on) {
     _shift_register[config->sr_led_a_pin / SHIFT_REGISTER_WIDTH] |=
@@ -582,10 +584,6 @@ void Flippie::fire_shift_register(bool enable) {
   digitalWrite(config->clock_pin, LOW);
   digitalWrite(config->latch_pin, LOW);
 
-  // just in case => clear shift-register
-  digitalWrite(config->not_clear_pin, LOW);
-  digitalWrite(config->not_clear_pin, HIGH);
-
   // shift out (reverse order) shift-register unsigned char array
   for (int i = (NUMBER_OF_SHIFT_REGISTERS * SHIFT_REGISTER_WIDTH) - 1; i >= 0;
        --i) {
@@ -601,41 +599,26 @@ void Flippie::fire_shift_register(bool enable) {
   // storage register
   digitalWrite(config->latch_pin, HIGH);
   digitalWrite(config->latch_pin, LOW);
-  //  delay(1000);
 
   if (enable) {
     // fire using ADDRSHIFT_REGISTER_WIDTH aka NOT_EN => FP2800A enable (E)
     digitalWrite(config->not_enable_pin, LOW);
-    delay(FP2800A_ACTIVE_TIME_IN_MSEC);
+    if (!persistant) {
+      delay(FP2800A_ACTIVE_TIME_IN_MSEC);
+      digitalWrite(config->not_enable_pin, HIGH);
+    }
+  } else {
     digitalWrite(config->not_enable_pin, HIGH);
   }
-
-  // preserve state of LEDS
-  // clear shift-register
-  digitalWrite(config->serial_data_pin, led_C_on ? HIGH : LOW);
-  digitalWrite(config->clock_pin, HIGH);
-  digitalWrite(config->clock_pin, LOW);
-  digitalWrite(config->serial_data_pin, led_B_on ? HIGH : LOW);
-  digitalWrite(config->clock_pin, HIGH);
-  digitalWrite(config->clock_pin, LOW);
-  digitalWrite(config->serial_data_pin, led_A_on ? HIGH : LOW);
-  digitalWrite(config->clock_pin, HIGH);
-  digitalWrite(config->clock_pin, LOW);
-  digitalWrite(config->serial_data_pin, LOW);
-  for (int i = (NUMBER_OF_SHIFT_REGISTERS * SHIFT_REGISTER_WIDTH) - 1; i >= 3;
-       --i) {
-    digitalWrite(config->clock_pin, HIGH);
-    digitalWrite(config->clock_pin, LOW);
-  }
-  // storage register
-  digitalWrite(config->latch_pin, HIGH);
-  digitalWrite(config->latch_pin, LOW);
 
   if (config->verbose)
     Serial.print(enable ? "X" : "x");
 
   debug_printf("DONE.\n");
   yield();
+}
+void Flippie::fire_shift_register(bool enable) {
+  fire_shift_register(enable, false);
 }
 
 // fire a given shift-register according to pins given

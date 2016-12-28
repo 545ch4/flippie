@@ -59,49 +59,6 @@ bool FlippieHandler::handle(ESP8266WebServer &server, HTTPMethod method,
         flippie->clear_shift_register(true);
       } else if (server.arg("task").equals("fill-shiftregister")) {
         flippie->fill_shift_register(true);
-      } else if (server.arg("task").equals("esp") && server.hasArg("output") &&
-                 server.hasArg("state")) {
-        if (server.arg("output").equals("all") &&
-            server.arg("state").equals("1")) {
-          digitalWrite(D0, HIGH);
-          digitalWrite(D1, HIGH);
-          digitalWrite(D2, HIGH);
-          digitalWrite(D3, HIGH);
-          digitalWrite(D4, HIGH);
-          digitalWrite(D5, HIGH);
-          digitalWrite(D6, HIGH);
-          digitalWrite(D7, HIGH);
-          digitalWrite(D8, HIGH);
-        } else if (server.arg("output").equals("all") &&
-                   server.arg("state").equals("0")) {
-          digitalWrite(D0, LOW);
-          digitalWrite(D1, LOW);
-          digitalWrite(D2, LOW);
-          digitalWrite(D3, LOW);
-          digitalWrite(D4, LOW);
-          digitalWrite(D5, LOW);
-          digitalWrite(D6, LOW);
-          digitalWrite(D7, LOW);
-          digitalWrite(D8, LOW);
-        } else if (server.arg("output").equals("D0")) {
-          digitalWrite(D0, server.arg("state").equals("1") ? HIGH : LOW);
-        } else if (server.arg("output").equals("D1")) {
-          digitalWrite(D1, server.arg("state").equals("1") ? HIGH : LOW);
-        } else if (server.arg("output").equals("D2")) {
-          digitalWrite(D2, server.arg("state").equals("1") ? HIGH : LOW);
-        } else if (server.arg("output").equals("D3")) {
-          digitalWrite(D3, server.arg("state").equals("1") ? HIGH : LOW);
-        } else if (server.arg("output").equals("D4")) {
-          digitalWrite(D4, server.arg("state").equals("1") ? HIGH : LOW);
-        } else if (server.arg("output").equals("D5")) {
-          digitalWrite(D5, server.arg("state").equals("1") ? HIGH : LOW);
-        } else if (server.arg("output").equals("D6")) {
-          digitalWrite(D6, server.arg("state").equals("1") ? HIGH : LOW);
-        } else if (server.arg("output").equals("D7")) {
-          digitalWrite(D7, server.arg("state").equals("1") ? HIGH : LOW);
-        } else if (server.arg("output").equals("D8")) {
-          digitalWrite(D8, server.arg("state").equals("1") ? HIGH : LOW);
-        }
       } else {
         Serial.printf("Unknown task '%s'\n", server.arg("task").c_str());
         server.send(405, "application/json", "\"Unknown task\"");
@@ -160,8 +117,10 @@ bool FlippieHandler::handle(ESP8266WebServer &server, HTTPMethod method,
           flippie->set_row_rst(x);
         }
       }
-      flippie->fire_shift_register(server.hasArg("enable") &&
-                                   server.arg("enable").charAt(0) == '1');
+      flippie->fire_shift_register(
+          server.hasArg("enable") && server.arg("enable").charAt(0) == '1',
+          server.hasArg("persistant") &&
+              server.arg("persistant").charAt(0) == '1');
     }
   send_message:
     server.send(200, "application/json", json_verb ? "true" : "false");

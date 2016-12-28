@@ -1,0 +1,44 @@
+| Part Value | Device | Package | Description |
+| C1 | 100u/35V | CPOL-EU_E | PANASONIC_E | Polarized capacitor |
+| C2 | 100u | C-EU_C1206 | C1206 | Capacitor |
+| C3 | 22u | C-EU_C1206 | C1206 | Capacitor |
+| IC1 | 74HCT245DW | 74HCT245DW | SO20W | Octal BUS TRANSCEIVER, 3-state, TTL/CMOS |
+| IC2 | FPF2702MX | FPF2700 | SO8N | AccuPower 0.4~2 A Adjustable Over-Current Protection Load Switch
+| IC3 | SN74AHC595D | SN74AHC595D | SO16N | 8 bit Shift registers |
+| IC4 | SN74AHC595D | SN74AHC595D | SO16N | 8 bit Shift registers |
+| IC5 | SN74AHC595D | SN74AHC595D | SO16N | 8 bit Shift registers |
+| IC6 | SN74AHC595D | SN74AHC595D | SO16N | 8 bit Shift registers |
+| IC7 | SN74AHC595D | SN74AHC595D | SO16N | 8 bit Shift registers |
+| IC8 | SN74AHC595D | SN74AHC595D | SO16N | 8 bit Shift registers |
+| IC9 | SN74AHC595D | SN74AHC595D | SO16N | 8 bit Shift registers |
+| IC10 | TD62783AFG | UDN2981LW | SO18W | PMOS Darlington transistor array |
+| IC11 | TD62783AFG | UDN2981LW | SO18W | PMOS Darlington transistor array |
+| IC12 | TD62783AFG | UDN2981LW | SO18W | PMOS Darlington transistor array |
+| IC13 | ULN2803A | ULN2803ADW | SO18W | NMOS Darlington transistor array |
+| IC14 | ULN2803A | ULN2803ADW | SO18W | NMOS Darlington transistor array |
+| IC15 | ULN2803A | ULN2803ADW | SO18W | NMOS Darlington transistor array |
+| IC16 | ULN2803A | ULN2803ADW | SO18W | NMOS Darlington transistor array |
+| IC17 | ULN2803A | ULN2803ADW | SO18W | NMOS Darlington transistor array |
+| JP1 | 3V3 | JP1E | JP1 | Jumper |
+| JP2 | 24V | JP1E | JP1 | Jumper |
+| JP3 | 5V | JP1E | JP1 | Jumper |
+| JP4 | VS | JP1E | JP1 | Jumper |
+| LED1 C (red) | LED_SMT1206 | 1206 | LED |
+| LED2 B (yellow) | LED_SMT1206 | 1206 | LED |
+| LED3 A (green) | LED_SMT1206 | 1206 | LED |
+| MCU1 | WEMOS D1 mini | WEMOS D1 mini | WEMOS D1 mini MCU |
+| PAD1 (24V) | 2,15/1,0 | 2,15/1,0 | THROUGH-HOLE PAD |
+| PAD2 (VS) | 2,15/1,0 | 2,15/1,0 | THROUGH-HOLE PAD |
+| R1 | 470K | R-EU_R1206 | R1206 | Resistor |
+| R2 | 100K | R-EU_R1206 | R1206 | Resistor |
+| R3 | 10K | R-EU_R1206 | R1206 | Resistor |
+| R4 | 10K | R-EU_R1206 | R1206 | Resistor |
+| R5 | 10K | R-EU_R1206 | R1206 | Resistor |
+| R6 | 180 | R-EU_R1206 | R1206 | Resistor |
+| R7 | 150 | R-EU_R1206 | R1206 | Resistor |
+| R8 | 120 | R-EU_R1206 | R1206 | Resistor |
+| X1 | 3V3 | JST-XH-02 | JST-XH-02-PACKAGE-LONG-PAD | JST XH Connector 2 Pin |
+| X2 | 5V | JST-XH-02 | JST-XH-02-PACKAGE-LONG-PAD | JST XH Connector 2 Pin |
+| X3 | 24V | JST-XH-02 | JST-XH-02-PACKAGE-LONG-PAD | JST XH Connector 2 Pin |
+| X4 | ~EN_PWR | JST-XH-02 | JST-XH-02-PACKAGE-LONG-PAD | JST XH Connector 2 Pin |
+| X5 | BROSE-60-POL | 057-060-1 | 057-060-1 | 60-pol. BROSE CONNECTOR |

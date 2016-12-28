@@ -61,7 +61,6 @@ R"D8ESKJ6H4DSKHU(
                <li><a href="/ui/tasks.html">Tasks</a></li>
                <li class="active"><a href="/ui/low_level.html">Low-Level</a></li>
                <li><a href="/ui/paint.html">Paint</a></li>
-               <li><a href="/ui/tests.html">Tests</a></li>
             </ul>
          </div><!--/.nav-collapse -->
       </div>
@@ -314,7 +313,7 @@ R"D8ESKJ6H4DSKHU(
                </p>
 
                <p>
-                  D <input name="d" type="radio" value="1" /> 1 or <input name="d" type="radio" value="0" /> 0
+                  D <input name="d" type="radio" value="1" /> 1 (ROW_SET) or <input name="d" type="radio" value="0" /> 0 (ROW_RST)
                </p>
 
                <hr />
@@ -326,6 +325,7 @@ R"D8ESKJ6H4DSKHU(
                <hr />
                <div class="errors"></div>
                <input type="hidden" name="enable" value="0" />
+               <input type="hidden" name="persistant" value="0" />
                <p>
                   <div class="btn-group btn-block">
                      <button type="submit" class="btn btn-success btn-block" value="fire"><span class="glyphicon glyphicon-arrow-right"></span> Fire shift-regsiter</button>
@@ -333,7 +333,12 @@ R"D8ESKJ6H4DSKHU(
                </p>
                <p>
                   <div class="btn-group btn-block">
-                     <button type="submit" class="btn btn-danger btn-block" value="fire_enable"><span class="glyphicon glyphicon-arrow-right"></span> Fire shift-regsiter (FP2800A enable)</button>
+                     <button type="submit" class="btn btn-danger btn-block" value="fire_enable"><span class="glyphicon glyphicon-arrow-right"></span> Fire shift-regsiter (ENABLE)</button>
+                  </div>
+               </p>
+               <p>
+                  <div class="btn-group btn-block">
+                     <button type="submit" class="btn btn-danger btn-block" value="fire_persistant"><span class="glyphicon glyphicon-arrow-right"></span> Fire shift-regsiter (PERSISTANT)</button>
                   </div>
                </p>
                <p>
@@ -344,76 +349,6 @@ R"D8ESKJ6H4DSKHU(
                <p>
                   <div class="btn-group btn-block">
                      <a data-task="fill-shiftregister" class="btn btn-default btn-block"><span class="glyphicon glyphicon-arrow-right"></span> Fill shift-regsiter</a>
-                  </div>
-               </p>
-               <p>
-                  <div class="btn-group btn-block">
-                     <a data-task="esp" data-task-params="{&quot;output&quot;: &quot;all&quot;, &quot;state&quot;: 1}" class="btn btn-default btn-block"><span class="glyphicon glyphicon-arrow-right"></span> all high</a>
-
-                     <a data-task="esp" data-task-params="{&quot;output&quot;: &quot;all&quot;, &quot;state&quot;: 0}" class="btn btn-default btn-block"><span class="glyphicon glyphicon-arrow-right"></span> all low</a>
-                  </div>
-               </p>
-               <p>
-                  <div class="btn-group btn-block">
-                     <a data-task="esp" data-task-params="{&quot;output&quot;: &quot;D0&quot;, &quot;state&quot;: 1}" class="btn btn-default btn-block"><span class="glyphicon glyphicon-arrow-right"></span> D0 high</a>
-
-                     <a data-task="esp" data-task-params="{&quot;output&quot;: &quot;D0&quot;, &quot;state&quot;: 0}" class="btn btn-default btn-block"><span class="glyphicon glyphicon-arrow-right"></span> D0 low</a>
-                  </div>
-               </p>
-               <p>
-                  <div class="btn-group btn-block">
-                     <a data-task="esp" data-task-params="{&quot;output&quot;: &quot;D1&quot;, &quot;state&quot;: 1}" class="btn btn-default btn-block"><span class="glyphicon glyphicon-arrow-right"></span> D1 high</a>
-
-                     <a data-task="esp" data-task-params="{&quot;output&quot;: &quot;D1&quot;, &quot;state&quot;: 0}" class="btn btn-default btn-block"><span class="glyphicon glyphicon-arrow-right"></span> D1 low</a>
-                  </div>
-               </p>
-               <p>
-                  <div class="btn-group btn-block">
-                     <a data-task="esp" data-task-params="{&quot;output&quot;: &quot;D2&quot;, &quot;state&quot;: 1}" class="btn btn-default btn-block"><span class="glyphicon glyphicon-arrow-right"></span> D2 high</a>
-
-                     <a data-task="esp" data-task-params="{&quot;output&quot;: &quot;D2&quot;, &quot;state&quot;: 0}" class="btn btn-default btn-block"><span class="glyphicon glyphicon-arrow-right"></span> D2 low</a>
-                  </div>
-               </p>
-               <p>
-                  <div class="btn-group btn-block">
-                     <a data-task="esp" data-task-params="{&quot;output&quot;: &quot;D3&quot;, &quot;state&quot;: 1}" class="btn btn-default btn-block"><span class="glyphicon glyphicon-arrow-right"></span> D3 high</a>
-
-                     <a data-task="esp" data-task-params="{&quot;output&quot;: &quot;D3&quot;, &quot;state&quot;: 0}" class="btn btn-default btn-block"><span class="glyphicon glyphicon-arrow-right"></span> D3 low</a>
-                  </div>
-               </p>
-               <p>
-                  <div class="btn-group btn-block">
-                     <a data-task="esp" data-task-params="{&quot;output&quot;: &quot;D4&quot;, &quot;state&quot;: 1}" class="btn btn-default btn-block"><span class="glyphicon glyphicon-arrow-right"></span> D4 high</a>
-
-                     <a data-task="esp" data-task-params="{&quot;output&quot;: &quot;D4&quot;, &quot;state&quot;: 0}" class="btn btn-default btn-block"><span class="glyphicon glyphicon-arrow-right"></span> D4 low</a>
-                  </div>
-               </p>
-               <p>
-                  <div class="btn-group btn-block">
-                     <a data-task="esp" data-task-params="{&quot;output&quot;: &quot;D5&quot;, &quot;state&quot;: 1}" class="btn btn-default btn-block"><span class="glyphicon glyphicon-arrow-right"></span> D5 high</a>
-
-                     <a data-task="esp" data-task-params="{&quot;output&quot;: &quot;D5&quot;, &quot;state&quot;: 0}" class="btn btn-default btn-block"><span class="glyphicon glyphicon-arrow-right"></span> D5 low</a>
-                  </div>
-               </p>
-               <p>
-                  <div class="btn-group btn-block">
-                     <a data-task="esp" data-task-params="{&quot;output&quot;: &quot;D6&quot;, &quot;state&quot;: 1}" class="btn btn-default btn-block"><span class="glyphicon glyphicon-arrow-right"></span> D6 high</a>
-
-                     <a data-task="esp" data-task-params="{&quot;output&quot;: &quot;D6&quot;, &quot;state&quot;: 0}" class="btn btn-default btn-block"><span class="glyphicon glyphicon-arrow-right"></span> D6 low</a>
-                  </div>
-               </p>
-               <p>
-                  <div class="btn-group btn-block">
-                     <a data-task="esp" data-task-params="{&quot;output&quot;: &quot;D7&quot;, &quot;state&quot;: 1}" class="btn btn-default btn-block"><span class="glyphicon glyphicon-arrow-right"></span> D7 high</a>
-
-                     <a data-task="esp" data-task-params="{&quot;output&quot;: &quot;D7&quot;, &quot;state&quot;: 0}" class="btn btn-default btn-block"><span class="glyphicon glyphicon-arrow-right"></span> D7 low</a>
-                  </div>
-               </p>
-               <p>
-                  <div class="btn-group btn-block">
-                     <a data-task="esp" data-task-params="{&quot;output&quot;: &quot;D8&quot;, &quot;state&quot;: 1}" class="btn btn-default btn-block"><span class="glyphicon glyphicon-arrow-right"></span> D8 high</a>
-
-                     <a data-task="esp" data-task-params="{&quot;output&quot;: &quot;D8&quot;, &quot;state&quot;: 0}" class="btn btn-default btn-block"><span class="glyphicon glyphicon-arrow-right"></span> D8 low</a>
                   </div>
                </p>
             </form>
@@ -429,6 +364,7 @@ R"D8ESKJ6H4DSKHU(
 
    function fill_form() {
       $('#flippie input[name="enable"]').val('0');
+      $('#flippie input[name="persistant"]').val('0');
       $.getJSON('/flippie', {json: 1}).done(function(r) {
          $.each(r, function(k, v) {
             var elem = $('[name="' + k + '"]');
@@ -476,7 +412,7 @@ R"D8ESKJ6H4DSKHU(
 
    function form_as_object(selector) {
       var data = {};
-      $.each($(selector + ' input[type="text"],textarea,input[type="radio"]:checked,select'), function(i, _elem) {
+      $.each($(selector + ' input[type="text"],input[type="hidden"],textarea,input[type="radio"]:checked,select'), function(i, _elem) {
          var elem = $(_elem);
          data[elem.prop('name')] = '' + elem.val();
       });
@@ -520,7 +456,8 @@ R"D8ESKJ6H4DSKHU(
          e.preventDefault();
          $('#flippie input,select,button,textarea,a').prop('disabled', true);
          $('#flippie [type="submit"][clicked="true"] .glyphicon').removeClass('glyphicon-arrow-right').addClass('glyphicon-refresh glyphicon-refresh-animate');
-         $('#flippie input[name="enable"]').val($('#flippie [type="submit"][clicked="true"]').val() == 'fire_enable' ? '1' : '0');
+         $('#flippie input[name="enable"]').val(($('#flippie [type="submit"][clicked="true"]').val() == 'fire_enable' || $('#flippie [type="submit"][clicked="true"]').val() == 'fire_persistant') ? '1' : '0');
+         $('#flippie input[name="persistant"]').val($('#flippie [type="submit"][clicked="true"]').val() == 'fire_persistant' ? '1' : '0');
          $('#flippie .errors').empty();
          $.post('/flippie', form_as_object('#flippie')).done(function(r) {
             fill_form();

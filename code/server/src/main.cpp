@@ -20,9 +20,9 @@ void setup(void) {
   Serial.println("Booting...");
 
   // TODO: What's the SSID of your WiFi?
-  const char *ssid = "wifi";
+  const char *ssid = "WiFi";
   // TODO: What's the PASSWORD of your WiFi?
-  const char *password = "password";
+  const char *password = "PASSWORD";
 
   WiFi.mode(WIFI_AP_STA);
   WiFi.begin(ssid, password);

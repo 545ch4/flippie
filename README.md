@@ -5,7 +5,8 @@
 
 ## Basic idea and some background
 
-Usual story: no money, lots of deadlines, unsustainable promises, social responsibility, no time at all, but the unique opportunity to get an additional time-sink. Yeah. Seconds later, I got two huge flip-dot displays I couldn't even carry myself and a lot of single modules. Soon (measured in seasons) it became obvious, that reverse engineering the RS484 based IBIS bus would not make me very happy in the long run. So I decided to throw away the original controller board and drive the flip-dot modules myself. This is the story of that effort...
+Usual story: no money, lots of deadlines, unsustainable promises, social responsibility, no time at all, but the unique opportunity to get an additional time-sink. Yeah. Seconds later, I got two huge flip-dot displays I couldn't even carry myself and a lot of single modules. Soon (measured in seasons) it became obvious, that reverse engineering the RS485 based IBIS bus would not make me very happy in the long run. So I decided to throw away the original controller board and drive the flip-dot modules myself. **The goal would be a non intrusive board to directly connect any BROSE display (or array of the same) through the proprietary 60-pin connector...**  So, this is the story of that effort...
+
 
 ### Flip-dot display in general
 
@@ -15,13 +16,16 @@ The matrix schematic arranged on a two-dimensional area is shown below.
 
 <img src="https://github.com/545ch4/flippie/raw/master/board/docs/flipdot.png" alt="flip-dot solenoid schematic" title="flip-dot solenoid schematic" width="400px" />
 
+
 ### BROSE flip-dot
 
 Most BROSE flip-dots are equipped with an [origial FP2800A (or clone)](https://reaktor23.org/_media/projects/flipdot/fp2800-datasheet.pdf) decoder driver as column-selector. It drives one line addressed by 5-bits (A0, A1, A2, B1 and B2) in the direction of D (GND or +VS).  Based on the truth-table, 28 independent column-lines can be driven.
 
-The address lines (ADDR1..ADDR8) are compared to an DIP-switch on each module using a 74HC688. The ADDR8 line also drives the ENABLE pin of the FP2800A.
+The address lines (ADDR1..ADDR8) are compared to an DIP-switch on each module using a 74HCT688. The output of that comparison drives the ENABLE pin of the FP2800A (through a discrete inverter).
 
-All data and address lines are at 24V logic level. The +VS line should be current limited to 350-400 mA, because the coils and/or the FP2800A may blow at higher current.
+All data and address lines are at 24V logic level. The VS line should be current limited to 350-400 mA, because the coils and/or the FP2800A may blow at higher current.
+
+I did a reverse engineering of the 24V logic at the BROSE display just for illustration. Download as [PDF](https://github.com/545ch4/flippie/raw/master/board/docs/brose_24v_logic.pdf) or [Eagle SCH](https://github.com/545ch4/flippie/raw/master/board/docs/brose_24v_logic.sch).
 
 
 ### BROSE 60-pin connector
@@ -31,7 +35,7 @@ All data and address lines are at 24V logic level. The +VS line should be curren
 
 ## flippie board
 
-The board was designed to drive every serial assembly of modules or single ones without soldering or modifying the module(s) - simply by connection the proprietary 60-pin BROSE connector. The main MCU [ESP3266](https://espressif.com/en/products/hardware/esp8266ex/overview) is mounted on a USB-interfaced USB-to-Serial converter for convenient programming and WiFi on board. Please see [wemos D1 mini](https://www.wemos.cc/product/d1-mini.html) documentation. Usually you need some driver for the converter to be detected as serial port depending on your OS. The wemod D1 mini comes with a Jiangsu Qinheng CH340/CH341/CH34X or Silicon Labs CP210x chip.
+The board was designed to drive every serial assembly of modules or single ones non-intrusively - without soldering or modifying the module(s) - simply by connection the proprietary 60-pin BROSE connector. The main MCU [ESP8266](https://espressif.com/en/products/hardware/esp8266ex/overview) is mounted on a USB-interfaced USB-to-Serial converter for convenient programming and WiFi on board. Please see [wemos D1 mini](https://www.wemos.cc/product/d1-mini.html) documentation. Usually you need some driver for the converter to be detected as serial port depending on your OS. The wemos D1 mini comes with a Jiangsu Qinheng CH340/CH341/CH34X or Silicon Labs CP210x chip.
 
 
 ### Block diagram
@@ -43,55 +47,63 @@ The board was designed to drive every serial assembly of modules or single ones 
 
 Since this is my first PCB, the schematic may be slightly unusual. But it works... Suggestions are very welcome. Get the [Eagle SCH file](https://github.com/545ch4/flippie/raw/master/board/flippie.sch) or see the [PDF file](https://github.com/545ch4/flippie/raw/master/board/flippie_schematics.pdf).
 
+
 ### Layout
 
-![flippie board top view](https://github.com/545ch4/flippie/raw/master/board/board_top.png "flippie board top view")
-![flippie board bottom view](https://github.com/545ch4/flippie/raw/master/board/board_bottom.png "flippie board bottom view")
+![flippie board](https://github.com/545ch4/flippie/raw/master/board/board.png "flippie board")
 
-Download the [Eagle BRD](https://github.com/545ch4/flippie/board/flippie.brd) file and/or the generated [GERBER files as ZIP archive](https://github.com/545ch4/flippie/raw/master/board/flippie_gerber.zip). All design rules are taken from [SparkFuns Extended Gerber Format](https://github.com/sparkfun/SparkFun_Eagle_Settings/blob/master/cam/sfe-gerb274x-withGBP.cam).
+Download the [Eagle BRD](https://github.com/545ch4/flippie/board/flippie.brd) file and/or the generated [GERBER files as ZIP archive](https://github.com/545ch4/flippie/raw/master/board/gerber.zip). All design rules are taken from [SparkFuns Extended Gerber Format](https://github.com/sparkfun/SparkFun_Eagle_Settings/blob/master/cam/sfe-gerb274x-withGBP.cam).
 
 
 ### BOM
 
 | Part | Value      | Device        | Package       | Description |
 |------|------------|---------------|---------------|-------------|
-| C1   | 100u/25V   | CPOL          | PANASONIC_C   | POLARIZED CAPACITOR |
-| C2   | 22u/25V    | CPOL          | PANASONIC_B   | POLARIZED CAPACITOR |
-| D1   | BZV55-C3V6 | ZENER-DIODE   | SOD80C        | Z-Diode 3.6V |
-| ..   |            |               |               |              |
-| D14  | BZV55-C3V6 | ZENER-DIODE   | SOD80C        | Z-Diode 3.6V |
-| J1   | INT_3V3    | 1X02          | 1X02X2MM      | JUMPER |
-| JP1  | PWR        | 1X05X2MM      | 1X05X2MM      | CONNECTOR |
-| LED1 | C          | LED-SMD-1206  | 1206          | LED |
-| LED2 | B          | LED-SMD-1206  | 1206          | LED |
-| LED3 | A          | LED-SMD-1206  | 1206          | LED |
-| MCU1 | WEMOS      | WEMOS_D1_MINI | WEMOS_D1_MINI | WEMOS D1 mini board |
-| R1   | 680K       | R-SMD-1206    | 1206          | RESISTOR |
-| R2   | 100K       | R-SMD-1206    | 1206          | RESISTOR |
-| R3   | 10K        | R-SMD-1206    | 1206          | RESISTOR |
-| R4   | 10K        | R-SMD-1206    | 1206          | RESISTOR |
-| R5   | 10K        | R-SMD-1206    | 1206          | RESISTOR |
-| R6   | 150        | R-SMD-1206    | 1206          | RESISTOR |
-| R7   | 150        | R-SMD-1206    | 1206          | RESISTOR |
-| R8   | 150        | R-SMD-1206    | 1206          | RESISTOR |
-| R9   | 100K       | R-SMD-1206    | 1206          | RESISTOR |
-| ..   |            |               |               |          |
-| R22  | 100K       | R-SMD-1206    | 1206          | RESISTOR |
-| U1   | FPF2702MX  | FPF270x       | SO8N          | AccuPower <40V 0.4~2A current limiter |
-| U2   | SN74AHC595D| 74HC595       | SO16N         | 8 bit Shift register |
-| ..   |            |               |               |                      |
-| U8   | SN74AHC595D| 74HC595       | SO16N         | 8 bit Shift register |
-| U9   | ULN2803AFWG| ULN2803       | SO18N         | NMOS Darlington transistor array |
-| U10  | ULN2803AFWG| ULN2803       | SO18N         | NMOS Darlington transistor array |
-| U11  | TD62783AFG | UDN2981       | SO18W         | PMOS Darlington transistor array |
-| U12  | TD62783AFG | UDN2981       | SO18W         | PMOS Darlington transistor array |
-| U13  | TD62783AFG | UDN2981       | SO18W         | PMOS Darlington transistor array |
-| U14  | ULN2803AFWG| ULN2803       | SO18N         | NMOS Darlington transistor array |
-| U15  | TD62783AFG | UDN2981       | SO18W         | PMOS Darlington transistor array |
-| U16  | TD62783AFG | UDN2981       | SO18W         | PMOS Darlington transistor array |
-| X1   | BROSE-60-PO| 30X02X2MM     | 057-060-1     | CONNECTOR |
+| C1 | 100u/35V | CPOL-EU_E | PANASONIC_E | Polarized capacitor |
+| C2 | 100u | C-EU_C1206 | C1206 | Capacitor |
+| C3 | 22u | C-EU_C1206 | C1206 | Capacitor |
+| IC1 | 74HCT245DW | 74HCT245DW | SO20W | Octal BUS TRANSCEIVER, 3-state, TTL/CMOS |
+| IC2 | FPF2702MX | FPF2700 | SO8N | AccuPower 0.4~2 A Adjustable Over-Current Protection Load Switch
+| IC3 | SN74AHC595D | SN74AHC595D | SO16N | 8 bit Shift registers |
+| ... | ... | ... | ... | ... |
+| IC9 | SN74AHC595D | SN74AHC595D | SO16N | 8 bit Shift registers |
+| IC10 | TD62783AFG | UDN2981LW | SO18W | PMOS Darlington transistor array |
+| IC11 | TD62783AFG | UDN2981LW | SO18W | PMOS Darlington transistor array |
+| IC12 | TD62783AFG | UDN2981LW | SO18W | PMOS Darlington transistor array |
+| IC13 | ULN2803A | ULN2803ADW | SO18W | NMOS Darlington transistor array |
+| ... | ... | ... | ... | ... |
+| IC17 | ULN2803A | ULN2803ADW | SO18W | NMOS Darlington transistor array |
+| JP1 | 3V3 | JP1E | JP1 | Jumper |
+| JP2 | 24V | JP1E | JP1 | Jumper |
+| JP3 | 5V | JP1E | JP1 | Jumper |
+| JP4 | VS | JP1E | JP1 | Jumper |
+| LED1 C (red) | LED_SMT1206 | 1206 | LED |
+| LED2 B (yellow) | LED_SMT1206 | 1206 | LED |
+| LED3 A (green) | LED_SMT1206 | 1206 | LED |
+| MCU1 | WEMOS D1 mini | WEMOS D1 mini | WEMOS D1 mini MCU |
+| PAD1 (24V) | 2,15/1,0 | 2,15/1,0 | THROUGH-HOLE PAD |
+| PAD2 (VS) | 2,15/1,0 | 2,15/1,0 | THROUGH-HOLE PAD |
+| R1 | 470K | R-EU_R1206 | R1206 | Resistor |
+| R2 | 100K | R-EU_R1206 | R1206 | Resistor |
+| R3 | 10K | R-EU_R1206 | R1206 | Resistor |
+| R4 | 10K | R-EU_R1206 | R1206 | Resistor |
+| R5 | 10K | R-EU_R1206 | R1206 | Resistor |
+| R6 | 180 | R-EU_R1206 | R1206 | Resistor |
+| R7 | 150 | R-EU_R1206 | R1206 | Resistor |
+| R8 | 120 | R-EU_R1206 | R1206 | Resistor |
+| X1 | 3V3 | JST-XH-02 | JST-XH-02-PACKAGE-LONG-PAD | JST XH Connector 2 Pin |
+| X2 | 5V | JST-XH-02 | JST-XH-02-PACKAGE-LONG-PAD | JST XH Connector 2 Pin |
+| X3 | 24V | JST-XH-02 | JST-XH-02-PACKAGE-LONG-PAD | JST XH Connector 2 Pin |
+| X4 | ~EN_PWR | JST-XH-02 | JST-XH-02-PACKAGE-LONG-PAD | JST XH Connector 2 Pin |
+| X5 | BROSE-60-POL | 057-060-1 | 057-060-1 | 60-pol. BROSE CONNECTOR |
 
----
+
+### Soldering notes
+
+You can override the whole current limit circuit by shorting/bridging PAD1 (24V) and PAD2 (VS). If you decided to do so, you don't need to populate C1, C2, C3, R1, R2 and IC2.
+
+> **Close JP1 (3V3) and JP2 (24V) but not JP4 (VS) yet.**
+
 
 ## Code
 
@@ -104,12 +116,15 @@ Since building and maintaining an ESP8266 toolchain using the [Arduino ESP8266 F
 3. [Install Clang/LLVM](http://docs.platformio.org/en/stable/ide/atom.html#ide-atom-installation-clang)
 4. Ensure `platformio-ide` and `platformio-ide-terminal` are enabled (*"Settings > Packages"*)
 
+
 ### Open the project
 
 Download or clone this repository. Open the directory `./code/server` using *"Open project"* at PlatformIO IDE.
 
 
 ### Necessary adoptions
+
+Review you flip-dot addresses: **ADDR8 (8 on the DIP-switch) must be in ON state. We are emulating an overall-enable-pin with that one. Further, the addresses are inverted. So, address 0x01 matches the DIP-switch configuration 1-OFF, 2-ON, ..., 7-ON an 8-ON.**
 
 Before you compile and upload your custom firmware to the ESP8266, there are some values specific to your setup/environment to be defined.
 **Flip-dot configuration at `code/server/flippie_device.cpp`:**
@@ -140,28 +155,35 @@ const char* password = "PASSWORD";
 // WiFi.config(ip, gateway, subnet);
 ```
 
+
 ### Compile and upload firmware
 
-> **Please disconnect the power supply of your flippie board or remove the jumper J1 before connecting your computer to the USB port of the ESP8266 (if mounted at the flippie board already).**
+> **Please disconnect the power supply of your flippie board or remove the jumper JP1 und JP3 before connecting your computer to the USB port of the ESP8266 (if mounted at the flippie board already).**
 
 Navigate to *"PlatformIO > Build"* to compile this project and create the firmware for uploading to the ESP8266. Use *"PlatformIO > Upload"* to upload your firmware using the USB connection.
 
 
 ### Test
 
-Disconnect flippie and press the reset button of the wemos D1 mini board. All three LEDs should flash three times. Now, point your browser to `http://<flippie IP>/`. You should be able to do some tests (clearing, filling etc).
+Disconnect flippie from USB or press the reset button of the wemos D1 mini board. Plug the wemos D1 mini to flippie, ensure to close JP1 (3V3) and JP2 (24V) **but not JP4 (VS) yet**. Connect all three power rails to flippie (3V3, 5V and 24V). All three LEDs should flash three times. If not, the shift-register(s) doesn't seems to work properly... [So, check your soldering.](http://www.infidigm.net/articles/solder/)
 
-If you want to test using the bundled client, please head yourself to the directory `./client/` and initialize the ruby environment with:
-```shell
-gem install bundler
-bundle install
-```
+If the LEDs were flashing during boot-up, point your browser to `http://<flippie IP>/`. That's the web-interface of flippie. You've done well so far.
 
-You are now ready to send messages to your flippie board using the ruby tool. Example:
-```shell
-./cli.rb "my precious"
-```
-You should see an visual response on your command line.
+Since we do not want any damage to our display, we will try to set and reset some dots manually:
+
+1. Head to "Low Level" in at flippies web-interface.
+2. Fill the form for
+   1. Select the address of one of your panels (e.g. 1)
+   2. Select a column we are going to use (Column, e.g. 10)
+   3. Set "Row SET" to '0' (first row)
+   4. Leave "Row RST" undefined
+   5. Set the direction D to "1" (D=1 when setting (ROW_SET) and D=0 when reseting (ROW_RST) a pixel)
+3. Press "Fire shift-register (PERSISTENT)"; Most notably IC12 pin 11 should drive +24V and IC16 pin 18 should go to GND (check voltage between those pins)
+4. Now take a jumper and use it to shortly bypass JP4 (VS); The dot should flip!
+5. Repeat the procedure with "Row SET" undefined, "Row RST" set to '0' and D set to '0'. The dot should flip back!
+6. Press "Fire shift-register (ENABLE)" to quit "PERSISTENT" mode.
+
+Well done! You're ready to use your flippie! Simply head over to "Paint" and draw something.
 
 
 ### Firmware API documentation
@@ -180,7 +202,7 @@ This method reads the content of HTTP (POST/GET) variable `dots` which is a base
 
 **`/flippie` – Directly alter the shift register at flippie (possibly dangerous)**
 
-Low level access to flippie. Set using HTTP variables (POST) and retrieve values as JSON using GET. POST request will retung JSON `true`.
+Low level access to flippie. Set using HTTP variables (POST) and retrieve values as JSON using GET. POST request will return JSON `true`.
 
 | HTTP verb | Variable       | Value           | Description                   |
 |-----------|----------------|---------------- |-------------------------------|
@@ -198,7 +220,7 @@ Low level access to flippie. Set using HTTP variables (POST) and retrieve values
 | POST      | task           | inverse         | Inverse the whole display |
 | POST      | task           | magnetize       | Magnetize the whole display |
 
-Basic mechanism to set a dot (column 2, row 3) at module 0 with address 0x01 (DIP switch 1-0-0-0-0-0-0-1):
+Basic mechanism to set a dot (column 2, row 3) at module 0 with address 0x01 (DIP switch 0-1-1-1-1-1-1-0) using raw HTTP:
 ```shell
 $ telnet <flippie IP> 80
 > POST /flippie HTTP/1.0
@@ -206,7 +228,6 @@ $ telnet <flippie IP> 80
 >
 > address=1&column=1&row_set=2&d=1&enable=1
 ```
-
 
 **`/pixel` – Set individual pixels**
 
@@ -217,4 +238,21 @@ $ telnet <flippie IP> 80
 | c(0-31)                | Column |
 | state(0/1)             | Set of reset the pixel |
 
-For further information you may have a look at the example ruby code.
+A GET request will reveal the state of an pixel and a POST will set the state.
+
+
+## Demo ruby client
+
+There's a simple demo-like ruby implementation to write text at a given display. To use it, please head yourself to the directory `./client/` and initialize the ruby environment with:
+```shell
+gem install bundler
+bundle install
+```
+
+Adjust flippies IP in `cli.rb` and give it a go.
+
+You are now ready to send messages/text to your flippie board using the ruby tool. Example:
+```shell
+./cli.rb "my precious"
+```
+You should see an visual response on your command line as well as some text on your flip-dot diplay obviously. See the source for further options.
