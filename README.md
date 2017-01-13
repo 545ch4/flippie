@@ -84,7 +84,7 @@ Download the [Eagle BRD](https://github.com/545ch4/flippie/board/flippie.brd) fi
 | MCU1 | WEMOS D1 mini | WEMOS D1 mini | WEMOS D1 mini MCU |
 | PAD1 (24V) | 2,15/1,0 | 2,15/1,0 | THROUGH-HOLE PAD |
 | PAD2 (VS) | 2,15/1,0 | 2,15/1,0 | THROUGH-HOLE PAD |
-| R1 | 470K | R-EU_R1206 | R1206 | Resistor |
+| R1 | 680K | R-EU_R1206 | R1206 | Current limiter Resistor R_set |
 | R2 | 100K | R-EU_R1206 | R1206 | Resistor |
 | R3 | 10K | R-EU_R1206 | R1206 | Resistor |
 | R4 | 10K | R-EU_R1206 | R1206 | Resistor |
