@@ -59,11 +59,12 @@ Download the [Eagle BRD](https://github.com/545ch4/flippie/board/flippie.brd) fi
 
 | Part | Value      | Device        | Package       | Description |
 |------|------------|---------------|---------------|-------------|
-| C1 | 100u/35V | CPOL-EU_E | PANASONIC_E | Polarized capacitor |
-| C2 | 100u | C-EU_C1206 | C1206 | Capacitor |
-| C3 | 22u | C-EU_C1206 | C1206 | Capacitor |
+| Part Value | Device | Package | Description |
+| C1 | 100uF/50V | CPOL-EU_E | PANASONIC_E | Polarized capacitor, 50V |
+| C2 | 10uF/50V | C-EU_C1206 | C1206 | X7R Ceramic Capacitor, 50V |
+| C3 | 1uF/50V | C-EU_C1206 | C1206 | X7R Ceramic Capacitor, 50V |
 | IC1 | 74HCT245DW | 74HCT245DW | SO20W | Octal BUS TRANSCEIVER, 3-state, TTL/CMOS |
-| IC2 | FPF2702MX | FPF2700 | SO8N | AccuPower 0.4~2 A Adjustable Over-Current Protection Load Switch
+| IC2 | FPF2702MX | FPF2700 | SO8N | AccuPower 0.4~2 A Adjustable Over-Current Protection Load Switch |
 | IC3 | SN74AHC595D | SN74AHC595D | SO16N | 8 bit Shift registers |
 | ... | ... | ... | ... | ... |
 | IC9 | SN74AHC595D | SN74AHC595D | SO16N | 8 bit Shift registers |
@@ -73,10 +74,10 @@ Download the [Eagle BRD](https://github.com/545ch4/flippie/board/flippie.brd) fi
 | IC13 | ULN2803A | ULN2803ADW | SO18W | NMOS Darlington transistor array |
 | ... | ... | ... | ... | ... |
 | IC17 | ULN2803A | ULN2803ADW | SO18W | NMOS Darlington transistor array |
-| JP1 | 3V3 | JP1E | JP1 | Jumper |
-| JP2 | 24V | JP1E | JP1 | Jumper |
-| JP3 | 5V | JP1E | JP1 | Jumper |
-| JP4 | VS | JP1E | JP1 | Jumper |
+| JP1 | 3V3 | JP1E | JP1 | 3.3V Rail Jumper |
+| JP2 | 24V | JP1E | JP1 | 24V Rail Jumper |
+| JP3 | 5V | JP1E | JP1 | 5V(VCC) Rail Jumper |
+| JP4 | VS | JP1E | JP1 | 24V(VS) Jumper |
 | LED1 C (red) | LED_SMT1206 | 1206 | LED |
 | LED2 B (yellow) | LED_SMT1206 | 1206 | LED |
 | LED3 A (green) | LED_SMT1206 | 1206 | LED |
@@ -88,9 +89,9 @@ Download the [Eagle BRD](https://github.com/545ch4/flippie/board/flippie.brd) fi
 | R3 | 10K | R-EU_R1206 | R1206 | Resistor |
 | R4 | 10K | R-EU_R1206 | R1206 | Resistor |
 | R5 | 10K | R-EU_R1206 | R1206 | Resistor |
-| R6 | 180 | R-EU_R1206 | R1206 | Resistor |
-| R7 | 150 | R-EU_R1206 | R1206 | Resistor |
-| R8 | 120 | R-EU_R1206 | R1206 | Resistor |
+| R6 | 220 | R-EU_R1206 | R1206 | Resistor |
+| R7 | 220 | R-EU_R1206 | R1206 | Resistor |
+| R8 | 220 | R-EU_R1206 | R1206 | Resistor |
 | X1 | 3V3 | JST-XH-02 | JST-XH-02-PACKAGE-LONG-PAD | JST XH Connector 2 Pin |
 | X2 | 5V | JST-XH-02 | JST-XH-02-PACKAGE-LONG-PAD | JST XH Connector 2 Pin |
 | X3 | 24V | JST-XH-02 | JST-XH-02-PACKAGE-LONG-PAD | JST XH Connector 2 Pin |
@@ -167,10 +168,11 @@ Navigate to *"PlatformIO > Build"* to compile this project and create the firmwa
 
 Disconnect flippie from USB or press the reset button of the wemos D1 mini board. Plug the wemos D1 mini to flippie, ensure to close JP1 (3V3) and JP2 (24V) **but not JP4 (VS) yet**. Connect all three power rails to flippie (3V3, 5V and 24V). All three LEDs should flash three times. If not, the shift-register(s) doesn't seems to work properly... [So, check your soldering.](http://www.infidigm.net/articles/solder/)
 
-If the LEDs were flashing during boot-up, point your browser to `http://<flippie IP>/`. That's the web-interface of flippie. You've done well so far.
+If the LEDs were flashing during boot-up, don't yet connect the display itself but point your browser to `http://<flippie IP>/`. That's the web-interface of flippie. You've done well so far.
 
-Since we do not want any damage to our display, we will try to set and reset some dots manually:
+Since we do not want any damage to our display, we will try to set and reset some dots in a dry run first (**Don't connect you flipdot display yet.**):
 
+0. Make sure your display is **not** connected (X5), jumper JP4 (VS) is **closed/shorted** and all three power rails (3V3, 5V and 24V) are enabled through JP1, JP2, JP3
 1. Head to "Low Level" in at flippies web-interface.
 2. Fill the form for
    1. Select the address of one of your panels (e.g. 1)
@@ -178,10 +180,25 @@ Since we do not want any damage to our display, we will try to set and reset som
    3. Set "Row SET" to '0' (first row)
    4. Leave "Row RST" undefined
    5. Set the direction D to "1" (D=1 when setting (ROW_SET) and D=0 when reseting (ROW_RST) a pixel)
-3. Press "Fire shift-register (PERSISTENT)"; Most notably IC12 pin 11 should drive +24V and IC16 pin 18 should go to GND (check voltage between those pins)
-4. Now take a jumper and use it to shortly bypass JP4 (VS); The dot should flip!
-5. Repeat the procedure with "Row SET" undefined, "Row RST" set to '0' and D set to '0'. The dot should flip back!
-6. Press "Fire shift-register (ENABLE)" to quit "PERSISTENT" mode.
+4. Press "Fire shift-register (PERSISTENT)"
+   1. IC12 pin 11 should drive +24V (first row rail, same as pin 1 at X5)
+   2. IC16 pin 18 should go to GND (our simulated ENABLE signal, same as pin 60 at X5)
+5. Press "Fire shift-register (ENABLE)" to quit "PERSISTENT" mode.
+
+Repeat the test with flipdot display connected (X5):
+
+0. Make sure your display **is** connected (X5), jumper JP4 (VS) is **open** and all three power rails (3V3, 5V and 24V) are enabled through JP1, JP2, JP3
+1. Head to "Low Level" in at flippies web-interface.
+2. Fill the form for
+   1. Select the address of one of your panels (e.g. 1)
+   2. Select a column we are going to use (Column, e.g. 10)
+   3. Set "Row SET" to '0' (first row)
+   4. Leave "Row RST" undefined
+   5. Set the direction D to "1" (D=1 when setting (ROW_SET) and D=0 when reseting (ROW_RST) a pixel)
+4. Press "Fire shift-register (PERSISTENT)"
+5. Now take a jumper and use it to **shortly bypass** (close shortly and then open again) JP4 (VS): **The dot should flip!**
+6. Repeat the procedure with "Row SET" undefined, "Row RST" set to '0' and D set to '0'. **The dot should flip back!**
+5. Press "Fire shift-register (ENABLE)" to quit "PERSISTENT" mode.
 
 Well done! You're ready to use your flippie! Simply head over to "Paint" and draw something.
 
@@ -257,7 +274,7 @@ Adjust flippies credentials in `cli.rb`:
 ```ruby
 # initialize new flippie client
 fc = FlippieClient.new(
-   '192.168.1.65',     # IP address of your flippie board
+   '192.168.1.23',     # IP address of your flippie board
    18,                  # number of rows of your flip-dot display
    [21],                # number of columns per module (usually some 28ers an one 21er)
    false                # debug => true
@@ -266,6 +283,6 @@ fc = FlippieClient.new(
 
 You are now ready to send messages/text to your flippie board using the ruby tool. Example:
 ```shell
-./cli.rb "my precious"
+./cli.rb YES
 ```
-You should see an visual response on your command line as well as some text on your flip-dot diplay obviously. See the source for further options.
+You should see an visual response of "YES" on your command line as well as the same text on your flip-dot display, obviously. See the source for further options.

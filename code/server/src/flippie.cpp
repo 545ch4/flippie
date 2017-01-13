@@ -604,7 +604,7 @@ void Flippie::fire_shift_register(bool enable, bool persistant) {
     // fire using ADDRSHIFT_REGISTER_WIDTH aka NOT_EN => FP2800A enable (E)
     digitalWrite(config->not_enable_pin, LOW);
     if (!persistant) {
-      delay(FP2800A_ACTIVE_TIME_IN_MSEC);
+      delayMicroseconds(FP2800A_ACTIVE_TIME_IN_USEC);
       digitalWrite(config->not_enable_pin, HIGH);
     }
   } else {
