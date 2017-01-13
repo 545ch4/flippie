@@ -166,13 +166,13 @@ Navigate to *"PlatformIO > Build"* to compile this project and create the firmwa
 
 ### Test
 
-Disconnect flippie from USB or press the reset button of the wemos D1 mini board. Plug the wemos D1 mini to flippie, ensure to close JP1 (3V3) and JP2 (24V) **but not JP4 (VS) yet**. Connect all three power rails to flippie (3V3, 5V and 24V). All three LEDs should flash three times. If not, the shift-register(s) doesn't seems to work properly... [So, check your soldering.](http://www.infidigm.net/articles/solder/)
+Disconnect flippie from USB or press the reset button of the wemos D1 mini board. Plug the wemos D1 mini to flippie, ensure to close JP1 (3V3), JP2 (24V) and JP3 (5V) **but not JP4 (VS) yet**. All three LEDs should flash three times. If not, the shift-register(s) doesn't seems to work properly... [So, check your soldering.](http://www.infidigm.net/articles/solder/)
 
-If the LEDs were flashing during boot-up, don't yet connect the display itself but point your browser to `http://<flippie IP>/`. That's the web-interface of flippie. You've done well so far.
+If the LEDs were flashing during boot-up, don't yet connect the display itself. Point your browser to `http://<flippie IP>/`. That's the web-interface of flippie. You've done well so far.
 
-Since we do not want any damage to our display, we will try to set and reset some dots in a dry run first (**Don't connect you flipdot display yet.**):
+Since you don't want to damage your display, we will try to set and reset some dots in a dry run first (**AKA: don't connect your flipdot display yet**):
 
-0. Make sure your display is **not** connected (X5), jumper JP4 (VS) is **closed/shorted** and all three power rails (3V3, 5V and 24V) are enabled through JP1, JP2, JP3
+0. Make sure your display is **not** connected (X5), jumper JP4 (VS) is **closed/shorted** and all three power rails (3V3, 5V and 24V) are enabled through JP1, JP2, JP3.
 1. Head to "Low Level" in at flippies web-interface.
 2. Fill the form for
    1. Select the address of one of your panels (e.g. 1)
@@ -187,7 +187,7 @@ Since we do not want any damage to our display, we will try to set and reset som
 
 Repeat the test with flipdot display connected (X5):
 
-0. Make sure your display **is** connected (X5), jumper JP4 (VS) is **open** and all three power rails (3V3, 5V and 24V) are enabled through JP1, JP2, JP3
+0. Make sure your display **is** connected (X5), jumper JP4 (VS) is **open** and all three power rails (3V3, 5V and 24V) are enabled through JP1, JP2, JP3.
 1. Head to "Low Level" in at flippies web-interface.
 2. Fill the form for
    1. Select the address of one of your panels (e.g. 1)
@@ -200,7 +200,7 @@ Repeat the test with flipdot display connected (X5):
 6. Repeat the procedure with "Row SET" undefined, "Row RST" set to '0' and D set to '0'. **The dot should flip back!**
 5. Press "Fire shift-register (ENABLE)" to quit "PERSISTENT" mode.
 
-Well done! You're ready to use your flippie! Simply head over to "Paint" and draw something.
+**Well done!** You're ready to use your flippie! [Simply head over to "Paint" and draw something.](#paint)
 
 
 ### Firmware API documentation
@@ -212,6 +212,7 @@ A simple index page with browser UI controlling the flip-dot. All javascript and
 
 The UI does have a nice drawing pane, where every pixel can be set/reset like painting using a HTML5 canvas.
 
+<a name="paint"></a>
 <img src="https://github.com/545ch4/flippie/raw/master/board/ui_paint.png" alt="flippie ui paint pane" title="flippie ui paint pane" width="320px" />
 
 **`/dots` – A receiver of base64 encoded dots vector**  
