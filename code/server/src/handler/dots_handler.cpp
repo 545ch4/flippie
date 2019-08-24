@@ -20,7 +20,7 @@ bool DotsHandler::handle(ESP8266WebServer &server, HTTPMethod method, String uri
 
       if (dots_bytes_length != (flippie->config->num_rows * flippie->config->num_modules * 4)) {
          char *tmp = (char*)malloc(256);
-         sprintf(tmp, "Size mismatch: 'dots' is %u instead of %u bytes (%u rows X %u modules X 32-bit-int(4 bytes)) long!\0", dots_bytes_length, (flippie->config->num_rows * flippie->config->num_modules * 4), flippie->config->num_rows, flippie->config->num_modules, flippie->config->num_rows, flippie->config->num_modules);
+         sprintf(tmp, "Size mismatch: 'dots' is %u instead of %u bytes (%u rows X %u modules X 32-bit-int(4 bytes)) long!", dots_bytes_length, (flippie->config->num_rows * flippie->config->num_modules * 4), flippie->config->num_rows, flippie->config->num_modules);
          String s(tmp);
          free(tmp);
          Serial.printf(s.c_str());
@@ -38,7 +38,7 @@ bool DotsHandler::handle(ESP8266WebServer &server, HTTPMethod method, String uri
          }
       }
       debug_printf("%s", flippie->dots_as_string(int_dots).c_str());
-      
+
       flippie->set_next_and_paint(int_dots, true);
 
       free(dots_bytes);

@@ -28,7 +28,7 @@ UIHandler::UIHandler(Flippie *f) {
       i += sprintf(config_page_temp + i, "\t\t%u,\n",
       flippie->config->num_columns[j]);
    }
-   i += sprintf(config_page_temp + i, "\t\t%u\n\t]\n}\n\0",
+   i += sprintf(config_page_temp + i, "\t\t%u\n\t]\n}\n",
    flippie->config->num_columns[flippie->config->num_modules - 1]);
    config_page = String(config_page_temp);
    free(config_page_temp);
@@ -48,15 +48,15 @@ bool UIHandler::handle(ESP8266WebServer &server, HTTPMethod method,
             server.sendHeader("Location", "/ui/", true);
             server.send(302, "text/html", "");
          } else if (uri == "/ui" || uri == "/ui/" || uri == "/ui/index.html") {
-            server.send(200, "text/html", index_page);
+            server.send(200, "text/html", String(FPSTR(index_page)));
          } else if (uri == "/ui/low_level.html") {
-            server.send(200, "text/html", low_level_page);
+            server.send(200, "text/html", String(FPSTR(low_level_page)));
          } else if (uri == "/ui/paint.html") {
-            server.send(200, "text/html", paint_page);
+            server.send(200, "text/html", String(FPSTR(paint_page)));
          } else if (uri == "/ui/tasks.html") {
-            server.send(200, "text/html", tasks_page);
+            server.send(200, "text/html", String(FPSTR(tasks_page)));
          } else if (uri == "/ui/config.json") {
-            server.send(200, "application/json", config_page.c_str());
+            server.send(200, "application/json", config_page);
          } else {
             return false;
          }

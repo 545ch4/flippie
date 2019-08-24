@@ -386,14 +386,14 @@ unsigned char Flippie::get_column() {
   for (unsigned char column = 0; column < FP2800A_MAX_COLUMNS; ++column) {
     found = true;
     for (unsigned char i = 0; i < FP2800A_COLUMN_CODE_LINES; ++i) {
-      found &= ((FP2800A_COLUMN_CODES[column][i] == FP2800A_HGH &
+      found &= (((FP2800A_COLUMN_CODES[column][i] == FP2800A_HGH) &
                  ((_shift_register[config->sr_column_code_pins[i] /
                                    SHIFT_REGISTER_WIDTH] &
                    _byte_bit_array[config->sr_column_code_pins[i] %
                                    SHIFT_REGISTER_WIDTH]) ==
                   _byte_bit_array[config->sr_column_code_pins[i] %
                                   SHIFT_REGISTER_WIDTH])) ||
-                (FP2800A_COLUMN_CODES[column][i] == FP2800A_LOW &
+                ((FP2800A_COLUMN_CODES[column][i] == FP2800A_LOW) &
                  ((_shift_register[config->sr_column_code_pins[i] /
                                    SHIFT_REGISTER_WIDTH] &
                    _byte_bit_array[config->sr_column_code_pins[i] %
@@ -651,7 +651,7 @@ String Flippie::shift_register_as_string() {
                        : 'L';
     tmp_pos++;
   }
-  sprintf(tmp + tmp_pos, "\n\0");
+  sprintf(tmp + tmp_pos, "\n");
   String s(tmp);
   free(tmp);
   return s;
@@ -737,7 +737,7 @@ String Flippie::shift_register_as_json() {
   unsigned char r_len =
       sprintf(r, "{\n\t\"address\": %i,\n\t\"column\": %i,\n\t\"row_set\": "
                  "%i,\n\t\"row_rst\": %i,\n\t\"led_A\": %u,\n\t\"led_B\": "
-                 "%u,\n\t\"led_C\": %u,\n\t\"d\": %u\n}\n\0",
+                 "%u,\n\t\"led_C\": %u,\n\t\"d\": %u\n}\n",
               get_address(), get_column(), get_row_set(), get_row_rst(),
               led_A_on ? 1 : 0, led_B_on ? 1 : 0, led_C_on ? 1 : 0, get_d());
   String s(r);

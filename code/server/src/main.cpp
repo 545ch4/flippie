@@ -20,11 +20,13 @@ void setup(void) {
   Serial.println("Booting...");
 
   // TODO: What's the SSID of your WiFi?
-  const char *ssid = "WiFi";
+  const char *ssid = "Camp2019-insecure";
   // TODO: What's the PASSWORD of your WiFi?
-  const char *password = "PASSWORD";
+  const char *password = NULL;
 
   WiFi.mode(WIFI_AP_STA);
+  WiFi.persistent(false);
+  WiFi.disconnect(true);
   WiFi.begin(ssid, password);
   // WiFi.mode(WIFI_AP);
   // WiFi.softAP(ssid, NULL);
